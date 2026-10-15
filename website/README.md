@@ -35,7 +35,7 @@ Then open http://localhost:8788 in a browser.
 
 ## Release integration
 
-The download picker fetches releases from the GitHub API. Stable shows non-prerelease builds; Nightly shows prerelease / nightly builds. APK links appear only for actual published APK assets.
+The download section fetches stable releases from the GitHub API and excludes experimental/prerelease builds. APK links appear only for actual published APK assets.
 
 A private GitHub repository is **not** readable through GitHub's public releases API. For visitors without access, the release panel displays an accurate unavailable status and provides a link to GitHub. To offer public downloads, either make the repo public or publish releases elsewhere and adapt app.js. **Never embed a GitHub access token in browser code.**
 

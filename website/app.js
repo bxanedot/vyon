@@ -193,10 +193,10 @@ $("#shuffle-btn").addEventListener("click",e=>{shuffle=!shuffle;e.currentTarget.
 $("#repeat-btn").addEventListener("click",e=>{repeat=!repeat;e.currentTarget.setAttribute("aria-pressed",String(repeat));});
 document.addEventListener("visibilitychange",()=>{if(document.hidden&&playing)stop();});
 paintPlayer();
-// Release channels: show only GitHub's actual published assets, never fabricated APKs.
+// Show official stable GitHub releases only; never invent APK downloads.
 const repo="bxanedot/vyon",releasePage="https://github.com/"+repo+"/releases";
 const title=$("#release-title"),desc=$("#release-description"),caption=$("#release-caption"),meta=$("#release-meta"),links=$("#download-links");
-let channel="stable",releases=[],releaseError=null,loaded=false;
+let releases=[],releaseError=null,loaded=false;
 function link(text,href,secondary=false){
  const a=document.createElement("a");a.className=secondary?"btn btn-ghost":"btn btn-primary";
  a.href=href;a.target="_blank";a.rel="noopener noreferrer";
@@ -204,29 +204,23 @@ function link(text,href,secondary=false){
  a.append(document.createTextNode(text+" "),arrow);return a;
 }
 function renderReleases(){
- const night=channel==="nightly";
- caption.textContent=night?"NIGHTLY / EXPERIMENTAL BUILDS":"STABLE / STANDARD RELEASES";
- $$("[data-channel]").forEach(b=>{const on=b.dataset.channel===channel;b.classList.toggle("selected",on);b.setAttribute("aria-pressed",String(on));});
+ caption.textContent="STABLE / OFFICIAL RELEASE";
  links.replaceChildren();
- const found=releases.find(r=>{
-  const label=(String(r.name||"")+" "+String(r.tag_name||"")).toLowerCase();
-  const isNight=!!r.prerelease||/nightly|canary|dev.build/.test(label);return night?isNight:!isNight;
- });
+ const found=releases[0];
  if(found){
   title.textContent=found.name||found.tag_name||"Latest release";
-  desc.textContent=night?"Experimental build: features may change or break.":"Latest published stable version, from the official GitHub project.";
+  desc.textContent="Latest published stable version, from the official GitHub project.";
   meta.textContent="PUBLISHED / "+(found.published_at?new Date(found.published_at).toLocaleDateString().toUpperCase():"DATE UNKNOWN");
   const apk=(Array.isArray(found.assets)?found.assets:[]).find(a=>/\.apk$/i.test(a.name||"")&&/^https:\/\//.test(a.browser_download_url||""));
   if(apk)links.append(link("Download APK",apk.browser_download_url));
   links.append(link("Release details",found.html_url||releasePage,!!apk));
  }else{
-  title.textContent=!loaded?"Checking GitHub releases…":releaseError?"Releases unavailable.":night?"No Nightly release yet.":"No Stable release yet.";
-  desc.textContent=!loaded?"Checking published build information. Download links will appear when available.":releaseError?"GitHub could not provide a public release feed. The repository might be private or the API temporarily unavailable. Sign in on GitHub if you have access.":night?"No published Nightly build is currently visible. Experimental releases stay separate from Stable releases.":"No publicly listed stable build yet. Follow the project on GitHub for updates.";
+  title.textContent=!loaded?"Checking GitHub releases…":releaseError?"Releases unavailable.":"No Stable release yet.";
+  desc.textContent=!loaded?"Checking published build information. Download links will appear when available.":releaseError?"GitHub could not provide a public release feed. The repository might be private or the API temporarily unavailable. Sign in on GitHub if you have access.":"No publicly listed stable build yet. Follow the project on GitHub for updates.";
   meta.textContent=!loaded?"RELEASE STATUS / CHECKING":releaseError?"RELEASE STATUS / UNVERIFIED":"RELEASE STATUS / NOT PUBLISHED";
   links.append(link("View GitHub releases",releasePage));
  }
 }
-$$("[data-channel]").forEach(b=>b.addEventListener("click",()=>{channel=b.dataset.channel;renderReleases();}));
 renderReleases();
 (async()=>{
  try{
@@ -235,7 +229,7 @@ renderReleases();
   finally{clearTimeout(timer);}
   if(!response.ok)throw Error("GitHub HTTP "+response.status);
   const body=await response.json();if(!Array.isArray(body))throw Error("Unexpected response");
-  releases=body.filter(r=>!r.draft);
+  releases=body.filter(r=>!r.draft&&!r.prerelease&&!/nightly|canary|dev.build/i.test(String(r.name||"")+" "+String(r.tag_name||"")));
  }catch(err){releaseError=err;console.info("Vyon releases:",err.message);}
  finally{loaded=true;renderReleases();}
 })();
