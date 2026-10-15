@@ -73,7 +73,7 @@ if("IntersectionObserver" in window){
   if(!e.isIntersecting)return;
   navLinks.forEach(a=>a.getAttribute("href")==="#"+e.target.id?a.setAttribute("aria-current","location"):a.removeAttribute("aria-current"));
  }),{rootMargin:"-36% 0px -58% 0px",threshold:0});
- ["experience","details","faq","community","support"].forEach(id=>{const section=document.getElementById(id);if(section)sectionObserver.observe(section);});
+ ["experience","equalizer","details","faq","community","support"].forEach(id=>{const section=document.getElementById(id);if(section)sectionObserver.observe(section);});
 }
 // Accent palette
 function theme(color){
@@ -309,11 +309,7 @@ window.addEventListener("resize",resizeOrb,{passive:true});
 resizeOrb();
 loadIconParticles();
 if(!reduce)requestAnimationFrame(animateOrb);
-// Feature-card visualizer
-const eqBars=$$("#eq-bars i"),eqLabel=$("#eq-mode-label");let mode=0,eqFrame=0;
-function eqPulse(){eqFrame++;eqBars.forEach((bar,i)=>{let value=mode?.2+.6*Math.abs(Math.cos(i*.49+eqFrame*.37)):.14+.56*Math.abs(Math.sin(i*.39+eqFrame*.22));bar.style.height=Math.round(value*100)+"%";});}
-$("#eq-toggle").addEventListener("click",()=>{mode=1-mode;eqLabel.textContent=mode?"PULSE":"DRIFT";eqPulse();});
-if(!reduce){eqPulse();setInterval(()=>{if(!document.hidden)eqPulse();},410);}
+// The interactive EQ controls live in /equalizer.js; no fake animated-bar visualizer.
 // Cursor-reactive surface light, with no dependency on animation libraries.
 if(window.matchMedia("(hover: hover) and (pointer: fine)").matches){
  $$(".feature-card").forEach(card=>card.addEventListener("pointermove",e=>{
