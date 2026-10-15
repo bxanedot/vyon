@@ -366,3 +366,13 @@ html{scroll-behavior:smooth}
  .social-grid-support .social-card:last-child{grid-column:auto}
  .support-group{margin-top:32px;padding-top:30px}
 }
+
+/* Visible by default. JavaScript-enhanced reveal animation must not hide page content. */
+.reveal,.reveal.is-visible{opacity:1;transform:none}
+/* Distinct header links, without the Community / Support separator. */
+.nav-desktop{gap:clamp(13px,1.55vw,25px)}
+@media(min-width:851px) and (max-width:1150px){
+ .command-trigger{display:none}
+ .nav-desktop{gap:14px;font-size:12px}
+ .header-actions{gap:10px}
+}

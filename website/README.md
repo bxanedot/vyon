@@ -100,4 +100,8 @@ The entire **GET vyon / Take your music further** release-status card has been r
 
 ## Community / Support header navigation
 
-The sticky desktop header presents **Community / Support** with a visible slash between two accessible, independent anchor links. The mobile menu and command palette expose both shortcuts too. The Community anchor jumps to the Guns.lol, Discord and Telegram cards at the bottom; Support jumps to the separate Ko-fi and Patreon cards directly below. Jump navigation honors the fixed header using `scroll-margin-top`. No external redirect happens until a user clicks one of the actual social cards.
+The sticky desktop header presents **Community** and **Support** as two independent navigation links (without a slash). The mobile menu and command palette expose both shortcuts too. The Community anchor jumps to the Guns.lol, Discord and Telegram cards at the bottom; Support jumps to the separate Ko-fi and Patreon cards directly below. Jump navigation honors the fixed header using `scroll-margin-top`. No external redirect happens until a user clicks one of the actual social cards.
+
+## October 2026 visibility fix
+
+A runtime error caused by calling `.forEach()` on a single DOM element interrupted the page JavaScript before the scroll reveal observer could initialize. The navigation and reveal handlers now correctly query element lists with `querySelectorAll`. Content uses **visible-by-default** styling and scroll animation is optional, so a future JavaScript failure cannot leave entire sections invisible. Community and Support remain separate bottom-section anchors. The site still requires successful deployment from GitHub to its actual hosting provider before visitors see these repository changes.

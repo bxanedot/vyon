@@ -25,10 +25,10 @@ document.addEventListener("keydown",e=>{
  if(e.key==="Tab"){e.preventDefault();input.focus();}
 });
 mobBtn.addEventListener("click",()=>{const opened=mobBtn.getAttribute("aria-expanded")!=="true";mobBtn.setAttribute("aria-expanded",String(opened));mob.hidden=!opened;});
-$("a",mob).forEach(x=>x.addEventListener("click",()=>{mob.hidden=true;mobBtn.setAttribute("aria-expanded","false");}));
+$$("a",mob).forEach(x=>x.addEventListener("click",()=>{mob.hidden=true;mobBtn.setAttribute("aria-expanded","false");}));
 
 // Header, mobile, and quick-navigation links jump straight to the bottom sections.
-$('a[href="#community"],a[href="#support"]').forEach(link=>{
+$$('a[href="#community"],a[href="#support"]').forEach(link=>{
  link.addEventListener("click",event=>{
   const hash=link.getAttribute("href");
   const target=document.querySelector(hash);
@@ -36,14 +36,25 @@ $('a[href="#community"],a[href="#support"]').forEach(link=>{
   event.preventDefault();
   const prior=root.style.scrollBehavior;
   root.style.scrollBehavior="auto";
-  target.scrollIntoView({behavior:"instant",block:"start"});
+  target.scrollIntoView({behavior:"auto",block:"start"});
   root.style.scrollBehavior=prior;
   if(location.hash!==hash)history.pushState(null,"",hash);
  });
 });
 
+// Content stays visible by default; animation is an optional enhancement.
+// JavaScript errors must never hide the main page.
 if("IntersectionObserver" in window&&!reduce){
- const obs=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add("is-visible");obs.unobserve(e.target);}}),{threshold:.08,rootMargin:"0px 0px -35px 0px"});
+ const obs=new IntersectionObserver(entries=>entries.forEach(e=>{
+  if(!e.isIntersecting)return;
+  const el=e.target;
+  el.classList.add("is-visible");
+  obs.unobserve(el);
+  if(typeof el.animate==="function"){
+   el.animate([{opacity:0,transform:"translate3d(0,18px,0)"},{opacity:1,transform:"translate3d(0,0,0)"}],
+     {duration:750,easing:"cubic-bezier(.22,1,.36,1)"});
+  }
+ }),{threshold:.08,rootMargin:"0px 0px -35px 0px"});
  $$(".reveal").forEach(x=>obs.observe(x));
 }else $$(".reveal").forEach(x=>x.classList.add("is-visible"));
 // Scroll progress and active navigation
