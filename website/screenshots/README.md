@@ -1,4 +1,4 @@
-# Official Vyon screenshots
+# Official vyon screenshots
 
 Place genuine Android screenshots here:
 

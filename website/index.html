@@ -4,36 +4,40 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#08090d">
-  <meta name="description" content="Vyon is an Android music player powered by YouTube Music. Explore the app, discover community features, and find official APK releases.">
+  <meta name="description" content="vyon is an Android music player powered by YouTube Music. Explore the app, discover community features, and find official APK releases.">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Vyon — Music, on your terms.">
-  <meta property="og:description" content="Discover Vyon, an Android music player using YouTube Music as its backend, with a distinct listening interface.">
+  <meta property="og:title" content="vyon — Music, on your terms.">
+  <meta property="og:description" content="Discover vyon, an Android music player using YouTube Music as its backend, with a distinct listening interface.">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="/compact.css">
-  <title>Vyon — Music, on your terms.</title>
+  <title>vyon — Music, on your terms.</title>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
-  <div class="grain" aria-hidden="true"></div><div id="reading-progress" class="reading-progress" aria-hidden="true"></div><div class="ambient-pointer" id="ambient-pointer" aria-hidden="true"></div>
+  <div id="reading-progress" class="reading-progress" aria-hidden="true"></div>
   <header class="site-header" id="site-header">
-    <a class="brand" href="#top" aria-label="Vyon home"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span>vyon<span class="brand-period">.</span></span></a>
-    <nav class="nav-desktop" aria-label="Primary"><a href="#experience">Experience</a><a href="#details">Details</a><a href="#downloads">Downloads</a><a href="/listen/">Listen Together</a><a href="#connect">Connect</a></nav>
+    <a class="brand" href="#top" aria-label="vyon home"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span>vyon<span class="brand-period">.</span></span></a>
+    <nav class="nav-desktop" aria-label="Primary"><a href="#experience">Experience</a><a href="#details">Details</a><a href="#downloads">Downloads</a><a href="#connect">Connect</a></nav>
     <div class="header-actions"><button class="command-trigger" id="command-trigger" type="button" aria-label="Open quick navigation"><span class="command-key">⌘</span> K <span class="command-txt">Explore</span></button><a class="header-github" href="https://github.com/bxanedot/vyon" target="_blank" rel="noopener noreferrer">GitHub <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a><button class="mobile-menu-btn" id="mobile-menu-btn" type="button" aria-expanded="false" aria-controls="mobile-menu" aria-label="Toggle menu"><span></span><span></span></button></div>
   </header>
-  <nav class="mobile-menu" id="mobile-menu" aria-label="Mobile" hidden><a href="#experience">Experience</a><a href="#details">Details</a><a href="#downloads">Downloads</a><a href="/listen/">Listen Together</a><a href="#connect">Connect</a><a href="https://github.com/bxanedot/vyon" target="_blank" rel="noopener noreferrer">GitHub ↗</a></nav>
+  <nav class="mobile-menu" id="mobile-menu" aria-label="Mobile" hidden><a href="#experience">Experience</a><a href="#details">Details</a><a href="#downloads">Downloads</a><a href="#connect">Connect</a><a href="https://github.com/bxanedot/vyon" target="_blank" rel="noopener noreferrer">GitHub ↗</a></nav>
 
   <main id="main">
     <section class="hero section-pad" id="top">
       <div class="hero-orb" id="orb-region" aria-label="Interactive particle sculpture. Move your pointer or tap to interact.">
         <canvas id="orb-canvas" aria-hidden="true"></canvas>
-        <div class="orbit-caption"><span class="orbit-caption-point"></span> A listening universe <span class="orbit-caption-line"></span></div><div class="orb-shapes" role="group" aria-label="Particle shape"><button type="button" data-orb-shape="orbit" class="active" aria-pressed="true">Sphere</button><button type="button" data-orb-shape="halo" aria-pressed="false">Halo</button><button type="button" data-orb-shape="wave" aria-pressed="false">Wave</button></div>
+        <button class="vyon-spin-control" id="vyon-spin-control" type="button" aria-label="Spin the vyon icon faster" title="Tap to speed up the rotation">
+          <span class="vyon-spin-image-wrap" id="vyon-spin-image-wrap"><img src="/favicon.svg" data-original-src="/icons/originals/vyon-icon.png" id="vyon-spin-image" width="88" height="88" alt="" decoding="async"></span>
+          <span class="vyon-spin-label">TAP TO SPIN <span aria-hidden="true">↗</span></span>
+        </button>
+        <div class="orbit-caption"><span class="orbit-caption-point"></span> A listening universe <span class="orbit-caption-line"></span></div><div class="orb-shapes" role="group" aria-label="Particle shape"><button type="button" data-orb-shape="orbit" class="active" aria-pressed="true">Sphere</button><button type="button" data-orb-shape="halo" aria-pressed="false">Halo</button><button type="button" data-orb-shape="wave" aria-pressed="false">Wave</button><button type="button" data-orb-shape="sound" aria-pressed="false"><span class="sound-mode-dot" aria-hidden="true"></span> Sound</button></div>
       </div>
       <div class="hero-copy">
         <div class="eyebrow"><span class="eyebrow-line"></span><span>POWERED BY YOUTUBE MUSIC · FOR ANDROID</span><span class="eyebrow-star">✳</span></div>
         <h1>A different<br>kind of <span class="h-italic">listening<span class="h-dot">.</span></span></h1>
-        <p class="hero-description">Vyon brings a thoughtfully designed Android listening experience to music powered by YouTube Music.</p>
-        <div class="hero-buttons"><a class="btn btn-primary" href="#experience">See the app <span class="btn-arrow">↗</span></a><a class="btn btn-ghost" href="#downloads"><span class="btn-download-icon">↓</span> Android APK</a><a class="btn btn-ghost hero-listen-btn" href="/listen/"><span class="listen-live-dot"></span> Listen Together ↗</a></div>
+        <p class="hero-description">vyon brings a thoughtfully designed Android listening experience to music powered by YouTube Music.</p>
+        <div class="hero-buttons"><a class="btn btn-primary" href="#experience">See the app <span class="btn-arrow">↗</span></a><a class="btn btn-ghost" href="#downloads"><span class="btn-download-icon">↓</span> Android APK</a></div>
         <div class="hero-footnote"><span class="mini-bars" aria-hidden="true"><b></b><b></b><b></b><b></b><b></b></span><span>YOUTUBE MUSIC BACKEND</span><span class="footnote-divider"></span><span>DESIGNED WITH INTENTION</span></div>
       </div>
       <div class="hero-side-label" aria-hidden="true">SOUND IS A PLACE TO GO</div>
@@ -44,11 +48,11 @@
     <section class="experience section-pad" id="experience">
       <div class="section-heading reveal">
         <div class="kicker">THE EXPERIENCE</div>
-        <div class="heading-row"><h2>See Vyon<br><span>for yourself.</span></h2><p>Real Android app screenshots will appear here as soon as they are provided. No generated or fictional app interfaces.</p></div>
+        <div class="heading-row"><h2>See vyon<br><span>for yourself.</span></h2><p>Real Android app screenshots will appear here as soon as they are provided. No generated or fictional app interfaces.</p></div>
       </div>
       <div class="screenshot-layout">
         <div class="screenshot-browser reveal">
-          <div class="screenshot-browser-head"><span class="shot-led"></span><span>VYON / APP PREVIEW</span><span class="shot-header-right">OFFICIAL SCREENSHOTS ONLY</span></div>
+          <div class="screenshot-browser-head"><span class="shot-led"></span><span>vyon / APP PREVIEW</span><span class="shot-header-right">OFFICIAL SCREENSHOTS ONLY</span></div>
           <div class="screenshot-stage">
             <div class="screenshot-stage-inner">
               <img id="screenshot-image" class="screenshot-image" alt="" hidden>
@@ -62,12 +66,12 @@
               </div>
             </div>
           </div>
-          <div class="screenshot-browser-foot"><span id="screenshot-caption">HOME SCREEN</span><span>VYON FOR ANDROID</span></div>
+          <div class="screenshot-browser-foot"><span id="screenshot-caption">HOME SCREEN</span><span>vyon FOR ANDROID</span></div>
         </div>
         <div class="screenshot-aside reveal">
           <span class="screenshot-aside-eyebrow">THE ACTUAL EXPERIENCE <span>↗</span></span>
           <h3>Real app.<br><em>Real details.</em></h3>
-          <p>Explore the main views of Vyon as soon as official captures are available. Select a view below.</p>
+          <p>Explore the main views of vyon as soon as official captures are available. Select a view below.</p>
           <div class="screenshot-tabs" role="group" aria-label="Preview screen">
             <button class="screenshot-tab is-selected" type="button" data-screen="home" aria-pressed="true"><span>Home</span><span class="tab-arrow">↗</span></button>
             <button class="screenshot-tab" type="button" data-screen="now-playing" aria-pressed="false"><span>Now playing</span><span class="tab-arrow">↗</span></button>
@@ -82,17 +86,17 @@
       <div class="feature-grid">
         <article class="feature-card feature-one reveal"><div class="feature-top"><span>EXPRESSION</span><span class="feature-cross">✳</span></div><div class="feature-visual visual-palette"><div class="palette-orb" id="palette-orb"><div class="palette-orb-inner"></div></div><div class="palette-controls" role="group" aria-label="Website color theme"><button class="theme-chip active" data-color="violet" aria-label="Violet accent" aria-pressed="true" type="button"></button><button class="theme-chip" data-color="acid" aria-label="Lime accent" aria-pressed="false" type="button"></button><button class="theme-chip" data-color="coral" aria-label="Coral accent" aria-pressed="false" type="button"></button><button class="theme-chip" data-color="ice" aria-label="Ice accent" aria-pressed="false" type="button"></button></div></div><div class="feature-bottom"><h3>Your color.<br>Your mood.</h3><p>Choose a color to restyle this whole website instantly. Your choice is saved.</p></div></article>
         <article class="feature-card feature-two reveal"><div class="feature-top"><span>MOVEMENT</span><span class="feature-cross">↗</span></div><div class="feature-visual visual-equalizer"><div class="eq-top"><span>FREQUENCY</span><span id="eq-mode-label">DRIFT</span></div><div class="eq-bars" id="eq-bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><button class="eq-toggle" id="eq-toggle" type="button" aria-label="Switch equalizer animation">CHANGE FREQUENCY <span>↗</span></button></div><div class="feature-bottom"><h3>Never<br>standing still.</h3><p>Playful micro-interactions bring a little life to every pixel.</p></div></article>
-        <article class="feature-card feature-three reveal"><div class="feature-top"><span>COMMUNITY</span><span class="feature-cross">◎</span></div><div class="feature-visual visual-builds"><div class="builds-graphic"><span class="bg-orbit bg-orbit-one"></span><span class="bg-orbit bg-orbit-two"></span><span class="bg-center">V<span>✳</span></span></div><div class="build-tag"><span class="tag-dot"></span> LISTEN TOGETHER. STAY CONNECTED.</div></div><div class="feature-bottom"><h3>Your music.<br>Better together.</h3><p>Meet the community, share music, and listen in sync in the browser. <a class="feature-inline-link" href="/listen/">Open listening room ↗</a></p></div></article>
+        <article class="feature-card feature-three reveal"><div class="feature-top"><span>VISUAL IDENTITY</span><span class="feature-cross">◎</span></div><div class="feature-visual visual-builds"><div class="builds-graphic"><span class="bg-orbit bg-orbit-one"></span><span class="bg-orbit bg-orbit-two"></span><span class="bg-center">V<span>✳</span></span></div><div class="build-tag"><span class="tag-dot"></span> A NEW WAY TO SEE MUSIC.</div></div><div class="feature-bottom"><h3>Made to feel<br>like vyon.</h3><p>A distinctive visual identity inspired by the way music looks and feels.</p></div></article>
       </div>
     </section>
 
 
-    <section class="downloads section-pad" id="downloads"><div class="section-heading reveal"><div class="kicker">GET VYON</div><div class="heading-row"><h2>Take your<br><span>music further.</span></h2><p>Download the official Android APK when a stable Vyon release becomes available.</p></div></div><div class="download-panel reveal"><div class="download-background-art" aria-hidden="true"><div class="download-disc"><div></div></div></div><div class="download-content"><div class="download-heading"><span class="release-indicator"><span></span> BUILDS / FROM GITHUB</span><span class="download-platform">ANDROID APK ONLY</span></div><div class="release-status" aria-live="polite"><span class="release-caption" id="release-caption">STABLE CHANNEL</span><h3 id="release-title">Checking GitHub releases…</h3><p id="release-description">Only verified Android APKs from official stable GitHub releases appear here.</p></div><div class="download-links" id="download-links"><a class="btn btn-primary" href="https://github.com/bxanedot/vyon/releases" target="_blank" rel="noopener noreferrer">View GitHub releases <span class="btn-arrow">↗</span></a></div><div class="release-meta"><span id="release-meta">RELEASE STATUS / LOADING</span><span>ANDROID · APK FORMAT ONLY</span></div></div></div></section>
+    <section class="downloads section-pad" id="downloads"><div class="section-heading reveal"><div class="kicker">GET vyon</div><div class="heading-row"><h2>Take your<br><span>music further.</span></h2><p>Download the official Android APK when a stable vyon release becomes available.</p></div></div><div class="download-panel reveal"><div class="download-background-art" aria-hidden="true"><div class="download-disc"><div></div></div></div><div class="download-content"><div class="download-heading"><span class="release-indicator"><span></span> BUILDS / FROM GITHUB</span><span class="download-platform">ANDROID APK ONLY</span></div><div class="release-status" aria-live="polite"><span class="release-caption" id="release-caption">STABLE CHANNEL</span><h3 id="release-title">Checking GitHub releases…</h3><p id="release-description">Only verified Android APKs from official stable GitHub releases appear here.</p></div><div class="download-links" id="download-links"><a class="btn btn-primary" href="https://github.com/bxanedot/vyon/releases" target="_blank" rel="noopener noreferrer">View GitHub releases <span class="btn-arrow">↗</span></a></div><div class="release-meta"><span id="release-meta">RELEASE STATUS / LOADING</span><span>ANDROID · APK FORMAT ONLY</span></div></div></div></section>
 
     <section class="connect-section section-pad" id="connect" aria-labelledby="connect-title">
       <div class="connect-heading"><div><div class="kicker">THE COMMUNITY</div><h2 id="connect-title">Connect <em>&amp; support.</em></h2></div><p>Follow the project, join the conversation, or support what comes next.</p></div>
       <div class="social-grid">
-        <a class="social-card" href="https://guns.lol/bxane" target="_blank" rel="noopener noreferrer" aria-label="Guns.lol: Creator profile (opens in a new tab)"><span class="social-symbol"><img src="/icons/guns.svg" alt="" width="22" height="22" loading="lazy" decoding="async"></span><span class="social-copy"><strong>Guns.lol</strong><small>Creator profile</small></span><span class="social-chevron" aria-hidden="true">↗</span></a>
+        <a class="social-card" href="https://guns.lol/bxane" target="_blank" rel="noopener noreferrer" aria-label="Guns.lol: Creator profile (opens in a new tab)"><span class="social-symbol"><img src="https://assets.guns.lol/favicon/apple-touch-icon.png" alt="" referrerpolicy="no-referrer" width="22" height="22" loading="lazy" decoding="async"></span><span class="social-copy"><strong>Guns.lol</strong><small>Creator profile</small></span><span class="social-chevron" aria-hidden="true">↗</span></a>
         <a class="social-card" href="https://ko-fi.com/bxane" target="_blank" rel="noopener noreferrer" aria-label="Ko-fi: Support the project (opens in a new tab)"><span class="social-symbol"><img src="/icons/kofi.svg" alt="" width="22" height="22" loading="lazy" decoding="async"></span><span class="social-copy"><strong>Ko-fi</strong><small>Support the project</small></span><span class="social-chevron" aria-hidden="true">↗</span></a>
         <a class="social-card" href="https://patreon.com/bxane" target="_blank" rel="noopener noreferrer" aria-label="Patreon: Become a supporter (opens in a new tab)"><span class="social-symbol"><img src="/icons/patreon.svg" alt="" width="22" height="22" loading="lazy" decoding="async"></span><span class="social-copy"><strong>Patreon</strong><small>Become a supporter</small></span><span class="social-chevron" aria-hidden="true">↗</span></a>
         <a class="social-card" href="https://discord.gg/h4Wsu824Uf" target="_blank" rel="noopener noreferrer" aria-label="Discord: Join the community (opens in a new tab)"><span class="social-symbol"><img src="/icons/discord.svg" alt="" width="22" height="22" loading="lazy" decoding="async"></span><span class="social-copy"><strong>Discord</strong><small>Join the community</small></span><span class="social-chevron" aria-hidden="true">↗</span></a>
@@ -101,9 +105,9 @@
     </section>
 
   </main>
-  <footer class="site-footer"><div class="footer-main"><a class="footer-wordmark" href="#top">vyon<span>.</span></a><div class="footer-links"><a href="#experience">Experience</a><a href="#details">Details</a><a href="#downloads">Downloads</a><a href="#connect">Connect</a><a href="https://github.com/bxanedot/vyon" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div></div><div class="footer-bottom"><span>© <span id="copyright-year">2026</span> VYON. CREATED BY <a href="https://github.com/bxanedot" target="_blank" rel="noopener noreferrer">BXANE</a>.</span><span>CRAFTED FOR LISTENING <span class="foot-star">✳</span></span><a href="#top">BACK TO TOP ↑</a></div></footer>
+  <footer class="site-footer"><div class="footer-main"><a class="footer-wordmark" href="#top">vyon<span>.</span></a><div class="footer-links"><a href="#experience">Experience</a><a href="#details">Details</a><a href="#downloads">Downloads</a><a href="#connect">Connect</a><a href="https://github.com/bxanedot/vyon" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div></div><div class="footer-bottom"><span>© <span id="copyright-year">2026</span> vyon. CREATED BY <a href="https://github.com/bxanedot" target="_blank" rel="noopener noreferrer">BXANE</a>.</span><span>CRAFTED FOR LISTENING <span class="foot-star">✳</span></span><a href="#top">BACK TO TOP ↑</a></div><p class="platform-note">vyon uses YouTube Music as its backend and is not affiliated with YouTube or Google.</p></footer>
 
-  <div class="command-overlay" id="command-overlay" hidden><div class="command-backdrop" data-close-command></div><div class="command-dialog" role="dialog" aria-modal="true" aria-label="Quick navigation"><div class="command-input-wrap"><span aria-hidden="true">⌕</span><input id="command-input" autocomplete="off" spellcheck="false" placeholder="Where to?" aria-label="Search sections"><kbd>ESC</kbd></div><div class="command-results" id="command-results"><a href="#top" data-command-item> Introduction <span>↗</span></a><a href="#experience" data-command-item> App screenshots <span>↗</span></a><a href="#details" data-command-item> Visual details <span>↗</span></a><a href="#downloads" data-command-item> Download Vyon <span>↗</span></a><a href="/listen/" data-command-item> Listen Together <span>↗</span></a><a href="#connect" data-command-item> Connect &amp; support <span>↗</span></a><a href="https://github.com/bxanedot/vyon" target="_blank" rel="noopener noreferrer" data-command-item> GitHub repository <span>↗</span></a></div><div class="command-footer"><span>↑↓ SELECT</span><span>↵ OPEN</span><span>ESC CLOSE</span></div></div></div>
+  <div class="command-overlay" id="command-overlay" hidden><div class="command-backdrop" data-close-command></div><div class="command-dialog" role="dialog" aria-modal="true" aria-label="Quick navigation"><div class="command-input-wrap"><span aria-hidden="true">⌕</span><input id="command-input" autocomplete="off" spellcheck="false" placeholder="Where to?" aria-label="Search sections"><kbd>ESC</kbd></div><div class="command-results" id="command-results"><a href="#top" data-command-item> Introduction <span>↗</span></a><a href="#experience" data-command-item> App screenshots <span>↗</span></a><a href="#details" data-command-item> Visual details <span>↗</span></a><a href="#downloads" data-command-item> Download vyon <span>↗</span></a><a href="#connect" data-command-item> Connect &amp; support <span>↗</span></a><a href="https://github.com/bxanedot/vyon" target="_blank" rel="noopener noreferrer" data-command-item> GitHub repository <span>↗</span></a></div><div class="command-footer"><span>↑↓ SELECT</span><span>↵ OPEN</span><span>ESC CLOSE</span></div></div></div>
   <script src="/app.js" defer></script>
 </body>
 </html>

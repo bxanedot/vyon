@@ -1,4 +1,4 @@
-/* Vyon Listen Together
+/* vyon Listen Together
  * Real-time room synchronization using a Cloudflare Durable Object.
  * Audio stays at its original HTTPS source, never proxied or stored here.
  */

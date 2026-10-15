@@ -1,4 +1,4 @@
-/* Vyon Listen Together — WebSocket room client; the browser fetches audio from its source. */
+/* vyon Listen Together — WebSocket room client; the browser fetches audio from its source. */
 (()=>{
 "use strict";
 const $=s=>document.querySelector(s);

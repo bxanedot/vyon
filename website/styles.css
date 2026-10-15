@@ -22,7 +22,7 @@
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.marquee-track,.scroll-cue-arrow,.palette-orb,.download-disc{animation:none!important}.reveal{opacity:1;transform:none;transition:none}*,*:before,*:after{scroll-behavior:auto!important}}
 
 
-/* Vyon Atelier: editorial design refinements */
+/* vyon Atelier: editorial design refinements */
 :root{--bg:#08090c;--panel:#111217;--panel2:#16171d;--ink:#f8f7f9;--muted:#9998a2;--rule:rgba(255,255,255,.085)}
 body{background:var(--bg);background-image:radial-gradient(ellipse 56% 28% at 91% 6%,rgba(var(--accent-rgb),.043),transparent 75%)}
 .grain{opacity:.065}

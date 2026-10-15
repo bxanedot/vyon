@@ -1,10 +1,64 @@
-/* Vyon site. Original particle art, genuine screenshot slots, official stable-release status. */
+/* vyon site. Original particle art, genuine screenshot slots, official stable-release status. */
 (() => {
 "use strict";
 const $=(s,scope=document)=>scope.querySelector(s), $$=(s,scope=document)=>[...scope.querySelectorAll(s)];
 const root=document.documentElement;
 const reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 $("#copyright-year").textContent=new Date().getFullYear();
+// Rotating brand emblem: 30% baseline, click to ease into 80% and return to 30%.
+// A real, original vyon PNG replaces the fallback automatically when uploaded.
+const spinControl=$("#vyon-spin-control");
+const spinWrap=$("#vyon-spin-image-wrap");
+const spinImage=$("#vyon-spin-image");
+if(spinImage?.dataset.originalSrc){
+ const asset=new Image();
+ const originalPath=spinImage.dataset.originalSrc;
+ asset.onload=()=>{
+  if(!asset.naturalWidth)return;
+  spinImage.src=originalPath;
+  const headerBrand=$(".brand .brand-mark");
+  if(headerBrand){
+   const replacement=document.createElement("img");
+   replacement.src=originalPath;replacement.alt="";
+   replacement.width=30;replacement.height=30;
+   replacement.className="brand-original-image";
+   headerBrand.replaceChildren(replacement);
+   headerBrand.classList.add("has-original-image");
+  }
+ };
+ asset.src=originalPath;
+}
+if(spinControl&&spinWrap){
+ const baseline=.30,maximum=.80,fullRate=Math.PI*2/6;
+ let angle=0,boostStarted=null,previousFrame=0;
+ const ease=x=>x*x*(3-2*x);
+ function currentRate(now){
+  if(boostStarted===null)return baseline;
+  const elapsed=Math.max(0,now-boostStarted);
+  if(elapsed<580)return baseline+(maximum-baseline)*ease(elapsed/580);
+  if(elapsed<3800)return baseline+(maximum-baseline)*(1-ease((elapsed-580)/3220));
+  boostStarted=null;
+  spinControl.classList.remove("is-boosted");
+  return baseline;
+ }
+ function frame(now){
+  const dt=previousFrame?Math.max(0,Math.min(now-previousFrame,64)):0;
+  previousFrame=now;
+  if(!document.hidden){
+   angle+=fullRate*currentRate(now)*dt/1000;
+   spinWrap.style.transform="rotate("+angle+"rad)";
+  }
+  requestAnimationFrame(frame);
+ }
+ if(!reduce)requestAnimationFrame(frame);
+ spinControl.addEventListener("click",()=>{
+  if(reduce)return;
+  boostStarted=performance.now();
+  spinControl.classList.add("is-boosted");
+ });
+ if(reduce)spinControl.setAttribute("aria-label","vyon icon; animation off due to reduced-motion settings");
+}
+
 // Atmospheric pointer lighting, disabled for reduced motion.
 const ambient=$("#ambient-pointer");
 if(ambient&&!reduce&&window.matchMedia("(hover:hover) and (pointer:fine)").matches){
@@ -100,6 +154,15 @@ function renderOrb(){
   }else if(orbShape==="wave"){
    tx=p.x*.99;ty=p.y*.50+Math.sin(p.x*8+orbTime*.0015+p.z*2)*.20;
    tz=p.z*.29+Math.cos(p.y*7+orbTime*.0011)*.09;
+  }else if(orbShape==="sound"){
+   // Dot-based radial waveform: visually pulsing, no microphone or audio access.
+   const angle=Math.atan2(p.y,p.x),radius=Math.hypot(p.x,p.y);
+   const beat=.5+.5*Math.sin(orbTime*.0035);
+   const spectrum=.12*Math.sin(angle*18+orbTime*.002)+.075*Math.sin(angle*31-orbTime*.0014);
+   const distance=radius*(.65+beat*.06)+spectrum*(.55+.45*radius);
+   tx=Math.cos(angle)*distance;
+   ty=Math.sin(angle)*distance;
+   tz=p.z*.25+Math.sin(angle*9+orbTime*.0025)*.045;
   }
   const ease=reduce?1:.095;
   p.sx+=(tx-p.sx)*ease;p.sy+=(ty-p.sy)*ease;p.sz+=(tz-p.sz)*ease;
@@ -114,7 +177,7 @@ function renderOrb(){
   ctx.fillStyle="rgba("+color+","+opacity.toFixed(3)+")";ctx.beginPath();ctx.arc(x,y,size,0,Math.PI*2);ctx.fill();
  }
 }
-// Morph the particles into three distinct formations.
+// Morph the particles into four distinct visual formations.
 $$("[data-orb-shape]").forEach(btn=>btn.addEventListener("click",()=>{
  orbShape=btn.dataset.orbShape;root.dataset.orbForm=orbShape;
  $$("[data-orb-shape]").forEach(el=>{const active=el===btn;el.classList.toggle("active",active);el.setAttribute("aria-pressed",String(active));});
@@ -146,7 +209,7 @@ if(window.matchMedia("(hover: hover) and (pointer: fine)").matches){
   card.style.setProperty("--my",((e.clientY-rect.top)/rect.height*100).toFixed(1)+"%");
  }));
 }
-// Load official Vyon screenshots only. Missing images show honest placeholders.
+// Load official vyon screenshots only. Missing images show honest placeholders.
 const shots={
  "home":{file:"home.webp",title:"Home",caption:"HOME SCREEN",index:"01 / 03"},
  "now-playing":{file:"now-playing.webp",title:"Now playing",caption:"NOW PLAYING",index:"02 / 03"},
@@ -164,7 +227,7 @@ function chooseShot(key){
  image.onload=()=>{
   if(request!==shotRequest)return;
   shotImg.src=image.src;
-  shotImg.alt="Official Vyon Android screenshot: "+shot.title;
+  shotImg.alt="Official vyon Android screenshot: "+shot.title;
   shotImg.hidden=false;emptyShot.hidden=true;
  };
  image.onerror=()=>{if(request===shotRequest){shotImg.hidden=true;emptyShot.hidden=false;}};
@@ -189,10 +252,10 @@ chooseShot("home");
 const lightbox=document.createElement("div");
 lightbox.className="shot-lightbox";
 lightbox.hidden=true;
-lightbox.innerHTML='<button type="button" class="lightbox-close" aria-label="Close screenshot">×</button><img alt="Expanded Vyon screenshot">';
+lightbox.innerHTML='<button type="button" class="lightbox-close" aria-label="Close screenshot">×</button><img alt="Expanded vyon screenshot">';
 lightbox.setAttribute("role","dialog");
 lightbox.setAttribute("aria-modal","true");
-lightbox.setAttribute("aria-label","Full-size Vyon screenshot");
+lightbox.setAttribute("aria-label","Full-size vyon screenshot");
 document.body.append(lightbox);
 const fullImage=lightbox.querySelector("img");
 const closeLightbox=lightbox.querySelector("button");
@@ -231,8 +294,8 @@ function renderReleases(){
  const found=releases.find(r=>Array.isArray(r.assets)&&r.assets.some(a=>/\.apk$/i.test(a.name||"")&&/^https:\/\//.test(a.browser_download_url||"")));
  const apk=found&&found.assets.find(a=>/\.apk$/i.test(a.name||"")&&/^https:\/\//.test(a.browser_download_url||""));
  if(apk){
-  title.textContent=found.name||found.tag_name||"Vyon for Android";
-  desc.textContent="Official stable Android APK from Vyon GitHub releases.";
+  title.textContent=found.name||found.tag_name||"vyon for Android";
+  desc.textContent="Official stable Android APK from vyon GitHub releases.";
   meta.textContent="PUBLISHED / "+(found.published_at?new Date(found.published_at).toLocaleDateString().toUpperCase():"DATE UNKNOWN");
   links.append(link("Download Android APK",apk.browser_download_url));
   links.append(link("Release notes",found.html_url||releasePage,true));
@@ -252,7 +315,7 @@ renderReleases();
   if(!response.ok)throw Error("GitHub HTTP "+response.status);
   const body=await response.json();if(!Array.isArray(body))throw Error("Unexpected response");
   releases=body.filter(r=>!r.draft&&!r.prerelease&&!/nightly|canary|dev.build/i.test(String(r.name||"")+" "+String(r.tag_name||"")));
- }catch(err){releaseError=err;console.info("Vyon releases:",err.message);}
+ }catch(err){releaseError=err;console.info("vyon releases:",err.message);}
  finally{loaded=true;renderReleases();}
 })();
 })();

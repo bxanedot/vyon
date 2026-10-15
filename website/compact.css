@@ -125,3 +125,95 @@ body{background:var(--base);background-image:radial-gradient(ellipse 56% 28% at 
 .feature-inline-link{display:inline;color:var(--accent);border-bottom:1px solid rgba(var(--accent-rgb),.45);white-space:nowrap}
 .feature-inline-link:hover{border-bottom-color:var(--accent)}
 @media(max-width:590px){.hero-buttons{gap:8px}.hero-buttons .hero-listen-btn{font-size:11px;min-height:39px}.hero h1{font-size:clamp(43px,10.5vw,62px)}}
+
+
+/* True matte-black surfaces. Accent colors continue to drive interaction and artwork. */
+:root,
+:root[data-accent="violet"],
+:root[data-accent="acid"],
+:root[data-accent="coral"],
+:root[data-accent="ice"]{
+ --bg:#080808;--base:#080808;--panel:#111111;--panel2:#171717;
+ --surface:#101010;--raised:#181818;
+ --edge:rgba(var(--accent-rgb),.17);--glow:transparent;
+}
+html{background:#080808}
+body{background:#080808!important;background-image:none!important}
+.grain,.ambient-pointer{display:none!important}
+.hero{background:#080808}
+.hero:before{display:none!important}
+.site-header,.site-header.is-scrolled{background:#101010;border-color:var(--edge);backdrop-filter:none}
+.details{background:#0d0d0d}
+.screenshot-browser,.screenshot-aside,.feature-card,.download-panel,.social-card{
+ background:#111111!important;
+ background-image:none!important;
+}
+.download-content{background:transparent!important}
+.site-footer{background:#101010}
+.connect-section{background:#080808}
+.feature-card:hover,.social-card:hover{box-shadow:0 14px 29px rgba(0,0,0,.28)}
+.orb-shapes{right:12%;gap:4px;background:#111;backdrop-filter:none}
+.orb-shapes button{display:inline-flex;align-items:center;gap:7px}
+.sound-mode-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--accent);opacity:.85;box-shadow:0 0 7px rgba(var(--accent-rgb),.3)}
+.orb-shapes button.active .sound-mode-dot{background:#101010;box-shadow:0 0 0 2px rgba(0,0,0,.16);animation:vyon-dot-pulse 1.5s ease-in-out infinite}
+@keyframes vyon-dot-pulse{50%{transform:scale(.7);opacity:.55}}
+@media(max-width:590px){
+ .orb-shapes{right:8%;bottom:19%;transform:scale(.85);transform-origin:right}
+ .orb-shapes button{padding:9px 10px;gap:5px}
+}
+@media(prefers-reduced-motion:reduce){.sound-mode-dot{animation:none!important}}
+
+
+/* Rotating vyon emblem. Real uploaded icon replaces the fallback automatically. */
+.hero-orb{isolation:isolate}
+.vyon-spin-control{
+ position:absolute;top:46%;left:50%;transform:translate(-50%,-50%);
+ z-index:4;width:132px;height:160px;
+ display:flex;align-items:center;justify-content:center;flex-direction:column;
+ border:0;background:transparent;color:var(--accent);
+ cursor:pointer;touch-action:manipulation;
+}
+.vyon-spin-control:focus-visible{outline:2px solid var(--accent);outline-offset:7px;border-radius:14px}
+.vyon-spin-image-wrap{
+ width:108px;height:108px;border-radius:50%;
+ display:grid;place-items:center;
+ background:#0d0d0d;
+ border:1px solid rgba(var(--accent-rgb),.24);
+ box-shadow:0 0 0 12px rgba(var(--accent-rgb),.022),0 0 38px rgba(var(--accent-rgb),.1);
+ will-change:transform;
+}
+.vyon-spin-image-wrap img{
+ width:76px;height:76px;object-fit:contain;display:block;
+ pointer-events:none;
+}
+.vyon-spin-control:hover .vyon-spin-image-wrap,
+.vyon-spin-control.is-boosted .vyon-spin-image-wrap{
+ border-color:rgba(var(--accent-rgb),.75);
+ box-shadow:0 0 0 13px rgba(var(--accent-rgb),.035),0 0 40px rgba(var(--accent-rgb),.2);
+}
+.vyon-spin-label{
+ position:absolute;bottom:2px;left:50%;transform:translateX(-50%);
+ display:flex;align-items:center;gap:7px;
+ white-space:nowrap;font:9px var(--mono);letter-spacing:.1em;
+ color:#acaab4;transition:color .2s;
+}
+.vyon-spin-control:hover .vyon-spin-label{color:var(--accent)}
+.brand-mark.has-original-image{gap:0;flex:none;width:31px;height:31px}
+.brand-original-image{width:30px;height:30px;object-fit:contain}
+@media(max-width:850px){
+ .vyon-spin-control{top:45%;left:48%;width:109px;height:133px}
+ .vyon-spin-image-wrap{width:86px;height:86px}
+ .vyon-spin-image-wrap img{width:60px;height:60px}
+}
+@media(max-width:590px){
+ .vyon-spin-control{top:39%;left:46%;width:89px;height:110px}
+ .vyon-spin-image-wrap{width:71px;height:71px}
+ .vyon-spin-image-wrap img{width:49px;height:49px}
+ .vyon-spin-label{bottom:0;font-size:8px}
+}
+@media(prefers-reduced-motion:reduce){
+ .vyon-spin-image-wrap{will-change:auto;transition:none!important}
+ .vyon-spin-label{display:none}
+}
+/* Product-led messaging: quiet and legible, without visual noise. */
+.site-footer .platform-note{color:#a4a4a4;font:10px var(--mono);letter-spacing:.025em;line-height:1.65}
