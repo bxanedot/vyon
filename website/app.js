@@ -5,6 +5,15 @@ const $=(s,scope=document)=>scope.querySelector(s), $$=(s,scope=document)=>[...s
 const root=document.documentElement;
 const reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 $("#copyright-year").textContent=new Date().getFullYear();
+// Atmospheric pointer lighting, disabled for reduced motion.
+const ambient=$("#ambient-pointer");
+if(ambient&&!reduce&&window.matchMedia("(hover:hover) and (pointer:fine)").matches){
+ let pending=false,mouseX=-1000,mouseY=-1000;
+ document.addEventListener("pointermove",event=>{
+  mouseX=event.clientX;mouseY=event.clientY;
+  if(!pending){pending=true;requestAnimationFrame(()=>{ambient.style.transform="translate3d("+(mouseX-300)+"px,"+(mouseY-300)+"px,0)";pending=false;});}
+ },{passive:true});
+}
 // Navigation
 const overlay=$("#command-overlay"),input=$("#command-input"),items=$$("[data-command-item]"),mob=$("#mobile-menu"),mobBtn=$("#mobile-menu-btn");
 let focusBefore=null,selected=0;

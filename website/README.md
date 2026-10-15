@@ -7,9 +7,8 @@ This folder is intentionally isolated from the Android application source. All w
 ## Contents
 
 - **index.html** — page, demo player, release picker, metadata
-- **styles.css** — original responsive layout and interactive component styling
-- **premium.css** — editorial design system, responsive refinements, and high-end surface treatments
-- **app.js** — morphing Orbit/Halo/Wave particle art, local synth player, command palette, scroll feedback, stable release panel
+- **styles.css** — responsive styles, motion, accent colors
+- **app.js** — interactive particle art, local synth player, command palette, release panel
 - **favicon.svg** — site icon
 - **_headers** — Cloudflare Pages response headers
 
@@ -36,7 +35,7 @@ Then open http://localhost:8788 in a browser.
 
 ## Release integration
 
-The download section shows **stable releases only**, fetching published non-prerelease builds from the GitHub API and excluding experimental releases. APK links appear only for actual published APK assets.
+The download section fetches stable releases from the GitHub API and excludes experimental/prerelease builds. APK links appear only for actual published APK assets.
 
 A private GitHub repository is **not** readable through GitHub's public releases API. For visitors without access, the release panel displays an accurate unavailable status and provides a link to GitHub. To offer public downloads, either make the repo public or publish releases elsewhere and adapt app.js. **Never embed a GitHub access token in browser code.**
 
@@ -44,14 +43,12 @@ A private GitHub repository is **not** readable through GitHub's public releases
 
 The three short tracks in the preview player are generated locally using the Web Audio API. They are original synthesized demo loops, not Vyon app screenshots, music streams, or proof that a feature is shipped.
 
-The site includes a custom particle sculpture with three working formations (Orbit, Halo, Wave), pointer-responsive surfaces, accent palette switching, a locally synthesized audio preview, a scroll progress bar, an animated equalizer, a keyboard navigation palette, responsive layouts, and reduced-motion support.
+The site includes pointer-responsive particle art, a color switcher, an animated equalizer demo, keyboard navigation palette, mobile navigation, and reduced-motion support.
 
 ## License
 
 The repository root LICENSE continues to apply. Project maintained by [bxane](https://github.com/bxanedot).
 
-## Design notes
+## Visual direction
 
-The site uses an original black-and-silver editorial direction with a restrained color accent and the Instrument Serif typeface. The animated player and abstract album art are clearly labelled as a design concept, not screenshots of the Android application.
-
-All website-specific changes, including the premium design layer, stay inside this folder. The Android application, its Gradle setup, and the root license are not modified.
+The site uses an editorial, restrained dark design with dimensional glass-like cards, refined type hierarchy, soft accent lighting and an original interactive particle sculpture. All visual improvements remain isolated to the website directory.
