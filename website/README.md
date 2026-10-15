@@ -1,6 +1,6 @@
 # Vyon website
 
-Vyon's standalone compact website, official screenshot gallery, creator icons, Android APK download panel, and browser-based Listen Together. Android project files are unchanged.
+Vyon is an Android music player that uses YouTube Music as its backend. This directory contains its standalone compact website, official screenshot gallery, creator icons, Android APK download panel, and browser-based Listen Together. Android project files are unchanged.
 
 ## Directory
 
@@ -43,6 +43,10 @@ Add real Vyon APK captures at these exact paths:
 - website/screenshots/library.webp
 
 The website shows labeled empty placeholders until the images exist and expands real images on click. Never use made-up app screenshots.
+
+## Music source and affiliation
+
+Vyon uses **YouTube Music as its music backend**; the website must not describe Vyon as an independent music service or imply it hosts its own music catalogue. The separate website-based Listen Together prototype uses public direct HTTPS audio URLs and is **not** yet integrated with YouTube Music or the Android player.
 
 ## Releases
 
