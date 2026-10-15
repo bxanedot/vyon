@@ -73,6 +73,26 @@ const tones={
 };
 let w=0,h=0,orbVisible=true,orbAngle=-.13,orbLast=0;
 let orbVelocity=18,boostStarted=-100000;
+const interaction={x:-999,y:-999,tx:-999,ty:-999,strength:0,desired:0,pulseAt:-100000,pulseX:0,pulseY:0};
+const pointerRadius=reduce?68:92;
+function positionPointer(event){
+ const rect=region.getBoundingClientRect();
+ interaction.tx=event.clientX-rect.left;
+ interaction.ty=event.clientY-rect.top;
+ interaction.desired=1;
+ if(reduce){interaction.x=interaction.tx;interaction.y=interaction.ty;interaction.strength=1;renderOrb();}
+}
+region.addEventListener("pointerenter",e=>{if(e.pointerType==="mouse"||e.pointerType==="pen")positionPointer(e);},{passive:true});
+region.addEventListener("pointermove",e=>{if(e.pointerType!=="touch"||e.buttons)positionPointer(e);},{passive:true});
+region.addEventListener("pointerleave",()=>{interaction.desired=0;if(reduce){interaction.strength=0;renderOrb();}},{passive:true});
+region.addEventListener("pointerdown",e=>{
+ positionPointer(e);
+ interaction.pulseAt=performance.now();
+ interaction.pulseX=interaction.tx;interaction.pulseY=interaction.ty;
+},{passive:true});
+region.addEventListener("pointerup",e=>{if(e.pointerType==="touch")interaction.desired=0;},{passive:true});
+region.addEventListener("pointercancel",()=>{interaction.desired=0;},{passive:true});
+
 const particleSprite=document.createElement("canvas");
 particleSprite.width=720;particleSprite.height=720;
 const spriteContext=particleSprite.getContext("2d",{alpha:true});
@@ -155,9 +175,76 @@ function renderOrb(){
  ctx.imageSmoothingEnabled=true;
  ctx.drawImage(particleSprite,-radius,-radius,radius*2,radius*2);
  ctx.restore();
+ renderInteractiveDots(radius);
+}
+function renderInteractiveDots(radius){
+ const mouse=interaction;
+ const level=mouse.strength;
+ const rippleAge=(performance.now()-mouse.pulseAt)/1000;
+ const ripple=rippleAge>=0&&rippleAge<.95 ? Math.pow(1-rippleAge/.95,2) : 0;
+ if(level<.015&&ripple<.015)return;
+ const palette=tones[root.dataset.accent]||tones.violet;
+ const cx=w*.5,cy=h*.49;
+ const rad=pointerRadius*level;
+ // Fade out the cached dots under the pointer before drawing displaced ones.
+ if(level>.015){
+  ctx.save();
+  ctx.globalCompositeOperation="destination-out";
+  const fade=ctx.createRadialGradient(mouse.x,mouse.y,0,mouse.x,mouse.y,Math.max(1,rad));
+  fade.addColorStop(0,"rgba(0,0,0,1)");
+  fade.addColorStop(.72,"rgba(0,0,0,.98)");
+  fade.addColorStop(1,"rgba(0,0,0,0)");
+  ctx.fillStyle=fade;
+  ctx.beginPath();
+  ctx.arc(mouse.x,mouse.y,rad,0,Math.PI*2);
+  ctx.fill();
+  ctx.restore();
+ }
+ const angle=orbAngle*Math.PI/180,ca=Math.cos(angle),sa=Math.sin(angle);
+ const dotScale=radius*358/360;
+ for(const p of particles){
+  const x=cx+(p.x*ca-p.y*sa)*dotScale;
+  const y=cy+(p.x*sa+p.y*ca)*dotScale;
+  const dx=x-mouse.x,dy=y-mouse.y;
+  const d2=dx*dx+dy*dy;
+  const nearPointer=level>.015&&d2<(rad+3)*(rad+3);
+  const waveDx=x-mouse.pulseX,waveDy=y-mouse.pulseY;
+  const waveDist=Math.hypot(waveDx,waveDy);
+  const waveFront=rippleAge*265;
+  const inWave=ripple>.015&&Math.abs(waveDist-waveFront)<43;
+  if(!nearPointer&&!inWave)continue;
+  let move=0,ax=dx,ay=dy,length=Math.sqrt(d2);
+  if(nearPointer&&length>1){
+   // A gentle 45px repulsion that springs back when the pointer leaves.
+   const t=Math.max(0,1-length/rad);
+   move+=t*t*46*level;
+  }
+  if(inWave){
+   const phase=Math.max(0,1-Math.abs(waveDist-waveFront)/43);
+   move+=phase*ripple*29;
+   if(!nearPointer){ax=waveDx;ay=waveDy;length=waveDist;}
+  }
+  const shift=length>1?move/length:0;
+  const colorIndex=Math.min(2,Math.max(0,Math.floor((p.x+p.y+2)/4*3)));
+  let alpha=(.58+.38*p.j);
+  // Edges of the cached image remain visible, so avoid a harsh interaction seam.
+  if(nearPointer){
+   const t=Math.min(1,Math.sqrt(d2)/Math.max(rad,1));
+   alpha*=.75+.25*t;
+  }
+  ctx.fillStyle="rgba("+palette[colorIndex]+","+alpha.toFixed(3)+")";
+  ctx.beginPath();
+  ctx.arc(x+ax*shift,y+ay*shift,(.9+p.j*.5)+(inWave?.35:0),0,Math.PI*2);
+  ctx.fill();
+ }
 }
 function accelerateIcon(){
  boostStarted=performance.now();
+ if(interaction.pulseAt<boostStarted-125){
+  interaction.pulseAt=boostStarted;
+  interaction.pulseX=interaction.strength>.05?interaction.x:w*.5;
+  interaction.pulseY=interaction.strength>.05?interaction.y:h*.49;
+ }
  if(reduce){orbAngle=(orbAngle+15)%360;renderOrb();}
 }
 region.addEventListener("click",accelerateIcon);
@@ -179,6 +266,14 @@ function animateOrb(now){
   const target=18+30*envelope; // 30% idle / 80% peak of 60 deg/s
   orbVelocity+=(target-orbVelocity)*(1-Math.exp(-dt*13));
   orbAngle=(orbAngle+orbVelocity*dt)%360;
+  // Smooth pointer motion and fade out to the exact original dotted silhouette.
+  if(interaction.x<0&&interaction.desired>0){interaction.x=interaction.tx;interaction.y=interaction.ty;}
+  const ease=1-Math.exp(-dt*13);
+  if(interaction.desired>0){
+   interaction.x+=(interaction.tx-interaction.x)*ease;
+   interaction.y+=(interaction.ty-interaction.y)*ease;
+  }
+  interaction.strength+=(interaction.desired-interaction.strength)*(1-Math.exp(-dt*9));
   renderOrb();
  }
  orbLast=now;

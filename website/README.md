@@ -89,3 +89,7 @@ The hero uses a **single vyon particle silhouette** derived from the original wa
 - The favicon is a small optimized **white PNG sourced from the original uploaded icon artwork** at `website/icons/vyon-white-favicon.png`; it replaces the violet favicon.
 - The dot-based vyon waveform is about 25% smaller. Its dots are rendered to a cached texture only on artwork/color changes; the browser rotates that texture at full-frame animation speed with eased click acceleration from 30% to 80%, followed by gradual deceleration.
 - Scroll reveals, button transitions and cards use more consistent easing and reduced-motion support.
+
+## Interactive vyon particles
+
+The only hero icon is the dot-built vyon waveform silhouette. It now sits lower beneath the sticky header (72 px desktop, 56 px tablet, 48 px mobile). Pointer movement repels nearby particles with soft easing, touching/dragging has the same effect where supported, and clicking/tapping produces a gentle expanding particle ripple while accelerating the existing spin. The nearby dots settle back into the exact original icon shape when interaction stops. The cached dotted texture still drives normal rotation; only affected dots are individually redrawn for efficiency. Keyboard users can press Enter or Space to activate the spin, and reduced-motion users do not receive continuous rotation.

@@ -208,3 +208,19 @@ html{scroll-behavior:smooth}
  .btn,.social-card,.feature-card,.theme-chip,.screenshot-tab,.header-github{transition:none!important}
  .btn:hover,.social-card:hover,.feature-card:hover{transform:none!important}
 }
+
+/* Give the floating header clear space above the interactive particle icon. */
+.hero .hero-orb{
+ transform:translate3d(0,72px,0);
+ transition:none;
+}
+.hero .hero-orb:focus-visible{
+ outline:2px solid var(--accent);
+ border-radius:22px;
+}
+@media(max-width:850px){
+ .hero .hero-orb{transform:translate3d(0,56px,0)}
+}
+@media(max-width:590px){
+ .hero .hero-orb{transform:translate3d(0,48px,0)}
+}
