@@ -46,7 +46,7 @@ if("IntersectionObserver" in window){
   if(!e.isIntersecting)return;
   navLinks.forEach(a=>a.getAttribute("href")==="#"+e.target.id?a.setAttribute("aria-current","location"):a.removeAttribute("aria-current"));
  }),{rootMargin:"-36% 0px -58% 0px",threshold:0});
- ["experience","details","downloads","connect"].forEach(id=>{const section=document.getElementById(id);if(section)sectionObserver.observe(section);});
+ ["experience","details","faq","connect"].forEach(id=>{const section=document.getElementById(id);if(section)sectionObserver.observe(section);});
 }
 // Accent palette
 function theme(color){
@@ -364,53 +364,55 @@ shotImg.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preven
 closeLightbox.addEventListener("click",dismissShot);
 lightbox.addEventListener("click",e=>{if(e.target===lightbox)dismissShot();});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!lightbox.hidden)dismissShot();});
-// Show official stable GitHub releases only; never invent APK downloads.
-const repo="bxanedot/vyon",releasePage="https://github.com/"+repo+"/releases";
-const heroApk=$("#hero-apk-link"),heroApkLabel=$("#hero-apk-label");
-const title=$("#release-title"),desc=$("#release-description"),caption=$("#release-caption"),meta=$("#release-meta"),links=$("#download-links");
-let releases=[],releaseError=null,loaded=false;
-function link(text,href,secondary=false,directApk=false){
- const a=document.createElement("a");a.className=secondary?"btn btn-ghost":"btn btn-primary";
- a.href=href;a.target=directApk?"_self":"_blank";a.rel="noopener noreferrer";
- if(directApk)a.setAttribute("aria-label","Download the official stable Android APK directly from GitHub Releases");
- const arrow=document.createElement("span");arrow.className="btn-arrow";arrow.textContent=directApk?"↓":"↗";
- a.append(document.createTextNode(text+" "),arrow);return a;
-}
-function renderReleases(){
- caption.textContent="ANDROID / STABLE APK";
- links.replaceChildren();
- const found=releases.find(r=>Array.isArray(r.assets)&&r.assets.some(a=>/\.apk$/i.test(a.name||"")&&/^https:\/\//.test(a.browser_download_url||"")));
- const apk=found&&found.assets.find(a=>/\.apk$/i.test(a.name||"")&&/^https:\/\//.test(a.browser_download_url||""));
- if(apk){
-  title.textContent=found.name||found.tag_name||"vyon for Android";
-  desc.textContent="Official stable Android APK from vyon GitHub releases.";
-  meta.textContent="PUBLISHED / "+(found.published_at?new Date(found.published_at).toLocaleDateString().toUpperCase():"DATE UNKNOWN");
-  heroApk.href=apk.browser_download_url;
-  heroApk.target="_self";heroApk.rel="noopener noreferrer";
-  heroApkLabel.textContent="Download APK";
-  heroApk.setAttribute("aria-label","Download the latest stable Android APK directly from GitHub");
-  links.append(link("Download Android APK",apk.browser_download_url,false,true));
-  links.append(link("Release notes",found.html_url||releasePage,true));
- }else{
-  title.textContent=!loaded?"Checking APK releases…":releaseError?"APK releases unavailable.":"No stable APK published yet.";
-  desc.textContent=!loaded?"Checking GitHub for a published Android APK.":releaseError?"GitHub may be private or temporarily unavailable. View releases on GitHub if you have access.":"No public stable Android APK is listed yet. Check official GitHub releases for updates.";
-  meta.textContent=!loaded?"APK STATUS / CHECKING":releaseError?"APK STATUS / UNVERIFIED":"APK STATUS / NOT PUBLISHED";
-  heroApk.href="#downloads";heroApk.removeAttribute("target");
-  heroApkLabel.textContent="Check APK availability";
-  heroApk.setAttribute("aria-label","Check whether a stable Android APK is available");
-  links.append(link("View GitHub releases",releasePage));
- }
-}
-renderReleases();
+// Single primary APK action. It links directly to the GitHub release asset when verified.
+// Do not invent a filename, publish a dead download link, or show an obsolete status panel.
+const apkLink=$("#hero-apk-link"),apkFeedback=$("#hero-download-status");
+const repo="bxanedot/vyon";
+let apkUrl=null,releaseCheckPending=true,releaseError=null,apkClickRequested=false;
+const missingApkMessage=()=>{
+ if(releaseCheckPending)return "Checking GitHub for an official stable APK…";
+ if(releaseError)return "The APK couldn't be verified. GitHub releases may be private or unavailable.";
+ return "No stable APK has been published yet.";
+};
+apkLink.addEventListener("click",event=>{
+ if(apkUrl)return; // Native anchor navigation to GitHub's direct downloadable APK asset.
+ event.preventDefault();
+ apkClickRequested=true;
+ apkFeedback.textContent=missingApkMessage();
+});
 (async()=>{
  try{
-  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),8000);let response;
-  try{response=await fetch("https://api.github.com/repos/"+repo+"/releases?per_page=75",{headers:{Accept:"application/vnd.github+json"},signal:controller.signal});}
-  finally{clearTimeout(timer);}
+  const controller=new AbortController();
+  const timer=setTimeout(()=>controller.abort(),8000);
+  let response;
+  try{
+   response=await fetch("https://api.github.com/repos/"+repo+"/releases?per_page=75",{
+    headers:{Accept:"application/vnd.github+json"},signal:controller.signal
+   });
+  }finally{clearTimeout(timer);}
   if(!response.ok)throw Error("GitHub HTTP "+response.status);
-  const body=await response.json();if(!Array.isArray(body))throw Error("Unexpected response");
-  releases=body.filter(r=>!r.draft&&!r.prerelease&&!/nightly|canary|dev.build/i.test(String(r.name||"")+" "+String(r.tag_name||"")));
- }catch(err){releaseError=err;console.info("vyon releases:",err.message);}
- finally{loaded=true;renderReleases();}
+  const data=await response.json();
+  if(!Array.isArray(data))throw Error("Unexpected release response");
+  // API returns newest first. Drafts, prereleases and experimental channels are excluded.
+  const stable=data.filter(r=>!r.draft&&!r.prerelease&&
+   !/nightly|canary|dev.build/i.test(String(r.name||"")+" "+String(r.tag_name||"")));
+  const release=stable.find(r=>Array.isArray(r.assets)&&
+   r.assets.some(a=>/\.apk$/i.test(a.name||"")&&/^https:\/\//.test(a.browser_download_url||"")));
+  const apk=release?.assets.find(a=>/\.apk$/i.test(a.name||"")&&
+   /^https:\/\//.test(a.browser_download_url||""));
+  if(apk){
+   apkUrl=apk.browser_download_url;
+   apkLink.href=apkUrl;
+   apkLink.setAttribute("aria-label","Download the official stable vyon Android APK directly from GitHub");
+   apkLink.title="Direct APK download from GitHub Releases";
+   if(apkClickRequested)apkFeedback.textContent="APK ready. Click Download APK to start downloading.";
+  }
+ }catch(err){
+  releaseError=err;
+  console.info("vyon APK check:",err.message);
+ }finally{
+  releaseCheckPending=false;
+  if(!apkUrl&&apkClickRequested)apkFeedback.textContent=missingApkMessage();
+ }
 })();
 })();

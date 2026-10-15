@@ -19,10 +19,10 @@
   <div id="reading-progress" class="reading-progress" aria-hidden="true"></div>
   <header class="site-header" id="site-header">
     <a class="brand" href="#top" aria-label="vyon home"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span>vyon<span class="brand-period">.</span></span></a>
-    <nav class="nav-desktop" aria-label="Primary"><a href="#experience">Experience</a><a href="#details">Details</a><a href="#downloads">Downloads</a></nav>
+    <nav class="nav-desktop" aria-label="Primary"><a href="#experience">Experience</a><a href="#details">Details</a><a href="#faq">FAQ</a></nav>
     <div class="header-actions"><button class="command-trigger" id="command-trigger" type="button" aria-label="Open quick navigation"><span class="command-key">⌘</span> K <span class="command-txt">Explore</span></button><a class="header-github" href="https://github.com/bxanedot/vyon" target="_blank" rel="noopener noreferrer">GitHub <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a><button class="mobile-menu-btn" id="mobile-menu-btn" type="button" aria-expanded="false" aria-controls="mobile-menu" aria-label="Toggle menu"><span></span><span></span></button></div>
   </header>
-  <nav class="mobile-menu" id="mobile-menu" aria-label="Mobile" hidden><a href="#experience">Experience</a><a href="#details">Details</a><a href="#downloads">Downloads</a><a href="https://github.com/bxanedot/vyon" target="_blank" rel="noopener noreferrer">GitHub ↗</a></nav>
+  <nav class="mobile-menu" id="mobile-menu" aria-label="Mobile" hidden><a href="#experience">Experience</a><a href="#details">Details</a><a href="#faq">FAQ</a><a href="https://github.com/bxanedot/vyon" target="_blank" rel="noopener noreferrer">GitHub ↗</a></nav>
 
   <main id="main">
     <section class="hero section-pad" id="top">
@@ -33,7 +33,7 @@
         <div class="eyebrow"><span class="eyebrow-line"></span><span>POWERED BY YOUTUBE MUSIC · FOR ANDROID</span><span class="eyebrow-star">✳</span></div>
         <h1>A different<br>kind of <span class="h-italic">listening<span class="h-dot">.</span></span></h1>
         <p class="hero-description">vyon brings a thoughtfully designed Android listening experience to music powered by YouTube Music.</p>
-        <div class="hero-buttons"><a class="btn btn-primary" href="#experience">See the app <span class="btn-arrow">↗</span></a><a class="btn btn-ghost" id="hero-apk-link" href="#downloads" aria-label="Check whether a stable Android APK is available"><span class="btn-download-icon">↓</span> <span id="hero-apk-label">Check APK availability</span></a></div>
+        <div class="hero-buttons"><a class="btn btn-primary" href="#experience">See the app <span class="btn-arrow">↗</span></a><a class="btn btn-ghost" id="hero-apk-link" href="#" aria-label="Download the latest stable Android APK directly from GitHub when available"><span class="btn-download-icon">↓</span> <span id="hero-apk-label">Download APK</span></a></div><p class="hero-download-status" id="hero-download-status" role="status" aria-live="polite"></p>
         <div class="hero-footnote"><span class="mini-bars" aria-hidden="true"><b></b><b></b><b></b><b></b><b></b></span><span>YOUTUBE MUSIC BACKEND</span><span class="footnote-divider"></span><span>DESIGNED WITH INTENTION</span></div>
       </div>
       <div class="hero-side-label" aria-hidden="true">SOUND IS A PLACE TO GO</div>
@@ -87,7 +87,39 @@
     </section>
 
 
-    <section class="downloads section-pad" id="downloads"><div class="section-heading reveal"><div class="kicker">GET vyon</div><div class="heading-row"><h2>Take your<br><span>music further.</span></h2><p>Download the official Android APK directly from GitHub Releases as soon as a stable build is published. No intermediate download page.</p></div></div><div class="download-panel reveal"><div class="download-background-art" aria-hidden="true"><div class="download-disc"><div></div></div></div><div class="download-content"><div class="download-heading"><span class="release-indicator"><span></span> BUILDS / FROM GITHUB</span><span class="download-platform">ANDROID APK ONLY</span></div><div class="release-status" aria-live="polite"><span class="release-caption" id="release-caption">STABLE CHANNEL</span><h3 id="release-title">Checking GitHub releases…</h3><p id="release-description">Stable APK downloads open the actual GitHub-hosted file, never an intermediate page.</p></div><div class="download-links" id="download-links"><a class="btn btn-primary" href="https://github.com/bxanedot/vyon/releases" target="_blank" rel="noopener noreferrer">View GitHub releases <span class="btn-arrow">↗</span></a></div><div class="release-meta"><span id="release-meta">RELEASE STATUS / LOADING</span><span>ANDROID · APK FORMAT ONLY</span></div></div></div></section>
+    <section class="faq-section section-pad" id="faq" aria-labelledby="faq-title">
+      <div class="faq-intro reveal">
+        <div class="kicker">GOOD TO KNOW</div>
+        <h2 id="faq-title">Questions,<br><em>answered.</em></h2>
+        <p>The essentials about vyon, YouTube Music, and Android downloads.</p>
+      </div>
+      <div class="faq-list reveal">
+        <details class="faq-item">
+          <summary><span>What is vyon?</span><span class="faq-plus" aria-hidden="true">+</span></summary>
+          <div class="faq-answer"><p>vyon is an Android music player that uses YouTube Music as its backend, with its own interface for listening. It isn't a separate music hosting service.</p></div>
+        </details>
+        <details class="faq-item">
+          <summary><span>Where can I download vyon?</span><span class="faq-plus" aria-hidden="true">+</span></summary>
+          <div class="faq-answer"><p>Use <strong>Download APK</strong> at the top of this page. When a stable Android APK has been published, the button links directly to the file on <a href="https://github.com/bxanedot/vyon/releases" target="_blank" rel="noopener noreferrer">GitHub Releases</a>, without a separate download page. If no stable APK is available, the button will tell you.</p></div>
+        </details>
+        <details class="faq-item">
+          <summary><span>How do I install the APK?</span><span class="faq-plus" aria-hidden="true">+</span></summary>
+          <div class="faq-answer"><p>Download the official APK on your Android device, open the file, and follow Android's installation prompts. Your device may ask you to allow installations from the app you used to download it.</p></div>
+        </details>
+        <details class="faq-item">
+          <summary><span>How do I get updates?</span><span class="faq-plus" aria-hidden="true">+</span></summary>
+          <div class="faq-answer"><p>Check the project's <a href="https://github.com/bxanedot/vyon/releases" target="_blank" rel="noopener noreferrer">GitHub Releases</a> for newer stable APKs. Install a newer compatible, correctly signed APK over your existing installation using Android's normal update prompts.</p></div>
+        </details>
+        <details class="faq-item">
+          <summary><span>Is vyon available on iOS or desktop?</span><span class="faq-plus" aria-hidden="true">+</span></summary>
+          <div class="faq-answer"><p>vyon currently targets Android APKs. There is no iOS or desktop download offered on this site.</p></div>
+        </details>
+        <details class="faq-item">
+          <summary><span>Is vyon an official YouTube Music app?</span><span class="faq-plus" aria-hidden="true">+</span></summary>
+          <div class="faq-answer"><p>No. vyon is a separate project that uses YouTube Music as its backend. It is not presented as an official YouTube Music application.</p></div>
+        </details>
+      </div>
+    </section>
 
     <section class="connect-section section-pad" id="connect" aria-labelledby="connect-title">
       <div class="connect-heading"><div><div class="kicker">THE COMMUNITY</div><h2 id="connect-title">Connect <em>&amp; support.</em></h2></div><p>Follow the project, join the conversation, or support what comes next.</p></div>
@@ -101,7 +133,7 @@
     </section>
 
   </main>
-  <div class="command-overlay" id="command-overlay" hidden><div class="command-backdrop" data-close-command></div><div class="command-dialog" role="dialog" aria-modal="true" aria-label="Quick navigation"><div class="command-input-wrap"><span aria-hidden="true">⌕</span><input id="command-input" autocomplete="off" spellcheck="false" placeholder="Where to?" aria-label="Search sections"><kbd>ESC</kbd></div><div class="command-results" id="command-results"><a href="#top" data-command-item> Introduction <span>↗</span></a><a href="#experience" data-command-item> App screenshots <span>↗</span></a><a href="#details" data-command-item> Visual details <span>↗</span></a><a href="#downloads" data-command-item> Download vyon <span>↗</span></a><a href="https://github.com/bxanedot/vyon" target="_blank" rel="noopener noreferrer" data-command-item> GitHub repository <span>↗</span></a></div><div class="command-footer"><span>↑↓ SELECT</span><span>↵ OPEN</span><span>ESC CLOSE</span></div></div></div>
+  <div class="command-overlay" id="command-overlay" hidden><div class="command-backdrop" data-close-command></div><div class="command-dialog" role="dialog" aria-modal="true" aria-label="Quick navigation"><div class="command-input-wrap"><span aria-hidden="true">⌕</span><input id="command-input" autocomplete="off" spellcheck="false" placeholder="Where to?" aria-label="Search sections"><kbd>ESC</kbd></div><div class="command-results" id="command-results"><a href="#top" data-command-item> Introduction <span>↗</span></a><a href="#experience" data-command-item> App screenshots <span>↗</span></a><a href="#details" data-command-item> Visual details <span>↗</span></a><a href="#faq" data-command-item> Questions &amp; answers <span>↗</span></a><a href="https://github.com/bxanedot/vyon" target="_blank" rel="noopener noreferrer" data-command-item> GitHub repository <span>↗</span></a></div><div class="command-footer"><span>↑↓ SELECT</span><span>↵ OPEN</span><span>ESC CLOSE</span></div></div></div>
   <script src="/app.js" defer></script>
 </body>
 </html>

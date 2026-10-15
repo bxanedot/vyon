@@ -1,6 +1,6 @@
 # vyon website
 
-vyon is an Android music player that uses YouTube Music as its backend. This directory contains its standalone compact website, official screenshot gallery, creator icons, Android APK download panel, and browser-based Listen Together. Android project files are unchanged.
+vyon is an Android music player that uses YouTube Music as its backend. This directory contains its standalone compact website, official screenshot gallery, creator icons, direct stable-APK hero button, a compact FAQ, and browser-based Listen Together. Android project files are unchanged.
 
 ## Directory
 
@@ -50,7 +50,7 @@ vyon uses **YouTube Music as its music backend**; the website must not describe 
 
 ## Releases
 
-APK ONLY: the download section checks GitHub's stable releases and offers a download only if a real Android .apk asset is present. There is no Nightly channel or desktop distribution. Private GitHub releases may be inaccessible to site visitors through the public GitHub API.
+APK ONLY: the hero Download APK button checks GitHub stable releases and downloads directly only when a real Android .apk asset is present. There is no Nightly channel or desktop distribution. Private GitHub releases may be inaccessible to site visitors through the public GitHub API.
 
 ## Theme, socials, inspiration
 
@@ -84,8 +84,8 @@ The hero uses a **single vyon particle silhouette** derived from the original wa
 
 ## Direct stable APK downloads and icon polish
 
-- The hero APK CTA and Downloads section now point directly at the actual `browser_download_url` for the newest stable Android `.apk` found in the GitHub Releases API. Clicking a verified APK link downloads the GitHub-hosted file without first opening a release detail page. No Nightly or prerelease APKs are selected.
-- Until a stable APK is published and publicly discoverable, the hero CTA opens the release-status section instead of presenting a fake download. The current private repository has no releases according to the connected GitHub API as of October 15, 2026; website visitors may also be unable to query releases while the repository stays private.
+- The hero **Download APK** button points directly to the actual `browser_download_url` for the newest stable Android `.apk` found in the GitHub Releases API. Clicking an available APK link downloads the GitHub-hosted file without first opening a release detail page. No Nightly or prerelease APKs are selected.
+- Until a stable APK is published and publicly discoverable, clicking the hero CTA gives a brief inline unavailable message rather than presenting a fake download. The connected GitHub API listed no published releases on October 15, 2026; visitors may also be unable to retrieve private-repo assets.
 - The favicon is a small optimized **white PNG sourced from the original uploaded icon artwork** at `website/icons/vyon-white-favicon.png`; it replaces the violet favicon.
 - The dot-based vyon waveform is about 25% smaller. Its dots are rendered to a cached texture only on artwork/color changes; the browser rotates that texture at full-frame animation speed with eased click acceleration from 30% to 80%, followed by gradual deceleration.
 - Scroll reveals, button transitions and cards use more consistent easing and reduced-motion support.
@@ -93,3 +93,7 @@ The hero uses a **single vyon particle silhouette** derived from the original wa
 ## Interactive vyon particles
 
 The only hero icon is the dot-built vyon waveform silhouette. It now sits lower beneath the sticky header (72 px desktop, 56 px tablet, 48 px mobile). Pointer movement repels nearby particles with soft easing, touching/dragging has the same effect where supported, and clicking/tapping produces a gentle expanding particle ripple while accelerating the existing spin. The nearby dots settle back into the exact original icon shape when interaction stops. The cached dotted texture still drives normal rotation; only affected dots are individually redrawn for efficiency. Keyboard users can press Enter or Space to activate the spin, and reduced-motion users do not receive continuous rotation.
+
+## Compact FAQ replacing the old download panel
+
+The entire **GET vyon / Take your music further** release-status card has been removed. Desktop/mobile header links and the command menu now navigate to **FAQ** instead of the deleted `#downloads` anchor. The FAQ is a native `<details>` accordion inspired by the clarity of metrolist.cc's questions section, with original vyon-specific copy. Answers cover the YouTube Music backend, direct stable APKs, normal Android installation, future APK updates, Android-only distribution, and unofficial YouTube Music affiliation. We do not claim unverified sign-in, offline playback, updater or subscription features.
