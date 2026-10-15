@@ -217,3 +217,6 @@ body{background:#080808!important;background-image:none!important}
 }
 /* Product-led messaging: quiet and legible, without visual noise. */
 .site-footer .platform-note{color:#a4a4a4;font:10px var(--mono);letter-spacing:.025em;line-height:1.65}
+
+/* Matte hero surface: remove the old radial darkening layer. */
+.hero:after{background:none!important}
