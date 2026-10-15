@@ -97,3 +97,7 @@ The only hero icon is the dot-built vyon waveform silhouette. It now sits lower 
 ## Compact FAQ replacing the old download panel
 
 The entire **GET vyon / Take your music further** release-status card has been removed. Desktop/mobile header links and the command menu now navigate to **FAQ** instead of the deleted `#downloads` anchor. The FAQ is a native `<details>` accordion inspired by the clarity of metrolist.cc's questions section, with original vyon-specific copy. Answers cover the YouTube Music backend, direct stable APKs, normal Android installation, future APK updates, Android-only distribution, and unofficial YouTube Music affiliation. We do not claim unverified sign-in, offline playback, updater or subscription features.
+
+## Community / Support header navigation
+
+The sticky desktop header presents **Community / Support** with a visible slash between two accessible, independent anchor links. The mobile menu and command palette expose both shortcuts too. The Community anchor jumps to the Guns.lol, Discord and Telegram cards at the bottom; Support jumps to the separate Ko-fi and Patreon cards directly below. Jump navigation honors the fixed header using `scroll-margin-top`. No external redirect happens until a user clicks one of the actual social cards.

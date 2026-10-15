@@ -19,10 +19,10 @@
   <div id="reading-progress" class="reading-progress" aria-hidden="true"></div>
   <header class="site-header" id="site-header">
     <a class="brand" href="#top" aria-label="vyon home"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span>vyon<span class="brand-period">.</span></span></a>
-    <nav class="nav-desktop" aria-label="Primary"><a href="#experience">Experience</a><a href="#details">Details</a><a href="#faq">FAQ</a></nav>
+    <nav class="nav-desktop" aria-label="Primary"><a href="#experience">Experience</a><a href="#details">Details</a><a href="#faq">FAQ</a><span class="nav-pair" role="group" aria-label="Community and support"><a href="#community">Community</a><span class="nav-slash" aria-hidden="true">/</span><a href="#support">Support</a></span></nav>
     <div class="header-actions"><button class="command-trigger" id="command-trigger" type="button" aria-label="Open quick navigation"><span class="command-key">⌘</span> K <span class="command-txt">Explore</span></button><a class="header-github" href="https://github.com/bxanedot/vyon" target="_blank" rel="noopener noreferrer">GitHub <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a><button class="mobile-menu-btn" id="mobile-menu-btn" type="button" aria-expanded="false" aria-controls="mobile-menu" aria-label="Toggle menu"><span></span><span></span></button></div>
   </header>
-  <nav class="mobile-menu" id="mobile-menu" aria-label="Mobile" hidden><a href="#experience">Experience</a><a href="#details">Details</a><a href="#faq">FAQ</a><a href="https://github.com/bxanedot/vyon" target="_blank" rel="noopener noreferrer">GitHub ↗</a></nav>
+  <nav class="mobile-menu" id="mobile-menu" aria-label="Mobile" hidden><a href="#experience">Experience</a><a href="#details">Details</a><a href="#faq">FAQ</a><div class="mobile-nav-pair" role="group" aria-label="Community and support"><a href="#community">Community</a><span class="nav-slash" aria-hidden="true">/</span><a href="#support">Support</a></div><a href="https://github.com/bxanedot/vyon" target="_blank" rel="noopener noreferrer">GitHub ↗</a></nav>
 
   <main id="main">
     <section class="hero section-pad" id="top">
@@ -121,19 +121,30 @@
       </div>
     </section>
 
-    <section class="connect-section section-pad" id="connect" aria-labelledby="connect-title">
-      <div class="connect-heading"><div><div class="kicker">THE COMMUNITY</div><h2 id="connect-title">Connect <em>&amp; support.</em></h2></div><p>Follow the project, join the conversation, or support what comes next.</p></div>
-      <div class="social-grid">
+    <section class="connect-section section-pad" id="community" aria-labelledby="community-title">
+      <div class="connect-heading">
+        <div><div class="kicker">STAY CONNECTED</div><h2 id="community-title">Join the <em>community.</em></h2></div>
+        <p>Find vyon elsewhere, meet other listeners, and stay close to the project.</p>
+      </div>
+      <div class="social-grid social-grid-community">
         <a class="social-card" href="https://guns.lol/bxane" target="_blank" rel="noopener noreferrer" aria-label="Guns.lol: Creator profile (opens in a new tab)"><span class="social-symbol"><img src="https://assets.guns.lol/favicon/apple-touch-icon.png" alt="" referrerpolicy="no-referrer" width="22" height="22" loading="lazy" decoding="async"></span><span class="social-copy"><strong>Guns.lol</strong><small>Creator profile</small></span><span class="social-chevron" aria-hidden="true">↗</span></a>
-        <a class="social-card" href="https://ko-fi.com/bxane" target="_blank" rel="noopener noreferrer" aria-label="Ko-fi: Support the project (opens in a new tab)"><span class="social-symbol"><img src="/icons/kofi.svg" alt="" width="22" height="22" loading="lazy" decoding="async"></span><span class="social-copy"><strong>Ko-fi</strong><small>Support the project</small></span><span class="social-chevron" aria-hidden="true">↗</span></a>
-        <a class="social-card" href="https://patreon.com/bxane" target="_blank" rel="noopener noreferrer" aria-label="Patreon: Become a supporter (opens in a new tab)"><span class="social-symbol"><img src="/icons/patreon.svg" alt="" width="22" height="22" loading="lazy" decoding="async"></span><span class="social-copy"><strong>Patreon</strong><small>Become a supporter</small></span><span class="social-chevron" aria-hidden="true">↗</span></a>
         <a class="social-card" href="https://discord.gg/h4Wsu824Uf" target="_blank" rel="noopener noreferrer" aria-label="Discord: Join the community (opens in a new tab)"><span class="social-symbol"><img src="/icons/discord.svg" alt="" width="22" height="22" loading="lazy" decoding="async"></span><span class="social-copy"><strong>Discord</strong><small>Join the community</small></span><span class="social-chevron" aria-hidden="true">↗</span></a>
         <a class="social-card" href="https://t.me/+T9avk7iJ7_YyN2Rk" target="_blank" rel="noopener noreferrer" aria-label="Telegram: Stay connected (opens in a new tab)"><span class="social-symbol"><img src="/icons/telegram.svg" alt="" width="22" height="22" loading="lazy" decoding="async"></span><span class="social-copy"><strong>Telegram</strong><small>Stay connected</small></span><span class="social-chevron" aria-hidden="true">↗</span></a>
+      </div>
+      <div class="support-group" id="support" aria-labelledby="support-title">
+        <div class="connect-heading">
+          <div><div class="kicker">HELP IT GROW</div><h2 id="support-title">Support <em>vyon.</em></h2></div>
+          <p>Contribute to the project and help shape what comes next.</p>
+        </div>
+        <div class="social-grid social-grid-support">
+        <a class="social-card" href="https://ko-fi.com/bxane" target="_blank" rel="noopener noreferrer" aria-label="Ko-fi: Support the project (opens in a new tab)"><span class="social-symbol"><img src="/icons/kofi.svg" alt="" width="22" height="22" loading="lazy" decoding="async"></span><span class="social-copy"><strong>Ko-fi</strong><small>Support the project</small></span><span class="social-chevron" aria-hidden="true">↗</span></a>
+        <a class="social-card" href="https://patreon.com/bxane" target="_blank" rel="noopener noreferrer" aria-label="Patreon: Become a supporter (opens in a new tab)"><span class="social-symbol"><img src="/icons/patreon.svg" alt="" width="22" height="22" loading="lazy" decoding="async"></span><span class="social-copy"><strong>Patreon</strong><small>Become a supporter</small></span><span class="social-chevron" aria-hidden="true">↗</span></a>
+        </div>
       </div>
     </section>
 
   </main>
-  <div class="command-overlay" id="command-overlay" hidden><div class="command-backdrop" data-close-command></div><div class="command-dialog" role="dialog" aria-modal="true" aria-label="Quick navigation"><div class="command-input-wrap"><span aria-hidden="true">⌕</span><input id="command-input" autocomplete="off" spellcheck="false" placeholder="Where to?" aria-label="Search sections"><kbd>ESC</kbd></div><div class="command-results" id="command-results"><a href="#top" data-command-item> Introduction <span>↗</span></a><a href="#experience" data-command-item> App screenshots <span>↗</span></a><a href="#details" data-command-item> Visual details <span>↗</span></a><a href="#faq" data-command-item> Questions &amp; answers <span>↗</span></a><a href="https://github.com/bxanedot/vyon" target="_blank" rel="noopener noreferrer" data-command-item> GitHub repository <span>↗</span></a></div><div class="command-footer"><span>↑↓ SELECT</span><span>↵ OPEN</span><span>ESC CLOSE</span></div></div></div>
+  <div class="command-overlay" id="command-overlay" hidden><div class="command-backdrop" data-close-command></div><div class="command-dialog" role="dialog" aria-modal="true" aria-label="Quick navigation"><div class="command-input-wrap"><span aria-hidden="true">⌕</span><input id="command-input" autocomplete="off" spellcheck="false" placeholder="Where to?" aria-label="Search sections"><kbd>ESC</kbd></div><div class="command-results" id="command-results"><a href="#top" data-command-item> Introduction <span>↗</span></a><a href="#experience" data-command-item> App screenshots <span>↗</span></a><a href="#details" data-command-item> Visual details <span>↗</span></a><a href="#faq" data-command-item> Questions &amp; answers <span>↗</span></a><a href="#community" data-command-item> Community <span>↗</span></a><a href="#support" data-command-item> Support vyon <span>↗</span></a><a href="https://github.com/bxanedot/vyon" target="_blank" rel="noopener noreferrer" data-command-item> GitHub repository <span>↗</span></a></div><div class="command-footer"><span>↑↓ SELECT</span><span>↵ OPEN</span><span>ESC CLOSE</span></div></div></div>
   <script src="/app.js" defer></script>
 </body>
 </html>

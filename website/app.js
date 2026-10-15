@@ -25,7 +25,23 @@ document.addEventListener("keydown",e=>{
  if(e.key==="Tab"){e.preventDefault();input.focus();}
 });
 mobBtn.addEventListener("click",()=>{const opened=mobBtn.getAttribute("aria-expanded")!=="true";mobBtn.setAttribute("aria-expanded",String(opened));mob.hidden=!opened;});
-$$("a",mob).forEach(x=>x.addEventListener("click",()=>{mob.hidden=true;mobBtn.setAttribute("aria-expanded","false");}));
+$("a",mob).forEach(x=>x.addEventListener("click",()=>{mob.hidden=true;mobBtn.setAttribute("aria-expanded","false");}));
+
+// Header, mobile, and quick-navigation links jump straight to the bottom sections.
+$('a[href="#community"],a[href="#support"]').forEach(link=>{
+ link.addEventListener("click",event=>{
+  const hash=link.getAttribute("href");
+  const target=document.querySelector(hash);
+  if(!target)return;
+  event.preventDefault();
+  const prior=root.style.scrollBehavior;
+  root.style.scrollBehavior="auto";
+  target.scrollIntoView({behavior:"instant",block:"start"});
+  root.style.scrollBehavior=prior;
+  if(location.hash!==hash)history.pushState(null,"",hash);
+ });
+});
+
 if("IntersectionObserver" in window&&!reduce){
  const obs=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add("is-visible");obs.unobserve(e.target);}}),{threshold:.08,rootMargin:"0px 0px -35px 0px"});
  $$(".reveal").forEach(x=>obs.observe(x));
@@ -46,7 +62,7 @@ if("IntersectionObserver" in window){
   if(!e.isIntersecting)return;
   navLinks.forEach(a=>a.getAttribute("href")==="#"+e.target.id?a.setAttribute("aria-current","location"):a.removeAttribute("aria-current"));
  }),{rootMargin:"-36% 0px -58% 0px",threshold:0});
- ["experience","details","faq","connect"].forEach(id=>{const section=document.getElementById(id);if(section)sectionObserver.observe(section);});
+ ["experience","details","faq","community","support"].forEach(id=>{const section=document.getElementById(id);if(section)sectionObserver.observe(section);});
 }
 // Accent palette
 function theme(color){

@@ -333,3 +333,36 @@ html{scroll-behavior:smooth}
 @media(prefers-reduced-motion:reduce){
  .faq-item summary,.faq-plus{transition:none!important}
 }
+
+
+/* Community / Support navigation — explicit anchors with a quiet slash. */
+.nav-pair{display:inline-flex;align-items:center;gap:10px;white-space:nowrap}
+.nav-slash{color:rgba(var(--accent-rgb),.58);font-size:14px;line-height:1;user-select:none}
+.mobile-nav-pair{display:flex;align-items:center;justify-content:flex-start;gap:13px;border-bottom:1px solid var(--rule)}
+.mobile-menu .mobile-nav-pair a{padding:14px 0;border:0}
+#community,#support{scroll-margin-top:105px}
+.social-grid-community{grid-template-columns:repeat(3,minmax(0,1fr))}
+.social-grid-support{grid-template-columns:repeat(2,minmax(0,1fr));max-width:720px}
+.support-group{
+ margin-top:clamp(37px,5vw,65px);
+ padding-top:clamp(29px,4vw,47px);
+ border-top:1px solid var(--edge);
+}
+.support-group .connect-heading{margin-bottom:21px}
+@media(min-width:851px) and (max-width:1190px){
+ .nav-desktop{gap:18px}
+ .nav-pair{gap:8px}
+ .header-actions{gap:12px}
+}
+@media(max-width:850px){
+ .social-grid-community{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .social-grid-support{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .mobile-nav-pair{width:100%}
+}
+@media(max-width:590px){
+ #community,#support{scroll-margin-top:85px}
+ .social-grid-community{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .social-grid-support{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .social-grid-support .social-card:last-child{grid-column:auto}
+ .support-group{margin-top:32px;padding-top:30px}
+}
