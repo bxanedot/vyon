@@ -4,52 +4,6 @@
 const $=(s,scope=document)=>scope.querySelector(s), $$=(s,scope=document)=>[...scope.querySelectorAll(s)];
 const root=document.documentElement;
 const reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-$("#copyright-year").textContent=new Date().getFullYear();
-// Atmospheric pointer lighting, disabled for reduced motion.
-const ambient=$("#ambient-pointer");
-if(ambient&&!reduce&&window.matchMedia("(hover:hover) and (pointer:fine)").matches){
- let pending=false,mouseX=-1000,mouseY=-1000;
- document.addEventListener("pointermove",event=>{
-  mouseX=event.clientX;mouseY=event.clientY;
-  if(!pending){pending=true;requestAnimationFrame(()=>{ambient.style.transform="translate3d("+(mouseX-300)+"px,"+(mouseY-300)+"px,0)";pending=false;});}
- },{passive:true});
-}
-// The vyon waveform is traced from the user's original icon artwork.
-// 30% = 18 degrees/second, 80% = 48 degrees/second at peak.
-const spinButton=$("#vyon-spin-control"),spinImage=$("#vyon-spin-image");
-let spinAngle=0,spinVelocity=18,spinBoost=0,spinPrevious=0;
-const setIcon=()=>{
- const color=root.dataset.accent||"violet";
- const file=color==="acid"?"acid":color==="coral"?"coral":color==="ice"?"ice":"violet";
- if(spinImage)spinImage.src="/icons/originals/vyon-"+file+".svg";
-};
-if(spinImage){
- spinImage.draggable=false;
- setIcon();
- if(spinButton)spinButton.addEventListener("click",()=>{
-  spinBoost=1;spinVelocity=48;
-  spinButton.classList.remove("spin-boost");
-  void spinButton.offsetWidth;
-  spinButton.classList.add("spin-boost");
- });
- if(!reduce){
-  const animateSpin=t=>{
-   if(spinPrevious){
-    const dt=Math.min(.06,(t-spinPrevious)/1000);
-    spinBoost=Math.max(0,spinBoost-dt/3.2);
-    const target=18+30*(spinBoost*spinBoost*(3-2*spinBoost));
-    spinVelocity+=(target-spinVelocity)*Math.min(1,dt*8);
-    spinAngle=(spinAngle+spinVelocity*dt)%360;
-    spinImage.style.transform="rotate("+spinAngle+"deg)";
-   }
-   spinPrevious=t;
-   if(!document.hidden)requestAnimationFrame(animateSpin);
-   else spinPrevious=0;
-  };
-  requestAnimationFrame(animateSpin);
-  document.addEventListener("visibilitychange",()=>{if(!document.hidden)requestAnimationFrame(animateSpin);});
- }
-}
 // Navigation
 const overlay=$("#command-overlay"),input=$("#command-input"),items=$$("[data-command-item]"),mob=$("#mobile-menu"),mobBtn=$("#mobile-menu-btn");
 let focusBefore=null,selected=0;
@@ -98,87 +52,125 @@ if("IntersectionObserver" in window){
 function theme(color){
  if(!["violet","acid","coral","ice"].includes(color))return;
  root.dataset.accent=color;
- setIcon();
+ // The particle colors are derived from the active theme at render time.
  $$("[data-color]").forEach(b=>{const on=b.dataset.color===color;b.classList.toggle("active",on);b.setAttribute("aria-pressed",String(on));});
  const meta=document.querySelector('meta[name="theme-color"]');
- if(meta)meta.content=({violet:"#0b0918",acid:"#0b150a",coral:"#190d13",ice:"#08151b"})[color];
+ if(meta)meta.content=({violet:"#080808",acid:"#080808",coral:"#080808",ice:"#080808"})[color];
  try{localStorage.setItem("vyon-accent",color);}catch{}
  requestAnimationFrame(renderOrb);
 }
 $$("[data-color]").forEach(b=>b.addEventListener("click",()=>theme(b.dataset.color)));
 try{theme(localStorage.getItem("vyon-accent")||"violet");}catch{theme("violet");}
-// Orb canvas
+// A single particle sculpture generated from the actual vyon icon silhouette.
+// The original SVG is used only as an alpha mask: no image is laid over the dots.
 const region=$("#orb-region"),canvas=$("#orb-canvas"),ctx=canvas.getContext("2d",{alpha:true});
-let w=0,h=0,px=0,py=0,inside=false,orbVisible=true,orbTime=0,orbShape="orbit";
-const points=[],total=reduce?750:1200;
-for(let i=0;i<total;i++){
- const z=1-2*(i+.5)/total,phi=i*Math.PI*(3-Math.sqrt(5)),r=Math.sqrt(1-z*z);
- const x=Math.cos(phi)*r,y=Math.sin(phi)*r;points.push({x,y,z,sx:x,sy:y,sz:z,i,j:((i*137)%47)/47});
+const particles=[];
+const tones={
+ violet:["255,151,165","194,154,239","123,205,255"],
+ acid:["47,190,128","22,162,143","46,221,190"],
+ coral:["255,145,119","255,190,127","250,154,190"],
+ ice:["75,205,242","91,155,250","133,239,249"]
+};
+let w=0,h=0,orbVisible=true,orbAngle=-.13,orbLast=0;
+let orbVelocity=18,orbBoost=0;
+const hash=(x,y)=>{const n=Math.sin(x*127.1+y*311.7)*43758.5453123;return n-Math.floor(n);};
+function fillFallback(){
+ // A vyon-like six-lobed ring while the SVG mask is loading or unavailable.
+ particles.length=0;
+ for(let i=0;i<425;i++){
+  const theta=i/425*Math.PI*2;
+  for(let band=0;band<4;band++){
+   const radius=.64+.075*Math.cos(theta*7-.35)+.028*Math.sin(theta*5+.6)+(band-1.5)*.024;
+   particles.push({x:Math.cos(theta)*radius,y:Math.sin(theta)*radius,j:hash(i,band)});
+  }
+ }
+}
+fillFallback();
+function loadIconParticles(){
+ const im=new Image();
+ im.onload=()=>{
+  const size=336,sample=document.createElement("canvas");
+  sample.width=size;sample.height=size;
+  const sctx=sample.getContext("2d",{willReadFrequently:true});
+  if(!sctx)return;
+  sctx.clearRect(0,0,size,size);
+  sctx.drawImage(im,0,0,size,size);
+  const pixels=sctx.getImageData(0,0,size,size).data;
+  const next=[];
+  for(let y=2;y<size-2;y+=3){
+   for(let x=2;x<size-2;x+=3){
+    const jitterX=(hash(x,y)-.5)*2.1,jitterY=(hash(y,x)-.5)*2.1;
+    const xi=Math.min(size-1,Math.max(0,Math.round(x+jitterX)));
+    const yi=Math.min(size-1,Math.max(0,Math.round(y+jitterY)));
+    const alpha=pixels[(yi*size+xi)*4+3];
+    if(alpha<90)continue;
+    // Map the original full icon square into centered Cartesian coordinates.
+    next.push({x:((xi+.5)/size-.5)*2,y:((yi+.5)/size-.5)*2,j:hash(x+13,y+37)});
+   }
+  }
+  if(next.length>250){particles.splice(0,particles.length,...next);renderOrb();}
+ };
+ im.onerror=()=>renderOrb();
+ im.src="/icons/originals/vyon-violet.svg";
 }
 function resizeOrb(){
- const r=region.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2);
- w=Math.max(r.width,1);h=Math.max(r.height,1);canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);
- ctx.setTransform(dpr,0,0,dpr,0,0);renderOrb();
+ if(!ctx)return;
+ const bounds=region.getBoundingClientRect();
+ const ratio=Math.min(window.devicePixelRatio||1,2);
+ w=Math.max(1,bounds.width);h=Math.max(1,bounds.height);
+ canvas.width=Math.max(1,Math.round(w*ratio));
+ canvas.height=Math.max(1,Math.round(h*ratio));
+ ctx.setTransform(ratio,0,0,ratio,0,0);
+ renderOrb();
 }
 function renderOrb(){
  if(!ctx||!w||!h)return;
  ctx.clearRect(0,0,w,h);
- const color=getComputedStyle(root).getPropertyValue("--accent-rgb").trim()||"169,157,255";
- const cx=w*.50,cy=h*.47,R=Math.min(w*.51,h*.425,365);
- const grad=ctx.createRadialGradient(cx,cy,R*.08,cx,cy,R*1.30);
- grad.addColorStop(0,"rgba("+color+",.12)");grad.addColorStop(.5,"rgba("+color+",.05)");grad.addColorStop(1,"rgba("+color+",0)");
- ctx.fillStyle=grad;ctx.beginPath();ctx.arc(cx,cy,R*1.3,0,Math.PI*2);ctx.fill();
- const a=reduce?.4:orbTime*.00011,ca=Math.cos(a),sa=Math.sin(a),tilt=-.27+(inside?py*.08:0),ct=Math.cos(tilt),st=Math.sin(tilt);
- const ordered=points.map(p=>{
-  let tx=p.x,ty=p.y,tz=p.z;
-  if(orbShape==="halo"){
-   const theta=Math.atan2(p.y,p.x),minor=p.i*2.399963229728653,major=.78+.20*Math.cos(minor);
-   tx=Math.cos(theta)*major;ty=Math.sin(theta)*major*.72;tz=Math.sin(minor)*.27;
-  }else if(orbShape==="wave"){
-   tx=p.x*.99;ty=p.y*.50+Math.sin(p.x*8+orbTime*.0015+p.z*2)*.20;
-   tz=p.z*.29+Math.cos(p.y*7+orbTime*.0011)*.09;
-  }else if(orbShape==="sound"){
-   // Dot-based radial waveform: visually pulsing, no microphone or audio access.
-   const angle=Math.atan2(p.y,p.x),radius=Math.hypot(p.x,p.y);
-   const beat=.5+.5*Math.sin(orbTime*.0035);
-   const spectrum=.12*Math.sin(angle*18+orbTime*.002)+.075*Math.sin(angle*31-orbTime*.0014);
-   const distance=radius*(.65+beat*.06)+spectrum*(.55+.45*radius);
-   tx=Math.cos(angle)*distance;
-   ty=Math.sin(angle)*distance;
-   tz=p.z*.25+Math.sin(angle*9+orbTime*.0025)*.045;
-  }
-  const ease=reduce?1:.095;
-  p.sx+=(tx-p.sx)*ease;p.sy+=(ty-p.sy)*ease;p.sz+=(tz-p.sz)*ease;
-  const xx=p.sx*ca-p.sz*sa,zz=p.sx*sa+p.sz*ca,yy=p.sy*ct-zz*st,z=p.sy*st+zz*ct,scale=1+z*.21;
-  return{x:cx+xx*R*scale,y:cy+yy*R*scale,z,j:p.j};
- }).sort((a,b)=>a.z-b.z);
- const mx=cx+px*R*.3,my=cy+py*R*.3;
- for(const p of ordered){
-  let x=p.x,y=p.y;
-  if(inside){const dx=x-mx,dy=y-my,d=Math.hypot(dx,dy);if(d<115&&d>.01){const force=Math.pow(1-d/115,2)*34;x+=dx/d*force;y+=dy/d*force;}}
-  const opacity=(.22+(p.z+1)*.27)*(.7+p.j*.36),size=(.65+(p.z+1)*.49)*(p.j>.96?1.8:1);
-  ctx.fillStyle="rgba("+color+","+opacity.toFixed(3)+")";ctx.beginPath();ctx.arc(x,y,size,0,Math.PI*2);ctx.fill();
+ const palette=tones[root.dataset.accent]||tones.violet;
+ const centerX=w*.5,centerY=h*.49;
+ const radius=Math.min(w*.43,h*.42,320);
+ const angle=orbAngle*Math.PI/180,ca=Math.cos(angle),sa=Math.sin(angle);
+ for(const p of particles){
+  const x=p.x*ca-p.y*sa;
+  const y=p.x*sa+p.y*ca;
+  const index=Math.min(2,Math.max(0,Math.floor((p.x+p.y+2)/4*3)));
+  const opacity=(.50+.43*p.j).toFixed(3);
+  ctx.fillStyle="rgba("+palette[index]+","+opacity+")";
+  ctx.beginPath();
+  ctx.arc(centerX+x*radius,centerY+y*radius,.9+p.j*.65,0,Math.PI*2);
+  ctx.fill();
  }
 }
-// Morph the particles into four distinct visual formations.
-$$("[data-orb-shape]").forEach(btn=>btn.addEventListener("click",()=>{
- orbShape=btn.dataset.orbShape;root.dataset.orbForm=orbShape;
- $$("[data-orb-shape]").forEach(el=>{const active=el===btn;el.classList.toggle("active",active);el.setAttribute("aria-pressed",String(active));});
- if(reduce)renderOrb();
-}));
-function movePointer(e){
- const r=region.getBoundingClientRect();
- px=((e.clientX-r.left)/r.width-.5)*2;py=((e.clientY-r.top)/r.height-.5)*2;inside=true;
- if(reduce)renderOrb();
+function accelerateIcon(){
+ orbBoost=1;
+ orbVelocity=48; // 80% speed, relative to an intentionally calm 60 deg/s maximum
+ if(reduce){orbAngle=(orbAngle+15)%360;renderOrb();}
 }
-region.addEventListener("pointermove",movePointer);
-region.addEventListener("pointerdown",movePointer);
-region.addEventListener("pointerleave",()=>{px=py=0;inside=false;if(reduce)renderOrb();});
-if("IntersectionObserver" in window)new IntersectionObserver(e=>orbVisible=e[0].isIntersecting).observe(region);
-let lastFrame=0;
-function orbLoop(t){requestAnimationFrame(orbLoop);if(!orbVisible||document.hidden||t-lastFrame<32)return;lastFrame=t;orbTime=t;renderOrb();}
+region.addEventListener("click",accelerateIcon);
+region.addEventListener("keydown",e=>{
+ if(e.key==="Enter"||e.key===" "){e.preventDefault();accelerateIcon();}
+});
+if("IntersectionObserver" in window){
+ new IntersectionObserver(entries=>{orbVisible=entries[0].isIntersecting;orbLast=0;},{threshold:.01}).observe(region);
+}
+function animateOrb(now){
+ requestAnimationFrame(animateOrb);
+ if(reduce||document.hidden||!orbVisible){orbLast=0;return;}
+ if(orbLast){
+  const dt=Math.min(.06,(now-orbLast)/1000);
+  orbBoost=Math.max(0,orbBoost-dt/3.2);
+  const ease=orbBoost*orbBoost*(3-2*orbBoost);
+  const target=18+30*ease;
+  orbVelocity+=(target-orbVelocity)*Math.min(1,dt*8);
+  orbAngle=(orbAngle+orbVelocity*dt)%360;
+  renderOrb();
+ }
+ orbLast=now;
+}
 window.addEventListener("resize",resizeOrb,{passive:true});
-resizeOrb();if(!reduce)requestAnimationFrame(orbLoop);
+resizeOrb();
+loadIconParticles();
+if(!reduce)requestAnimationFrame(animateOrb);
 // Feature-card visualizer
 const eqBars=$$("#eq-bars i"),eqLabel=$("#eq-mode-label");let mode=0,eqFrame=0;
 function eqPulse(){eqFrame++;eqBars.forEach((bar,i)=>{let value=mode?.2+.6*Math.abs(Math.cos(i*.49+eqFrame*.37)):.14+.56*Math.abs(Math.sin(i*.39+eqFrame*.22));bar.style.height=Math.round(value*100)+"%";});}

@@ -163,16 +163,29 @@ body{background:#080808!important;background-image:none!important}
 }
 @media(prefers-reduced-motion:reduce){.sound-mode-dot{animation:none!important}}
 
-/* User-supplied original vyon waveform mark, faithful vector traced shape.
-   Slow rotation: 30% baseline; click spikes to 80%, then eases back. */
-.hero:after{background:linear-gradient(90deg,#080808 0%,rgba(8,8,8,.38) 68%,rgba(8,8,8,0) 100%)!important}
-.vyon-spin-control{position:absolute;z-index:2;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;margin:auto;width:250px;height:290px;padding:20px;border:0;background:transparent;color:var(--accent);cursor:pointer;top:-5%;left:8%;pointer-events:auto}
-.vyon-spin-image-wrap{display:grid;place-items:center;width:215px;height:215px;filter:drop-shadow(0 0 18px rgba(var(--accent-rgb),.12));transition:filter .35s}
-.vyon-spin-control:hover .vyon-spin-image-wrap{filter:drop-shadow(0 0 28px rgba(var(--accent-rgb),.35))}
-#vyon-spin-image{width:100%;height:100%;object-fit:contain;transform-origin:center;will-change:transform;user-select:none}
-.vyon-spin-label{font:9px var(--mono);color:var(--muted);letter-spacing:.15em}
-.vyon-spin-label span{color:var(--accent)}
-.vyon-spin-control:focus-visible{outline:2px solid var(--accent);border-radius:20px}
-@media(max-width:850px){.vyon-spin-control{left:0;top:-9%;width:190px;height:230px}.vyon-spin-image-wrap{width:165px;height:165px}}
-@media(max-width:590px){.vyon-spin-control{left:-14%;top:-9%;width:185px;height:205px}.vyon-spin-image-wrap{width:158px;height:158px}.vyon-spin-label{font-size:8px}}
-@media(prefers-reduced-motion:reduce){#vyon-spin-image{will-change:auto}.vyon-spin-control:hover .vyon-spin-image-wrap{filter:none}}
+
+/* The navigation remains visible at all scroll positions. */
+.site-header{
+ position:fixed!important;
+ top:12px!important;
+ left:clamp(15px,3vw,56px)!important;
+ right:clamp(15px,3vw,56px)!important;
+ z-index:110!important;
+}
+.site-header.is-scrolled{
+ background:#111!important;
+ border-color:var(--edge);
+ box-shadow:0 8px 26px rgba(0,0,0,.47);
+}
+/* The particle canvas alone forms the real vyon waveform silhouette.
+   No overlapping icon image or mode selector is rendered. */
+.hero:after{
+ background:linear-gradient(90deg,#080808 0%,rgba(8,8,8,.25) 68%,transparent 100%)!important;
+ pointer-events:none;
+}
+.hero-orb{cursor:pointer;outline-offset:-8px}
+.hero-orb canvas{pointer-events:none}
+.hero-orb:focus-visible{outline:2px solid var(--accent);border-radius:22px}
+@media(max-width:590px){
+ .site-header{top:9px!important;left:12px!important;right:12px!important}
+}

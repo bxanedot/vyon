@@ -18,20 +18,15 @@
   <div id="reading-progress" class="reading-progress" aria-hidden="true"></div>
   <header class="site-header" id="site-header">
     <a class="brand" href="#top" aria-label="vyon home"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span>vyon<span class="brand-period">.</span></span></a>
-    <nav class="nav-desktop" aria-label="Primary"><a href="#experience">Experience</a><a href="#details">Details</a><a href="#downloads">Downloads</a><a href="#connect">Connect</a></nav>
+    <nav class="nav-desktop" aria-label="Primary"><a href="#experience">Experience</a><a href="#details">Details</a><a href="#downloads">Downloads</a></nav>
     <div class="header-actions"><button class="command-trigger" id="command-trigger" type="button" aria-label="Open quick navigation"><span class="command-key">⌘</span> K <span class="command-txt">Explore</span></button><a class="header-github" href="https://github.com/bxanedot/vyon" target="_blank" rel="noopener noreferrer">GitHub <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a><button class="mobile-menu-btn" id="mobile-menu-btn" type="button" aria-expanded="false" aria-controls="mobile-menu" aria-label="Toggle menu"><span></span><span></span></button></div>
   </header>
-  <nav class="mobile-menu" id="mobile-menu" aria-label="Mobile" hidden><a href="#experience">Experience</a><a href="#details">Details</a><a href="#downloads">Downloads</a><a href="#connect">Connect</a><a href="https://github.com/bxanedot/vyon" target="_blank" rel="noopener noreferrer">GitHub ↗</a></nav>
+  <nav class="mobile-menu" id="mobile-menu" aria-label="Mobile" hidden><a href="#experience">Experience</a><a href="#details">Details</a><a href="#downloads">Downloads</a><a href="https://github.com/bxanedot/vyon" target="_blank" rel="noopener noreferrer">GitHub ↗</a></nav>
 
   <main id="main">
     <section class="hero section-pad" id="top">
-      <div class="hero-orb" id="orb-region" aria-label="Interactive particle sculpture. Move your pointer or tap to interact.">
+      <div class="hero-orb" id="orb-region" role="button" tabindex="0" aria-label="Spin the vyon particle icon faster" title="Tap to accelerate the vyon particles">
         <canvas id="orb-canvas" aria-hidden="true"></canvas>
-        <button class="vyon-spin-control" id="vyon-spin-control" type="button" aria-label="Spin the vyon icon faster" title="Tap to speed up the rotation">
-          <span class="vyon-spin-image-wrap" id="vyon-spin-image-wrap"><img src="/icons/originals/vyon-violet.svg" id="vyon-spin-image" width="190" height="190" alt="" decoding="async"></span>
-          <span class="vyon-spin-label">TAP TO SPIN <span aria-hidden="true">↗</span></span>
-        </button>
-        <div class="orbit-caption"><span class="orbit-caption-point"></span> A listening universe <span class="orbit-caption-line"></span></div><div class="orb-shapes" role="group" aria-label="Particle shape"><button type="button" data-orb-shape="orbit" class="active" aria-pressed="true">Sphere</button><button type="button" data-orb-shape="halo" aria-pressed="false">Halo</button><button type="button" data-orb-shape="wave" aria-pressed="false">Wave</button><button type="button" data-orb-shape="sound" aria-pressed="false"><span class="sound-mode-dot" aria-hidden="true"></span> Sound</button></div>
       </div>
       <div class="hero-copy">
         <div class="eyebrow"><span class="eyebrow-line"></span><span>POWERED BY YOUTUBE MUSIC · FOR ANDROID</span><span class="eyebrow-star">✳</span></div>
@@ -105,9 +100,7 @@
     </section>
 
   </main>
-  <footer class="site-footer"><div class="footer-main"><a class="footer-wordmark" href="#top">vyon<span>.</span></a><div class="footer-links"><a href="#experience">Experience</a><a href="#details">Details</a><a href="#downloads">Downloads</a><a href="#connect">Connect</a><a href="https://github.com/bxanedot/vyon" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div></div><div class="footer-bottom"><span>© <span id="copyright-year">2026</span> vyon. CREATED BY <a href="https://github.com/bxanedot" target="_blank" rel="noopener noreferrer">BXANE</a>.</span><span>CRAFTED FOR LISTENING <span class="foot-star">✳</span></span><a href="#top">BACK TO TOP ↑</a></div></footer>
-
-  <div class="command-overlay" id="command-overlay" hidden><div class="command-backdrop" data-close-command></div><div class="command-dialog" role="dialog" aria-modal="true" aria-label="Quick navigation"><div class="command-input-wrap"><span aria-hidden="true">⌕</span><input id="command-input" autocomplete="off" spellcheck="false" placeholder="Where to?" aria-label="Search sections"><kbd>ESC</kbd></div><div class="command-results" id="command-results"><a href="#top" data-command-item> Introduction <span>↗</span></a><a href="#experience" data-command-item> App screenshots <span>↗</span></a><a href="#details" data-command-item> Visual details <span>↗</span></a><a href="#downloads" data-command-item> Download vyon <span>↗</span></a><a href="#connect" data-command-item> Connect &amp; support <span>↗</span></a><a href="https://github.com/bxanedot/vyon" target="_blank" rel="noopener noreferrer" data-command-item> GitHub repository <span>↗</span></a></div><div class="command-footer"><span>↑↓ SELECT</span><span>↵ OPEN</span><span>ESC CLOSE</span></div></div></div>
+  <div class="command-overlay" id="command-overlay" hidden><div class="command-backdrop" data-close-command></div><div class="command-dialog" role="dialog" aria-modal="true" aria-label="Quick navigation"><div class="command-input-wrap"><span aria-hidden="true">⌕</span><input id="command-input" autocomplete="off" spellcheck="false" placeholder="Where to?" aria-label="Search sections"><kbd>ESC</kbd></div><div class="command-results" id="command-results"><a href="#top" data-command-item> Introduction <span>↗</span></a><a href="#experience" data-command-item> App screenshots <span>↗</span></a><a href="#details" data-command-item> Visual details <span>↗</span></a><a href="#downloads" data-command-item> Download vyon <span>↗</span></a><a href="https://github.com/bxanedot/vyon" target="_blank" rel="noopener noreferrer" data-command-item> GitHub repository <span>↗</span></a></div><div class="command-footer"><span>↑↓ SELECT</span><span>↵ OPEN</span><span>ESC CLOSE</span></div></div></div>
   <script src="/app.js" defer></script>
 </body>
 </html>

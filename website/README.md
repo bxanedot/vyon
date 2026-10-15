@@ -75,3 +75,9 @@ The guns.lol profile card now uses the official guns.lol apple-touch icon from `
 ## Brand casing
 
 The displayed project name is consistently written as **vyon** in lowercase. Other proper names (for example YouTube Music and Patreon) retain their original capitalization.
+
+## Simplified public layout (October 2026)
+
+The marketing website retains a **fixed matte-black header** that stays in view while scrolling. The footer has been removed. The public header and command navigation no longer feature a Connect link; creator support and social cards remain lower on the page. Browser Listen Together stays unadvertised and accessible only by its direct URL.
+
+The hero uses a **single vyon particle silhouette** derived from the original waveform icon artwork. The separate overlaid image and alternate Sphere/Halo/Wave/Sound selectors have been removed. Clicking or pressing Enter/Space on the particle silhouette accelerates its rotation from a gentle ~18 degrees per second (30% of 60°/s) to ~48 degrees per second (80%), then smoothly reduces it to its normal pace. Reduced-motion settings stop continuous spinning.
