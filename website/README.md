@@ -75,13 +75,3 @@ The guns.lol profile card now uses the official guns.lol apple-touch icon from `
 ## Brand casing
 
 The displayed project name is consistently written as **vyon** in lowercase. Other proper names (for example YouTube Music and Patreon) retain their original capitalization.
-
-## Reference direction and brand emblem
-
-The homepage takes product-led inspiration from https://metrolist.cc/ — a straightforward Android/YouTube Music identity, prominent app screenshots, and a direct APK path — while preserving an original vyon layout and site code. No Metrolist screenshots or branded art are imported.
-
-A floating vyon emblem in the hero rotates continuously at 30% of its defined maximum speed. Clicking it accelerates the rotation smoothly to 80% before returning to 30%. Repeated clicks restart the boost without resetting the icon's angle. Reduced-motion preferences disable automatic spinning.
-
-The supplied original icon images were shared as inline chat imagery, not downloadable file attachments in this tool environment. **The site currently displays its existing SVG favicon as the fallback** and automatically uses `website/icons/originals/vyon-icon.png` for the hero emblem and header mark if that image is added. The original files have *not* been copied to GitHub; add the PNG in that exact path, or provide it as a downloadable image attachment to include it. No fake icon substitutes are generated.
-
-The homepage no longer exposes the direct listening-room route; the existing `/listen/` page remains accessible when someone knows its URL. Hiding navigation is not access control.

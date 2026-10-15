@@ -5,60 +5,6 @@ const $=(s,scope=document)=>scope.querySelector(s), $$=(s,scope=document)=>[...s
 const root=document.documentElement;
 const reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 $("#copyright-year").textContent=new Date().getFullYear();
-// Rotating brand emblem: 30% baseline, click to ease into 80% and return to 30%.
-// A real, original vyon PNG replaces the fallback automatically when uploaded.
-const spinControl=$("#vyon-spin-control");
-const spinWrap=$("#vyon-spin-image-wrap");
-const spinImage=$("#vyon-spin-image");
-if(spinImage?.dataset.originalSrc){
- const asset=new Image();
- const originalPath=spinImage.dataset.originalSrc;
- asset.onload=()=>{
-  if(!asset.naturalWidth)return;
-  spinImage.src=originalPath;
-  const headerBrand=$(".brand .brand-mark");
-  if(headerBrand){
-   const replacement=document.createElement("img");
-   replacement.src=originalPath;replacement.alt="";
-   replacement.width=30;replacement.height=30;
-   replacement.className="brand-original-image";
-   headerBrand.replaceChildren(replacement);
-   headerBrand.classList.add("has-original-image");
-  }
- };
- asset.src=originalPath;
-}
-if(spinControl&&spinWrap){
- const baseline=.30,maximum=.80,fullRate=Math.PI*2/6;
- let angle=0,boostStarted=null,previousFrame=0;
- const ease=x=>x*x*(3-2*x);
- function currentRate(now){
-  if(boostStarted===null)return baseline;
-  const elapsed=Math.max(0,now-boostStarted);
-  if(elapsed<580)return baseline+(maximum-baseline)*ease(elapsed/580);
-  if(elapsed<3800)return baseline+(maximum-baseline)*(1-ease((elapsed-580)/3220));
-  boostStarted=null;
-  spinControl.classList.remove("is-boosted");
-  return baseline;
- }
- function frame(now){
-  const dt=previousFrame?Math.max(0,Math.min(now-previousFrame,64)):0;
-  previousFrame=now;
-  if(!document.hidden){
-   angle+=fullRate*currentRate(now)*dt/1000;
-   spinWrap.style.transform="rotate("+angle+"rad)";
-  }
-  requestAnimationFrame(frame);
- }
- if(!reduce)requestAnimationFrame(frame);
- spinControl.addEventListener("click",()=>{
-  if(reduce)return;
-  boostStarted=performance.now();
-  spinControl.classList.add("is-boosted");
- });
- if(reduce)spinControl.setAttribute("aria-label","vyon icon; animation off due to reduced-motion settings");
-}
-
 // Atmospheric pointer lighting, disabled for reduced motion.
 const ambient=$("#ambient-pointer");
 if(ambient&&!reduce&&window.matchMedia("(hover:hover) and (pointer:fine)").matches){
@@ -67,6 +13,42 @@ if(ambient&&!reduce&&window.matchMedia("(hover:hover) and (pointer:fine)").match
   mouseX=event.clientX;mouseY=event.clientY;
   if(!pending){pending=true;requestAnimationFrame(()=>{ambient.style.transform="translate3d("+(mouseX-300)+"px,"+(mouseY-300)+"px,0)";pending=false;});}
  },{passive:true});
+}
+// The vyon waveform is traced from the user's original icon artwork.
+// 30% = 18 degrees/second, 80% = 48 degrees/second at peak.
+const spinButton=$("#vyon-spin-control"),spinImage=$("#vyon-spin-image");
+let spinAngle=0,spinVelocity=18,spinBoost=0,spinPrevious=0;
+const setIcon=()=>{
+ const color=root.dataset.accent||"violet";
+ const file=color==="acid"?"acid":color==="coral"?"coral":color==="ice"?"ice":"violet";
+ if(spinImage)spinImage.src="/icons/originals/vyon-"+file+".svg";
+};
+if(spinImage){
+ spinImage.draggable=false;
+ setIcon();
+ if(spinButton)spinButton.addEventListener("click",()=>{
+  spinBoost=1;spinVelocity=48;
+  spinButton.classList.remove("spin-boost");
+  void spinButton.offsetWidth;
+  spinButton.classList.add("spin-boost");
+ });
+ if(!reduce){
+  const animateSpin=t=>{
+   if(spinPrevious){
+    const dt=Math.min(.06,(t-spinPrevious)/1000);
+    spinBoost=Math.max(0,spinBoost-dt/3.2);
+    const target=18+30*(spinBoost*spinBoost*(3-2*spinBoost));
+    spinVelocity+=(target-spinVelocity)*Math.min(1,dt*8);
+    spinAngle=(spinAngle+spinVelocity*dt)%360;
+    spinImage.style.transform="rotate("+spinAngle+"deg)";
+   }
+   spinPrevious=t;
+   if(!document.hidden)requestAnimationFrame(animateSpin);
+   else spinPrevious=0;
+  };
+  requestAnimationFrame(animateSpin);
+  document.addEventListener("visibilitychange",()=>{if(!document.hidden)requestAnimationFrame(animateSpin);});
+ }
 }
 // Navigation
 const overlay=$("#command-overlay"),input=$("#command-input"),items=$$("[data-command-item]"),mob=$("#mobile-menu"),mobBtn=$("#mobile-menu-btn");
@@ -116,6 +98,7 @@ if("IntersectionObserver" in window){
 function theme(color){
  if(!["violet","acid","coral","ice"].includes(color))return;
  root.dataset.accent=color;
+ setIcon();
  $$("[data-color]").forEach(b=>{const on=b.dataset.color===color;b.classList.toggle("active",on);b.setAttribute("aria-pressed",String(on));});
  const meta=document.querySelector('meta[name="theme-color"]');
  if(meta)meta.content=({violet:"#0b0918",acid:"#0b150a",coral:"#190d13",ice:"#08151b"})[color];

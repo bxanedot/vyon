@@ -163,60 +163,16 @@ body{background:#080808!important;background-image:none!important}
 }
 @media(prefers-reduced-motion:reduce){.sound-mode-dot{animation:none!important}}
 
-
-/* Rotating vyon emblem. Real uploaded icon replaces the fallback automatically. */
-.hero-orb{isolation:isolate}
-.vyon-spin-control{
- position:absolute;top:46%;left:50%;transform:translate(-50%,-50%);
- z-index:4;width:132px;height:160px;
- display:flex;align-items:center;justify-content:center;flex-direction:column;
- border:0;background:transparent;color:var(--accent);
- cursor:pointer;touch-action:manipulation;
-}
-.vyon-spin-control:focus-visible{outline:2px solid var(--accent);outline-offset:7px;border-radius:14px}
-.vyon-spin-image-wrap{
- width:108px;height:108px;border-radius:50%;
- display:grid;place-items:center;
- background:#0d0d0d;
- border:1px solid rgba(var(--accent-rgb),.24);
- box-shadow:0 0 0 12px rgba(var(--accent-rgb),.022),0 0 38px rgba(var(--accent-rgb),.1);
- will-change:transform;
-}
-.vyon-spin-image-wrap img{
- width:76px;height:76px;object-fit:contain;display:block;
- pointer-events:none;
-}
-.vyon-spin-control:hover .vyon-spin-image-wrap,
-.vyon-spin-control.is-boosted .vyon-spin-image-wrap{
- border-color:rgba(var(--accent-rgb),.75);
- box-shadow:0 0 0 13px rgba(var(--accent-rgb),.035),0 0 40px rgba(var(--accent-rgb),.2);
-}
-.vyon-spin-label{
- position:absolute;bottom:2px;left:50%;transform:translateX(-50%);
- display:flex;align-items:center;gap:7px;
- white-space:nowrap;font:9px var(--mono);letter-spacing:.1em;
- color:#acaab4;transition:color .2s;
-}
-.vyon-spin-control:hover .vyon-spin-label{color:var(--accent)}
-.brand-mark.has-original-image{gap:0;flex:none;width:31px;height:31px}
-.brand-original-image{width:30px;height:30px;object-fit:contain}
-@media(max-width:850px){
- .vyon-spin-control{top:45%;left:48%;width:109px;height:133px}
- .vyon-spin-image-wrap{width:86px;height:86px}
- .vyon-spin-image-wrap img{width:60px;height:60px}
-}
-@media(max-width:590px){
- .vyon-spin-control{top:39%;left:46%;width:89px;height:110px}
- .vyon-spin-image-wrap{width:71px;height:71px}
- .vyon-spin-image-wrap img{width:49px;height:49px}
- .vyon-spin-label{bottom:0;font-size:8px}
-}
-@media(prefers-reduced-motion:reduce){
- .vyon-spin-image-wrap{will-change:auto;transition:none!important}
- .vyon-spin-label{display:none}
-}
-/* Product-led messaging: quiet and legible, without visual noise. */
-.site-footer .platform-note{color:#a4a4a4;font:10px var(--mono);letter-spacing:.025em;line-height:1.65}
-
-/* Matte hero surface: remove the old radial darkening layer. */
-.hero:after{background:none!important}
+/* User-supplied original vyon waveform mark, faithful vector traced shape.
+   Slow rotation: 30% baseline; click spikes to 80%, then eases back. */
+.hero:after{background:linear-gradient(90deg,#080808 0%,rgba(8,8,8,.38) 68%,rgba(8,8,8,0) 100%)!important}
+.vyon-spin-control{position:absolute;z-index:2;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;margin:auto;width:250px;height:290px;padding:20px;border:0;background:transparent;color:var(--accent);cursor:pointer;top:-5%;left:8%;pointer-events:auto}
+.vyon-spin-image-wrap{display:grid;place-items:center;width:215px;height:215px;filter:drop-shadow(0 0 18px rgba(var(--accent-rgb),.12));transition:filter .35s}
+.vyon-spin-control:hover .vyon-spin-image-wrap{filter:drop-shadow(0 0 28px rgba(var(--accent-rgb),.35))}
+#vyon-spin-image{width:100%;height:100%;object-fit:contain;transform-origin:center;will-change:transform;user-select:none}
+.vyon-spin-label{font:9px var(--mono);color:var(--muted);letter-spacing:.15em}
+.vyon-spin-label span{color:var(--accent)}
+.vyon-spin-control:focus-visible{outline:2px solid var(--accent);border-radius:20px}
+@media(max-width:850px){.vyon-spin-control{left:0;top:-9%;width:190px;height:230px}.vyon-spin-image-wrap{width:165px;height:165px}}
+@media(max-width:590px){.vyon-spin-control{left:-14%;top:-9%;width:185px;height:205px}.vyon-spin-image-wrap{width:158px;height:158px}.vyon-spin-label{font-size:8px}}
+@media(prefers-reduced-motion:reduce){#vyon-spin-image{will-change:auto}.vyon-spin-control:hover .vyon-spin-image-wrap{filter:none}}
