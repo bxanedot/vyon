@@ -224,3 +224,8 @@ html{scroll-behavior:smooth}
 @media(max-width:590px){
  .hero .hero-orb{transform:translate3d(0,48px,0)}
 }
+
+/* Keep the official guns.lol mark, rendered pure white like the other social icons. */
+.social-card[href="https://guns.lol/bxane"] .social-symbol img{
+  filter:grayscale(1) brightness(0) invert(1);
+}
