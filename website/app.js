@@ -31,6 +31,24 @@ if("IntersectionObserver" in window&&!reduce){
  const obs=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add("is-visible");obs.unobserve(e.target);}}),{threshold:.08,rootMargin:"0px 0px -35px 0px"});
  $$(".reveal").forEach(x=>obs.observe(x));
 }else $$(".reveal").forEach(x=>x.classList.add("is-visible"));
+// Scroll progress and active navigation
+const progressBar=$("#reading-progress"),siteHeader=$("#site-header"),navLinks=$(".nav-desktop a");
+let scrollScheduled=false;
+function updateScroll(){
+ const total=document.documentElement.scrollHeight-innerHeight;
+ progressBar.style.transform="scaleX("+(total>0?Math.min(1,Math.max(0,scrollY/total)):0)+")";
+ siteHeader.classList.toggle("is-scrolled",scrollY>32);
+ scrollScheduled=false;
+}
+window.addEventListener("scroll",()=>{if(!scrollScheduled){scrollScheduled=true;requestAnimationFrame(updateScroll);}},{passive:true});
+updateScroll();
+if("IntersectionObserver" in window){
+ const sectionObserver=new IntersectionObserver(entries=>entries.forEach(e=>{
+  if(!e.isIntersecting)return;
+  navLinks.forEach(a=>a.getAttribute("href")==="#"+e.target.id?a.setAttribute("aria-current","location"):a.removeAttribute("aria-current"));
+ }),{rootMargin:"-36% 0px -58% 0px",threshold:0});
+ ["experience","details","downloads"].forEach(id=>{const section=document.getElementById(id);if(section)sectionObserver.observe(section);});
+}
 // Accent palette
 function theme(color){
  if(!["violet","acid","coral","ice"].includes(color))return;
@@ -43,11 +61,11 @@ $("[data-color]").forEach(b=>b.addEventListener("click",()=>theme(b.dataset.colo
 try{theme(localStorage.getItem("vyon-accent")||"violet");}catch{theme("violet");}
 // Orb canvas
 const region=$("#orb-region"),canvas=$("#orb-canvas"),ctx=canvas.getContext("2d",{alpha:true});
-let w=0,h=0,px=0,py=0,inside=false,orbVisible=true,orbTime=0;
+let w=0,h=0,px=0,py=0,inside=false,orbVisible=true,orbTime=0,orbShape="orbit";
 const points=[],total=reduce?750:1200;
 for(let i=0;i<total;i++){
  const z=1-2*(i+.5)/total,phi=i*Math.PI*(3-Math.sqrt(5)),r=Math.sqrt(1-z*z);
- points.push({x:Math.cos(phi)*r,y:Math.sin(phi)*r,z,j:((i*137)%47)/47});
+ const x=Math.cos(phi)*r,y=Math.sin(phi)*r;points.push({x,y,z,sx:x,sy:y,sz:z,i,j:((i*137)%47)/47});
 }
 function resizeOrb(){
  const r=region.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2);
@@ -64,7 +82,17 @@ function renderOrb(){
  ctx.fillStyle=grad;ctx.beginPath();ctx.arc(cx,cy,R*1.3,0,Math.PI*2);ctx.fill();
  const a=reduce?.4:orbTime*.00011,ca=Math.cos(a),sa=Math.sin(a),tilt=-.27+(inside?py*.08:0),ct=Math.cos(tilt),st=Math.sin(tilt);
  const ordered=points.map(p=>{
-  const xx=p.x*ca-p.z*sa,zz=p.x*sa+p.z*ca,yy=p.y*ct-zz*st,z=p.y*st+zz*ct,scale=1+z*.21;
+  let tx=p.x,ty=p.y,tz=p.z;
+  if(orbShape==="halo"){
+   const theta=Math.atan2(p.y,p.x),minor=p.i*2.399963229728653,major=.78+.20*Math.cos(minor);
+   tx=Math.cos(theta)*major;ty=Math.sin(theta)*major*.72;tz=Math.sin(minor)*.27;
+  }else if(orbShape==="wave"){
+   tx=p.x*.99;ty=p.y*.50+Math.sin(p.x*8+orbTime*.0015+p.z*2)*.20;
+   tz=p.z*.29+Math.cos(p.y*7+orbTime*.0011)*.09;
+  }
+  const ease=reduce?1:.095;
+  p.sx+=(tx-p.sx)*ease;p.sy+=(ty-p.sy)*ease;p.sz+=(tz-p.sz)*ease;
+  const xx=p.sx*ca-p.sz*sa,zz=p.sx*sa+p.sz*ca,yy=p.sy*ct-zz*st,z=p.sy*st+zz*ct,scale=1+z*.21;
   return{x:cx+xx*R*scale,y:cy+yy*R*scale,z,j:p.j};
  }).sort((a,b)=>a.z-b.z);
  const mx=cx+px*R*.3,my=cy+py*R*.3;
@@ -75,6 +103,12 @@ function renderOrb(){
   ctx.fillStyle="rgba("+color+","+opacity.toFixed(3)+")";ctx.beginPath();ctx.arc(x,y,size,0,Math.PI*2);ctx.fill();
  }
 }
+// Morph the particles into three distinct formations.
+$("[data-orb-shape]").forEach(btn=>btn.addEventListener("click",()=>{
+ orbShape=btn.dataset.orbShape;root.dataset.orbForm=orbShape;
+ $("[data-orb-shape]").forEach(el=>{const active=el===btn;el.classList.toggle("active",active);el.setAttribute("aria-pressed",String(active));});
+ if(reduce)renderOrb();
+}));
 function movePointer(e){
  const r=region.getBoundingClientRect();
  px=((e.clientX-r.left)/r.width-.5)*2;py=((e.clientY-r.top)/r.height-.5)*2;inside=true;
@@ -93,6 +127,14 @@ const eqBars=$$("#eq-bars i"),eqLabel=$("#eq-mode-label");let mode=0,eqFrame=0;
 function eqPulse(){eqFrame++;eqBars.forEach((bar,i)=>{let value=mode?.2+.6*Math.abs(Math.cos(i*.49+eqFrame*.37)):.14+.56*Math.abs(Math.sin(i*.39+eqFrame*.22));bar.style.height=Math.round(value*100)+"%";});}
 $("#eq-toggle").addEventListener("click",()=>{mode=1-mode;eqLabel.textContent=mode?"PULSE":"DRIFT";eqPulse();});
 if(!reduce){eqPulse();setInterval(()=>{if(!document.hidden)eqPulse();},410);}
+// Cursor-reactive surface light, with no dependency on animation libraries.
+if(window.matchMedia("(hover: hover) and (pointer: fine)").matches){
+ $(".feature-card").forEach(card=>card.addEventListener("pointermove",e=>{
+  const rect=card.getBoundingClientRect();
+  card.style.setProperty("--mx",((e.clientX-rect.left)/rect.width*100).toFixed(1)+"%");
+  card.style.setProperty("--my",((e.clientY-rect.top)/rect.height*100).toFixed(1)+"%");
+ }));
+}
 // Original synthesized loops
 const tracks=[
  {name:"Afterglow",roots:[48,53,45,50],melody:[72,76,79,76,74,72,69,72],wave:"sine",art:"album-1"},
