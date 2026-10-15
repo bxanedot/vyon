@@ -6,16 +6,17 @@ const $$=(selector)=>[...document.querySelectorAll(selector)];
 const section=$("#equalizer");
 if(!section)return;
 
-const storageKey="vyon-eq-preview-v1";
+const storageKey="vyon-eq-preview-v2";
+const previousStorageKey="vyon-eq-preview-v1";
 const limits={min:-10,max:10};
-const names=["bass","mids","treble"];
-const frequencies=["31 Hz","125 Hz","1 kHz","4 kHz","16 kHz"];
+const frequencies=["31 Hz","62 Hz","125 Hz","250 Hz","500 Hz","1 kHz","2 kHz","4 kHz","8 kHz","16 kHz"];
+const groups={bass:[0,1,2],mids:[3,4,5,6],treble:[7,8,9]};
 const presetBands={
- flat:[0,0,0,0,0],
- signature:[2,2,0,4,4],
- bass:[7,5,1,0,0],
- treble:[0,0,0,5,7],
- warm:[4,3,2,1,0]
+ flat:[0,0,0,0,0,0,0,0,0,0],
+ signature:[2,2,2,1,0,0,2,4,4,4],
+ bass:[8,8,7,5,3,1,0,0,0,0],
+ treble:[0,0,0,0,0,1,3,5,7,7],
+ warm:[5,5,4,4,3,2,2,1,0,0]
 };
 const presetNames={flat:"Flat",signature:"vyon Signature",bass:"Bass Boost",treble:"Treble Boost",warm:"Warm",custom:"Custom"};
 const circle=$("#vqe-circle"),basic=$("#vqe-basic"),advanced=$("#vqe-advanced");
@@ -30,22 +31,38 @@ let bands=presetBands.signature.slice(),display=bands.slice();
 let preset="signature",mode="basic",animation=0;
 let activeAxis=null;
 function getRanges(values){
- return {
-  bass:(values[0]+values[1])/2,
-  mids:values[2],
-  treble:(values[3]+values[4])/2
- };
+ const avg=indices=>indices.reduce((sum,i)=>sum+values[i],0)/indices.length;
+ return {bass:avg(groups.bass),mids:avg(groups.mids),treble:avg(groups.treble)};
 }
 function saveState(){
  try{localStorage.setItem(storageKey,JSON.stringify({bands,preset,mode}));}catch{}
 }
+// Migrate saved five-band curves using log-frequency interpolation.
+function migrateFive(old){
+ const from=[31,125,1000,4000,16000];
+ const to=[31,62,125,250,500,1000,2000,4000,8000,16000];
+ return to.map(f=>{
+  if(f<=from[0])return clamp(old[0]);
+  if(f>=from[4])return clamp(old[4]);
+  const upper=from.findIndex(v=>v>=f),lower=upper-1;
+  const t=Math.log(f/from[lower])/Math.log(from[upper]/from[lower]);
+  return clamp(old[lower]*(1-t)+old[upper]*t);
+ });
+}
 try{
- const stored=JSON.parse(localStorage.getItem(storageKey)||"null");
- if(stored&&Array.isArray(stored.bands)&&stored.bands.length===5&&stored.bands.every(Number.isFinite)){
-  bands=stored.bands.map(clamp);
+ let stored=JSON.parse(localStorage.getItem(storageKey)||"null");
+ let migrated=false;
+ if(!stored){stored=JSON.parse(localStorage.getItem(previousStorageKey)||"null");migrated=!!stored;}
+ if(stored&&Array.isArray(stored.bands)&&[5,10].includes(stored.bands.length)&&stored.bands.every(Number.isFinite)){
+  if(stored.bands.length===5&&Object.hasOwn(presetBands,stored.preset)&&stored.preset!=="custom"){
+   bands=presetBands[stored.preset].slice();
+  }else{
+   bands=stored.bands.length===5?migrateFive(stored.bands):stored.bands.map(clamp);
+  }
   display=bands.slice();
   preset=Object.hasOwn(presetBands,stored.preset)&&bands.every((v,i)=>v===presetBands[stored.preset][i])?stored.preset:"custom";
   mode=stored.mode==="advanced"?"advanced":"basic";
+  if(migrated)saveState();
  }
 }catch{}
 function setPreset(which){
@@ -57,16 +74,14 @@ function setPreset(which){
  requestRender();
 }
 function setBasic(key,value){
+ if(!Object.hasOwn(groups,key))return;
  const v=clamp(value);
- if(key==="bass"){bands[0]=v;bands[1]=v;}
- else if(key==="mids"){bands[2]=v;}
- else if(key==="treble"){bands[3]=v;bands[4]=v;}
- else return;
+ groups[key].forEach(i=>{bands[i]=v;});
  preset="custom";saveState();syncControls();
  requestRender();
 }
 function setBand(index,value){
- if(!Number.isInteger(index)||index<0||index>=5)return;
+ if(!Number.isInteger(index)||index<0||index>=bands.length)return;
  bands[index]=clamp(value);
  preset="custom";saveState();syncControls();
  requestRender();
@@ -81,7 +96,7 @@ function changeMode(next){
   b.classList.toggle("is-active",active);
   b.setAttribute("aria-pressed",String(active));
  });
- $("#vqe-footer-detail").textContent=mode==="basic"?"Three ranges · −10 to +10 dB":"Five bands · −10 to +10 dB";
+ $("#vqe-footer-detail").textContent=mode==="basic"?"Three ranges · −10 to +10 dB" :"Ten bands · −10 to +10 dB";
  saveState();
  requestRender();
 }
@@ -119,7 +134,6 @@ const axes=[
  {name:"treble",angle:5*Math.PI/6}
 ];
 const baseRadius=52,gainScale=4;
-const radian=Math.PI/180;
 function position(axis,values){
  const range=getRanges(values)[axis.name];
  const radius=baseRadius+gainScale*range;
@@ -143,12 +157,12 @@ function wavePath(values){
  return d+" Z";
 }
 function advCurvePath(values){
- const x=[14,112,210,308,406];
+ const x=values.map((_,i)=>14+392*i/(values.length-1));
  const y=values.map(v=>xfmt(78-v*4.7));
- let d="M"+x[0]+" "+y[0];
- for(let i=0;i<4;i++){
+ let d="M"+xfmt(x[0])+" "+y[0];
+ for(let i=0;i<values.length-1;i++){
   const dist=(x[i+1]-x[i])/3;
-  d+=" C"+xfmt(x[i]+dist)+" "+y[i]+", "+xfmt(x[i+1]-dist)+" "+y[i+1]+", "+x[i+1]+" "+y[i+1];
+  d+=" C"+xfmt(x[i]+dist)+" "+y[i]+", "+xfmt(x[i+1]-dist)+" "+y[i+1]+", "+xfmt(x[i+1])+" "+y[i+1];
  }
  return d;
 }
@@ -173,7 +187,7 @@ function requestRender(){
 function tick(){
  animation=0;
  let delta=0;
- for(let i=0;i<5;i++){
+ for(let i=0;i<bands.length;i++){
   const diff=bands[i]-display[i];
   display[i]+=diff*.22;
   if(Math.abs(diff)<.018)display[i]=bands[i];

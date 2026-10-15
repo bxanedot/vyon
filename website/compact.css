@@ -376,3 +376,52 @@ html{scroll-behavior:smooth}
  .nav-desktop{gap:14px;font-size:12px}
  .header-actions{gap:10px}
 }
+
+
+/* Hero CTA pair: one vivid download action, one aligned source-code link. */
+.hero-buttons-primary{
+ display:flex;
+ flex-direction:row;
+ align-items:stretch;
+ gap:12px;
+ width:max-content;
+ max-width:100%;
+}
+.hero-buttons-primary .btn{
+ min-height:54px;
+ display:inline-flex;
+ justify-content:center;
+ align-items:center;
+ white-space:nowrap;
+ border-radius:8px;
+}
+.hero-buttons-primary .hero-download-btn{
+ background:linear-gradient(112deg,var(--accent),color-mix(in srgb,var(--accent) 68%,#ffffff));
+ border:1px solid transparent;
+ color:#090909;
+ box-shadow:0 9px 30px rgba(var(--accent-rgb),.21);
+}
+.hero-buttons-primary .hero-download-btn:hover{
+ background:linear-gradient(112deg,color-mix(in srgb,var(--accent) 85%,#fff),var(--accent));
+ box-shadow:0 12px 33px rgba(var(--accent-rgb),.30);
+}
+.hero-buttons-primary .hero-source-btn{
+ background:#121212;
+ color:#fff;
+ border:1px solid rgba(255,255,255,.24);
+}
+.hero-buttons-primary .hero-source-btn:hover{background:#1b1b1b;border-color:var(--accent)}
+.social-grid-community{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media(max-width:850px){
+ .social-grid-community{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:590px){
+ .hero-buttons-primary{flex-wrap:wrap;width:100%;gap:9px}
+ .hero-buttons-primary .btn{
+  min-height:48px;padding-inline:14px;font-size:12px;gap:10px;
+ }
+ .social-grid-community{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:350px){
+ .hero-buttons-primary .btn{flex:1 1 100%}
+}

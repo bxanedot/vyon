@@ -100,7 +100,7 @@ The entire **GET vyon / Take your music further** release-status card has been r
 
 ## Community / Support header navigation
 
-The sticky desktop header presents **Community** and **Support** as two independent navigation links (without a slash). The mobile menu and command palette expose both shortcuts too. The Community anchor jumps to the Guns.lol, Discord and Telegram cards at the bottom; Support jumps to the separate Ko-fi and Patreon cards directly below. Jump navigation honors the fixed header using `scroll-margin-top`. No external redirect happens until a user clicks one of the actual social cards.
+The sticky desktop header presents **Community** and **Support** as two independent navigation links (without a slash). The mobile menu and command palette expose both shortcuts too. The Community anchor jumps to the Guns.lol, X, Discord and Telegram cards at the bottom; Support jumps to the separate Ko-fi and Patreon cards directly below. Jump navigation honors the fixed header using `scroll-margin-top`. No external redirect happens until a user clicks one of the actual social cards.
 
 ## October 2026 visibility fix
 
@@ -110,6 +110,12 @@ A runtime error caused by calling `.forEach()` on a single DOM element interrupt
 
 A new full-width **vyon Equalizer** section is located at `/#equalizer`. Its dark two-column layout mirrors the visible structure of [xan.lat's equalizer](https://xan.lat/#equalizer): a heading, preset chips, two explanation cards, a rounded dark panel, Basic/Advanced switch, and circular three-axis tuner (Mids, Treble, Bass).
 
-This is **an original implementation**, not copied XAN source code. The Basic mode supports dragging handles on the circular chart and using accessible −10 to +10 dB sliders. Advanced mode shows a responsive five-band frequency-response curve and inputs for 31 Hz, 125 Hz, 1 kHz, 4 kHz and 16 kHz. Five presets—Flat, vyon Signature, Bass Boost, Treble Boost and Warm—work in either mode. Customized values are retained in browser localStorage under `vyon-eq-preview-v1` along with the selected mode.
+This is **an original implementation**, not copied XAN source code. The Basic mode supports dragging handles on the circular chart and using accessible −10 to +10 dB sliders. Advanced mode shows a responsive ten-band frequency-response curve and inputs for 31, 62, 125, 250, and 500 Hz plus 1, 2, 4, 8, and 16 kHz. Five presets—Flat, vyon Signature, Bass Boost, Treble Boost and Warm—work in either mode. Customized values are retained in browser localStorage under `vyon-eq-preview-v2` along with the selected mode. Older five-band custom settings are migrated where possible.
 
 The separate old animated frequency bars and their timer were removed. The EQ control is an **interactive website preview only** and intentionally does **not** alter the Android APK's audio, YouTube Music streaming, system audio, or any other listener's audio. Do not advertise it as a verified shipped APK equalizer until the Android project is actually integrated. The EQ visually follows the website's chosen accent color and respects reduced-motion settings.
+
+## X social link and hero actions
+
+An X social card was added to Community and points to the verified `https://x.com/bxanedot` account. Its icon is a local monochrome-white SVG under `website/icons/x.svg`, consistent with the other social icons. The hero now has two horizontally aligned actions: a vivid accent-colored **Download APK** primary button and a subdued **Source code** button linking to `https://github.com/bxanedot/vyon`. The former *only* downloads an APK when the site's GitHub Releases lookup finds a published stable APK; otherwise it reports unavailability. The former **See the app** button has been removed. The Experience copy no longer ends with “powered by YouTube Music.” Other factual backend references are intentionally retained.
+
+The Advanced EQ now contains ten bands rather than five; on very narrow screens its ten sliders form two rows of five to stay tappable. Basic and Advanced continue to share the same settings, and a previously saved custom five-band curve is interpolated into the new ten-band representation. EQ remains a browser-only demonstration.
