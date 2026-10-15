@@ -1,4 +1,4 @@
-/* Vyon site. Its audio demo uses local Web Audio oscillators; no streams or API keys. */
+/* Vyon site. Original particle art, genuine screenshot slots, official stable-release status. */
 (() => {
 "use strict";
 const $=(s,scope=document)=>scope.querySelector(s), $$=(s,scope=document)=>[...scope.querySelectorAll(s)];
@@ -41,7 +41,7 @@ if("IntersectionObserver" in window&&!reduce){
  $$(".reveal").forEach(x=>obs.observe(x));
 }else $$(".reveal").forEach(x=>x.classList.add("is-visible"));
 // Scroll progress and active navigation
-const progressBar=$("#reading-progress"),siteHeader=$("#site-header"),navLinks=$(".nav-desktop a");
+const progressBar=$("#reading-progress"),siteHeader=$("#site-header"),navLinks=$$(".nav-desktop a");
 let scrollScheduled=false;
 function updateScroll(){
  const total=document.documentElement.scrollHeight-innerHeight;
@@ -56,17 +56,19 @@ if("IntersectionObserver" in window){
   if(!e.isIntersecting)return;
   navLinks.forEach(a=>a.getAttribute("href")==="#"+e.target.id?a.setAttribute("aria-current","location"):a.removeAttribute("aria-current"));
  }),{rootMargin:"-36% 0px -58% 0px",threshold:0});
- ["experience","details","downloads"].forEach(id=>{const section=document.getElementById(id);if(section)sectionObserver.observe(section);});
+ ["experience","details","downloads","connect"].forEach(id=>{const section=document.getElementById(id);if(section)sectionObserver.observe(section);});
 }
 // Accent palette
 function theme(color){
  if(!["violet","acid","coral","ice"].includes(color))return;
  root.dataset.accent=color;
  $$("[data-color]").forEach(b=>{const on=b.dataset.color===color;b.classList.toggle("active",on);b.setAttribute("aria-pressed",String(on));});
+ const meta=document.querySelector('meta[name="theme-color"]');
+ if(meta)meta.content=({violet:"#0b0918",acid:"#0b150a",coral:"#190d13",ice:"#08151b"})[color];
  try{localStorage.setItem("vyon-accent",color);}catch{}
  requestAnimationFrame(renderOrb);
 }
-$("[data-color]").forEach(b=>b.addEventListener("click",()=>theme(b.dataset.color)));
+$$("[data-color]").forEach(b=>b.addEventListener("click",()=>theme(b.dataset.color)));
 try{theme(localStorage.getItem("vyon-accent")||"violet");}catch{theme("violet");}
 // Orb canvas
 const region=$("#orb-region"),canvas=$("#orb-canvas"),ctx=canvas.getContext("2d",{alpha:true});
@@ -113,9 +115,9 @@ function renderOrb(){
  }
 }
 // Morph the particles into three distinct formations.
-$("[data-orb-shape]").forEach(btn=>btn.addEventListener("click",()=>{
+$$("[data-orb-shape]").forEach(btn=>btn.addEventListener("click",()=>{
  orbShape=btn.dataset.orbShape;root.dataset.orbForm=orbShape;
- $("[data-orb-shape]").forEach(el=>{const active=el===btn;el.classList.toggle("active",active);el.setAttribute("aria-pressed",String(active));});
+ $$("[data-orb-shape]").forEach(el=>{const active=el===btn;el.classList.toggle("active",active);el.setAttribute("aria-pressed",String(active));});
  if(reduce)renderOrb();
 }));
 function movePointer(e){
@@ -138,112 +140,81 @@ $("#eq-toggle").addEventListener("click",()=>{mode=1-mode;eqLabel.textContent=mo
 if(!reduce){eqPulse();setInterval(()=>{if(!document.hidden)eqPulse();},410);}
 // Cursor-reactive surface light, with no dependency on animation libraries.
 if(window.matchMedia("(hover: hover) and (pointer: fine)").matches){
- $(".feature-card").forEach(card=>card.addEventListener("pointermove",e=>{
+ $$(".feature-card").forEach(card=>card.addEventListener("pointermove",e=>{
   const rect=card.getBoundingClientRect();
   card.style.setProperty("--mx",((e.clientX-rect.left)/rect.width*100).toFixed(1)+"%");
   card.style.setProperty("--my",((e.clientY-rect.top)/rect.height*100).toFixed(1)+"%");
  }));
 }
-// Original synthesized loops
-const tracks=[
- {name:"Afterglow",roots:[48,53,45,50],melody:[72,76,79,76,74,72,69,72],wave:"sine",art:"album-1"},
- {name:"Blue Hour",roots:[50,46,43,48],melody:[74,77,81,77,76,74,70,74],wave:"triangle",art:"album-2"},
- {name:"Nightdrive",roots:[45,41,48,43],melody:[69,72,76,79,76,72,67,72],wave:"sawtooth",art:"album-3"}
-];
-const D=24,STEP=.25,playButton=$("#play-btn"),playIcon=$("#play-icon"),pauseIcon=$("#pause-icon"),seek=$("#seek"),volume=$("#volume");
-let index=0,playing=false,shuffle=false,repeat=false,position=0,audio=null,master=null,anchor=0,nextStep=0,playerFrame=0;
-const liked=new Set(),voices=new Set();
-const format=s=>Math.floor(s/60)+":"+String(Math.floor(s%60)).padStart(2,"0");
-function sliderFill(s){s.style.setProperty("--fill",s.value+"%");}
-function paintPosition(){seek.value=String(Math.max(0,Math.min(100,position/D*100)));sliderFill(seek);$("#elapsed").textContent=format(position);$("#duration").textContent=format(D);}
-function paintPlayer(){
- $("#song-title").textContent=tracks[index].name;
- $("#song-artist").textContent="Vyon Sessions";
- $("#album-art").className="album-art "+tracks[index].art;
- $$(".queue-row").forEach((r,i)=>r.classList.toggle("is-active",i===index));
- $("#heart-btn").setAttribute("aria-pressed",String(liked.has(index)));
- $("#heart-btn").setAttribute("aria-label",liked.has(index)?"Unlike track":"Like track");
- playIcon.hidden=playing;pauseIcon.hidden=!playing;playButton.setAttribute("aria-label",playing?"Pause demo":"Play demo");
- $("#song-live").textContent=playing?"● PLAYING SYNTH DEMO":"● AUDIO DEMO";
- paintPosition();
+// Load official Vyon screenshots only. Missing images show honest placeholders.
+const shots={
+ "home":{file:"home.webp",title:"Home",caption:"HOME SCREEN",index:"01 / 03"},
+ "now-playing":{file:"now-playing.webp",title:"Now playing",caption:"NOW PLAYING",index:"02 / 03"},
+ "library":{file:"library.webp",title:"Library",caption:"YOUR LIBRARY",index:"03 / 03"}
+};
+const shotImg=$("#screenshot-image"),emptyShot=$("#screenshot-empty");let shotRequest=0;
+function chooseShot(key){
+ const shot=shots[key];if(!shot)return;
+ const request=++shotRequest;
+ $$("[data-screen]").forEach(btn=>{const active=btn.dataset.screen===key;btn.classList.toggle("is-selected",active);btn.setAttribute("aria-pressed",String(active));});
+ $("#screenshot-caption").textContent=shot.caption;
+ $("#screenshot-empty-title").textContent=shot.title;
+ shotImg.hidden=true;shotImg.removeAttribute("src");emptyShot.hidden=false;
+ const image=new Image();
+ image.onload=()=>{
+  if(request!==shotRequest)return;
+  shotImg.src=image.src;
+  shotImg.alt="Official Vyon Android screenshot: "+shot.title;
+  shotImg.hidden=false;emptyShot.hidden=true;
+ };
+ image.onerror=()=>{if(request===shotRequest){shotImg.hidden=true;emptyShot.hidden=false;}};
+ image.src="/screenshots/"+shot.file;
 }
-function stopVoices(){
- if(!audio)return;
- const now=audio.currentTime;
- for(const v of voices){try{v.amp.gain.cancelScheduledValues(now);v.amp.gain.setTargetAtTime(0,now,.015);v.osc.stop(now+.09);}catch{}}
- voices.clear();
+$$("[data-screen]").forEach(btn=>btn.addEventListener("click",()=>chooseShot(btn.dataset.screen)));
+const shotOrder=["home","now-playing","library"];
+const shotStage=$(".screenshot-stage");
+let touchStart=0;
+if(shotStage){
+ shotStage.addEventListener("touchstart",e=>{touchStart=e.changedTouches[0]?.clientX??0;},{passive:true});
+ shotStage.addEventListener("touchend",e=>{
+  const distance=(e.changedTouches[0]?.clientX??0)-touchStart;
+  if(Math.abs(distance)<55)return;
+  const selectedKey=$(".screenshot-tab.is-selected")?.dataset.screen||"home";
+  const next=(shotOrder.indexOf(selectedKey)+(distance<0?1:shotOrder.length-1))%shotOrder.length;
+  chooseShot(shotOrder[next]);
+ },{passive:true});
 }
-function note(midi,when,len,loud,type,cutoff){
- if(!audio)return;
- const osc=audio.createOscillator(),filter=audio.createBiquadFilter(),amp=audio.createGain();
- osc.type=type;osc.frequency.setValueAtTime(440*Math.pow(2,(midi-69)/12),when);
- filter.type="lowpass";filter.frequency.setValueAtTime(cutoff,when);
- amp.gain.setValueAtTime(.0001,when);
- amp.gain.linearRampToValueAtTime(loud,when+Math.min(.045,len/5));
- amp.gain.setTargetAtTime(.0001,when+Math.min(len*.68,len-.06),Math.max(.06,len*.12));
- osc.connect(filter);filter.connect(amp);amp.connect(master);
- const voice={osc,amp};voices.add(voice);
- osc.onended=()=>{voices.delete(voice);osc.disconnect();filter.disconnect();amp.disconnect();};
- osc.start(when);osc.stop(when+len+.2);
+chooseShot("home");
+// Expand a real screenshot only. Placeholders never open an invented image.
+const lightbox=document.createElement("div");
+lightbox.className="shot-lightbox";
+lightbox.hidden=true;
+lightbox.innerHTML='<button type="button" class="lightbox-close" aria-label="Close screenshot">×</button><img alt="Expanded Vyon screenshot">';
+lightbox.setAttribute("role","dialog");
+lightbox.setAttribute("aria-modal","true");
+lightbox.setAttribute("aria-label","Full-size Vyon screenshot");
+document.body.append(lightbox);
+const fullImage=lightbox.querySelector("img");
+const closeLightbox=lightbox.querySelector("button");
+let lightboxReturnFocus=null;
+function dismissShot(){
+ lightbox.hidden=true;document.body.style.overflow="";
+ if(lightboxReturnFocus?.focus)lightboxReturnFocus.focus();
 }
-function synth(step,when){
- const t=tracks[index],rootNote=t.roots[Math.floor(step/24)%4];
- if(step%24===0)[0,7,12,16].forEach(n=>note(rootNote+n,when,5.8,.021,"sine",900));
- if(step%4===0)note(rootNote-12,when,.5,.11,"sine",390);
- if(step%2===0){const n=t.melody[(Math.floor(step/2)+Math.floor(step/24))%t.melody.length];note(n,when,step%8===0?.72:.37,.07,t.wave,index===2?920:2400);}
- if(step%4===2)note(84+(step%12),when,.07,.012,"triangle",3900);
+function expandShot(){
+ if(shotImg.hidden||!shotImg.src)return;
+ lightboxReturnFocus=document.activeElement;
+ fullImage.src=shotImg.src;fullImage.alt=shotImg.alt;
+ lightbox.hidden=false;document.body.style.overflow="hidden";closeLightbox.focus();
 }
-function nextRandom(){return(index+1+Math.floor(Math.random()*(tracks.length-1)))%tracks.length;}
-function switchTrack(n){
- stopVoices();index=(n+tracks.length)%tracks.length;position=0;nextStep=0;
- if(audio)anchor=audio.currentTime;
- paintPlayer();
- if(playing){cancelAnimationFrame(playerFrame);playerFrame=requestAnimationFrame(tick);}
-}
-function tick(){
- if(!playing||!audio)return;
- position=Math.max(0,audio.currentTime-anchor);
- if(position>=D){switchTrack(repeat?index:shuffle?nextRandom():index+1);return;}
- const ahead=Math.min(D,position+.16);
- while(nextStep*STEP<ahead){synth(nextStep,audio.currentTime+Math.max(.005,nextStep*STEP-position));nextStep++;}
- paintPosition();playerFrame=requestAnimationFrame(tick);
-}
-async function start(){
- if(playing)return;
- try{
-  const Ctor=window.AudioContext||window.webkitAudioContext;
-  if(!Ctor)throw Error("Web Audio not supported");
-  if(!audio){
-   audio=new Ctor();master=audio.createGain();master.gain.value=Math.pow(Number(volume.value)/100,1.6)*.66;
-   const comp=audio.createDynamicsCompressor();comp.threshold.value=-18;comp.ratio.value=3;
-   master.connect(comp);comp.connect(audio.destination);
-  }
-  if(audio.state!=="running")await audio.resume();
- }catch(error){$("#song-live").textContent="● AUDIO UNAVAILABLE";console.warn(error);return;}
- playing=true;anchor=audio.currentTime-position;nextStep=Math.floor(position/STEP);cancelAnimationFrame(playerFrame);playerFrame=requestAnimationFrame(tick);paintPlayer();
-}
-function stop(){
- if(!playing)return;
- playing=false;position=Math.min(D,audio.currentTime-anchor);cancelAnimationFrame(playerFrame);stopVoices();paintPlayer();
-}
-playButton.addEventListener("click",()=>playing?stop():start());
-$("#previous-btn").addEventListener("click",()=>switchTrack(position>3?index:index-1));
-$("#next-btn").addEventListener("click",()=>switchTrack(shuffle?nextRandom():index+1));
-$$(".queue-row").forEach(r=>r.addEventListener("click",()=>switchTrack(Number(r.dataset.track))));
-seek.addEventListener("input",()=>{
- if(playing)stopVoices();
- position=Number(seek.value)/100*D;if(audio)anchor=audio.currentTime-position;
- nextStep=Math.floor(position/STEP);paintPosition();
-});
-volume.addEventListener("input",()=>{
- sliderFill(volume);
- if(master&&audio)master.gain.setTargetAtTime(Math.pow(Number(volume.value)/100,1.6)*.66,audio.currentTime,.02);
-});
-$("#heart-btn").addEventListener("click",()=>{liked.has(index)?liked.delete(index):liked.add(index);paintPlayer();});
-$("#shuffle-btn").addEventListener("click",e=>{shuffle=!shuffle;e.currentTarget.setAttribute("aria-pressed",String(shuffle));});
-$("#repeat-btn").addEventListener("click",e=>{repeat=!repeat;e.currentTarget.setAttribute("aria-pressed",String(repeat));});
-document.addEventListener("visibilitychange",()=>{if(document.hidden&&playing)stop();});
-paintPlayer();
+shotImg.tabIndex=0;
+shotImg.setAttribute("role","button");
+shotImg.setAttribute("aria-label","Expand official screenshot");
+shotImg.addEventListener("click",expandShot);
+shotImg.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();expandShot();}});
+closeLightbox.addEventListener("click",dismissShot);
+lightbox.addEventListener("click",e=>{if(e.target===lightbox)dismissShot();});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!lightbox.hidden)dismissShot();});
 // Show official stable GitHub releases only; never invent APK downloads.
 const repo="bxanedot/vyon",releasePage="https://github.com/"+repo+"/releases";
 const title=$("#release-title"),desc=$("#release-description"),caption=$("#release-caption"),meta=$("#release-meta"),links=$("#download-links");
@@ -255,20 +226,20 @@ function link(text,href,secondary=false){
  a.append(document.createTextNode(text+" "),arrow);return a;
 }
 function renderReleases(){
- caption.textContent="STABLE / OFFICIAL RELEASE";
+ caption.textContent="ANDROID / STABLE APK";
  links.replaceChildren();
- const found=releases[0];
- if(found){
-  title.textContent=found.name||found.tag_name||"Latest release";
-  desc.textContent="Latest published stable version, from the official GitHub project.";
+ const found=releases.find(r=>Array.isArray(r.assets)&&r.assets.some(a=>/\.apk$/i.test(a.name||"")&&/^https:\/\//.test(a.browser_download_url||"")));
+ const apk=found&&found.assets.find(a=>/\.apk$/i.test(a.name||"")&&/^https:\/\//.test(a.browser_download_url||""));
+ if(apk){
+  title.textContent=found.name||found.tag_name||"Vyon for Android";
+  desc.textContent="Official stable Android APK from Vyon GitHub releases.";
   meta.textContent="PUBLISHED / "+(found.published_at?new Date(found.published_at).toLocaleDateString().toUpperCase():"DATE UNKNOWN");
-  const apk=(Array.isArray(found.assets)?found.assets:[]).find(a=>/\.apk$/i.test(a.name||"")&&/^https:\/\//.test(a.browser_download_url||""));
-  if(apk)links.append(link("Download APK",apk.browser_download_url));
-  links.append(link("Release details",found.html_url||releasePage,!!apk));
+  links.append(link("Download Android APK",apk.browser_download_url));
+  links.append(link("Release notes",found.html_url||releasePage,true));
  }else{
-  title.textContent=!loaded?"Checking GitHub releases…":releaseError?"Releases unavailable.":"No Stable release yet.";
-  desc.textContent=!loaded?"Checking published build information. Download links will appear when available.":releaseError?"GitHub could not provide a public release feed. The repository might be private or the API temporarily unavailable. Sign in on GitHub if you have access.":"No publicly listed stable build yet. Follow the project on GitHub for updates.";
-  meta.textContent=!loaded?"RELEASE STATUS / CHECKING":releaseError?"RELEASE STATUS / UNVERIFIED":"RELEASE STATUS / NOT PUBLISHED";
+  title.textContent=!loaded?"Checking APK releases…":releaseError?"APK releases unavailable.":"No stable APK published yet.";
+  desc.textContent=!loaded?"Checking GitHub for a published Android APK.":releaseError?"GitHub may be private or temporarily unavailable. View releases on GitHub if you have access.":"No public stable Android APK is listed yet. Check official GitHub releases for updates.";
+  meta.textContent=!loaded?"APK STATUS / CHECKING":releaseError?"APK STATUS / UNVERIFIED":"APK STATUS / NOT PUBLISHED";
   links.append(link("View GitHub releases",releasePage));
  }
 }
