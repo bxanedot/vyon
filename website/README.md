@@ -81,3 +81,11 @@ The displayed project name is consistently written as **vyon** in lowercase. Oth
 The marketing website retains a **fixed matte-black header** that stays in view while scrolling. The footer has been removed. The public header and command navigation no longer feature a Connect link; creator support and social cards remain lower on the page. Browser Listen Together stays unadvertised and accessible only by its direct URL.
 
 The hero uses a **single vyon particle silhouette** derived from the original waveform icon artwork. The separate overlaid image and alternate Sphere/Halo/Wave/Sound selectors have been removed. Clicking or pressing Enter/Space on the particle silhouette accelerates its rotation from a gentle ~18 degrees per second (30% of 60°/s) to ~48 degrees per second (80%), then smoothly reduces it to its normal pace. Reduced-motion settings stop continuous spinning.
+
+## Direct stable APK downloads and icon polish
+
+- The hero APK CTA and Downloads section now point directly at the actual `browser_download_url` for the newest stable Android `.apk` found in the GitHub Releases API. Clicking a verified APK link downloads the GitHub-hosted file without first opening a release detail page. No Nightly or prerelease APKs are selected.
+- Until a stable APK is published and publicly discoverable, the hero CTA opens the release-status section instead of presenting a fake download. The current private repository has no releases according to the connected GitHub API as of October 15, 2026; website visitors may also be unable to query releases while the repository stays private.
+- The favicon is a small optimized **white PNG sourced from the original uploaded icon artwork** at `website/icons/vyon-white-favicon.png`; it replaces the violet favicon.
+- The dot-based vyon waveform is about 25% smaller. Its dots are rendered to a cached texture only on artwork/color changes; the browser rotates that texture at full-frame animation speed with eased click acceleration from 30% to 80%, followed by gradual deceleration.
+- Scroll reveals, button transitions and cards use more consistent easing and reduced-motion support.

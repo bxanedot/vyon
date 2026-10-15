@@ -189,3 +189,22 @@ body{background:#080808!important;background-image:none!important}
 @media(max-width:590px){
  .site-header{top:9px!important;left:12px!important;right:12px!important}
 }
+
+/* Responsive, low-overhead motion polish */
+html{scroll-behavior:smooth}
+:root{--vyon-ease:cubic-bezier(.22,1,.36,1)}
+.reveal{transform:translate3d(0,18px,0);transition:opacity .85s var(--vyon-ease),transform .9s var(--vyon-ease)}
+.reveal.is-visible{transform:translate3d(0,0,0)}
+.btn,.social-card,.feature-card,.theme-chip,.screenshot-tab,.header-github{
+ transition-timing-function:var(--vyon-ease)!important;
+ transition-duration:.36s!important;
+}
+.btn:hover{transform:translate3d(0,-2px,0)}
+.feature-card:hover,.social-card:hover{transform:translate3d(0,-3px,0)}
+.hero-orb{touch-action:manipulation}
+@media(prefers-reduced-motion:reduce){
+ html{scroll-behavior:auto}
+ .reveal,.reveal.is-visible{transition:none!important;transform:none!important}
+ .btn,.social-card,.feature-card,.theme-chip,.screenshot-tab,.header-github{transition:none!important}
+ .btn:hover,.social-card:hover,.feature-card:hover{transform:none!important}
+}

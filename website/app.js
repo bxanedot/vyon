@@ -72,7 +72,11 @@ const tones={
  ice:["75,205,242","91,155,250","133,239,249"]
 };
 let w=0,h=0,orbVisible=true,orbAngle=-.13,orbLast=0;
-let orbVelocity=18,orbBoost=0;
+let orbVelocity=18,boostStarted=-100000;
+const particleSprite=document.createElement("canvas");
+particleSprite.width=720;particleSprite.height=720;
+const spriteContext=particleSprite.getContext("2d",{alpha:true});
+let spriteAccent="";
 const hash=(x,y)=>{const n=Math.sin(x*127.1+y*311.7)*43758.5453123;return n-Math.floor(n);};
 function fillFallback(){
  // A vyon-like six-lobed ring while the SVG mask is loading or unavailable.
@@ -108,7 +112,7 @@ function loadIconParticles(){
     next.push({x:((xi+.5)/size-.5)*2,y:((yi+.5)/size-.5)*2,j:hash(x+13,y+37)});
    }
   }
-  if(next.length>250){particles.splice(0,particles.length,...next);renderOrb();}
+  if(next.length>250){particles.splice(0,particles.length,...next);spriteAccent="";renderOrb();}
  };
  im.onerror=()=>renderOrb();
  im.src="/icons/originals/vyon-violet.svg";
@@ -123,27 +127,37 @@ function resizeOrb(){
  ctx.setTransform(ratio,0,0,ratio,0,0);
  renderOrb();
 }
+// Build the original-dot silhouette only when the color or icon mask changes.
+// Each animation frame rotates this cached texture in one GPU-friendly canvas draw.
+function buildParticleSprite(){
+ if(!spriteContext)return;
+ spriteContext.clearRect(0,0,720,720);
+ const palette=tones[root.dataset.accent]||tones.violet;
+ for(const p of particles){
+  const index=Math.min(2,Math.max(0,Math.floor((p.x+p.y+2)/4*3)));
+  const opacity=.58+.38*p.j;
+  spriteContext.fillStyle="rgba("+palette[index]+","+opacity.toFixed(3)+")";
+  spriteContext.beginPath();
+  spriteContext.arc(360+p.x*358,360+p.y*358,1.7+p.j*.87,0,Math.PI*2);
+  spriteContext.fill();
+ }
+ spriteAccent=root.dataset.accent||"violet";
+}
 function renderOrb(){
  if(!ctx||!w||!h)return;
+ if(spriteAccent!==(root.dataset.accent||"violet"))buildParticleSprite();
  ctx.clearRect(0,0,w,h);
- const palette=tones[root.dataset.accent]||tones.violet;
- const centerX=w*.5,centerY=h*.49;
- const radius=Math.min(w*.43,h*.42,320);
- const angle=orbAngle*Math.PI/180,ca=Math.cos(angle),sa=Math.sin(angle);
- for(const p of particles){
-  const x=p.x*ca-p.y*sa;
-  const y=p.x*sa+p.y*ca;
-  const index=Math.min(2,Math.max(0,Math.floor((p.x+p.y+2)/4*3)));
-  const opacity=(.50+.43*p.j).toFixed(3);
-  ctx.fillStyle="rgba("+palette[index]+","+opacity+")";
-  ctx.beginPath();
-  ctx.arc(centerX+x*radius,centerY+y*radius,.9+p.j*.65,0,Math.PI*2);
-  ctx.fill();
- }
+ // 25% smaller than the prior icon. Center remains unchanged.
+ const radius=Math.min(w*.43,h*.42,320)*.75;
+ ctx.save();
+ ctx.translate(w*.5,h*.49);
+ ctx.rotate(orbAngle*Math.PI/180);
+ ctx.imageSmoothingEnabled=true;
+ ctx.drawImage(particleSprite,-radius,-radius,radius*2,radius*2);
+ ctx.restore();
 }
 function accelerateIcon(){
- orbBoost=1;
- orbVelocity=48; // 80% speed, relative to an intentionally calm 60 deg/s maximum
+ boostStarted=performance.now();
  if(reduce){orbAngle=(orbAngle+15)%360;renderOrb();}
 }
 region.addEventListener("click",accelerateIcon);
@@ -153,15 +167,17 @@ region.addEventListener("keydown",e=>{
 if("IntersectionObserver" in window){
  new IntersectionObserver(entries=>{orbVisible=entries[0].isIntersecting;orbLast=0;},{threshold:.01}).observe(region);
 }
+function smoothstep(t){const x=Math.min(1,Math.max(0,t));return x*x*(3-2*x);}
 function animateOrb(now){
  requestAnimationFrame(animateOrb);
  if(reduce||document.hidden||!orbVisible){orbLast=0;return;}
  if(orbLast){
-  const dt=Math.min(.06,(now-orbLast)/1000);
-  orbBoost=Math.max(0,orbBoost-dt/3.2);
-  const ease=orbBoost*orbBoost*(3-2*orbBoost);
-  const target=18+30*ease;
-  orbVelocity+=(target-orbVelocity)*Math.min(1,dt*8);
+  const dt=Math.min(.05,(now-orbLast)/1000);
+  const elapsed=(now-boostStarted)/1000;
+  // Ease up over 0.45s, briefly sustain peak speed, then ease down over 3.4s.
+  const envelope=smoothstep(elapsed/.45)*(1-smoothstep((elapsed-.8)/3.4));
+  const target=18+30*envelope; // 30% idle / 80% peak of 60 deg/s
+  orbVelocity+=(target-orbVelocity)*(1-Math.exp(-dt*13));
   orbAngle=(orbAngle+orbVelocity*dt)%360;
   renderOrb();
  }
@@ -255,12 +271,14 @@ lightbox.addEventListener("click",e=>{if(e.target===lightbox)dismissShot();});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!lightbox.hidden)dismissShot();});
 // Show official stable GitHub releases only; never invent APK downloads.
 const repo="bxanedot/vyon",releasePage="https://github.com/"+repo+"/releases";
+const heroApk=$("#hero-apk-link"),heroApkLabel=$("#hero-apk-label");
 const title=$("#release-title"),desc=$("#release-description"),caption=$("#release-caption"),meta=$("#release-meta"),links=$("#download-links");
 let releases=[],releaseError=null,loaded=false;
-function link(text,href,secondary=false){
+function link(text,href,secondary=false,directApk=false){
  const a=document.createElement("a");a.className=secondary?"btn btn-ghost":"btn btn-primary";
- a.href=href;a.target="_blank";a.rel="noopener noreferrer";
- const arrow=document.createElement("span");arrow.className="btn-arrow";arrow.textContent="↗";
+ a.href=href;a.target=directApk?"_self":"_blank";a.rel="noopener noreferrer";
+ if(directApk)a.setAttribute("aria-label","Download the official stable Android APK directly from GitHub Releases");
+ const arrow=document.createElement("span");arrow.className="btn-arrow";arrow.textContent=directApk?"↓":"↗";
  a.append(document.createTextNode(text+" "),arrow);return a;
 }
 function renderReleases(){
@@ -272,12 +290,19 @@ function renderReleases(){
   title.textContent=found.name||found.tag_name||"vyon for Android";
   desc.textContent="Official stable Android APK from vyon GitHub releases.";
   meta.textContent="PUBLISHED / "+(found.published_at?new Date(found.published_at).toLocaleDateString().toUpperCase():"DATE UNKNOWN");
-  links.append(link("Download Android APK",apk.browser_download_url));
+  heroApk.href=apk.browser_download_url;
+  heroApk.target="_self";heroApk.rel="noopener noreferrer";
+  heroApkLabel.textContent="Download APK";
+  heroApk.setAttribute("aria-label","Download the latest stable Android APK directly from GitHub");
+  links.append(link("Download Android APK",apk.browser_download_url,false,true));
   links.append(link("Release notes",found.html_url||releasePage,true));
  }else{
   title.textContent=!loaded?"Checking APK releases…":releaseError?"APK releases unavailable.":"No stable APK published yet.";
   desc.textContent=!loaded?"Checking GitHub for a published Android APK.":releaseError?"GitHub may be private or temporarily unavailable. View releases on GitHub if you have access.":"No public stable Android APK is listed yet. Check official GitHub releases for updates.";
   meta.textContent=!loaded?"APK STATUS / CHECKING":releaseError?"APK STATUS / UNVERIFIED":"APK STATUS / NOT PUBLISHED";
+  heroApk.href="#downloads";heroApk.removeAttribute("target");
+  heroApkLabel.textContent="Check APK availability";
+  heroApk.setAttribute("aria-label","Check whether a stable Android APK is available");
   links.append(link("View GitHub releases",releasePage));
  }
 }
