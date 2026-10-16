@@ -139,6 +139,7 @@ const debrisCtx=debris.getContext("2d",{alpha:true});
 let vw=0,vh=0,ratio=1,obstacleCells=new Map(),floor=0;
 const gridSize=96,particleCell=8;
 const textImpacts=new WeakMap();
+const inkMeasure=document.createElement("canvas").getContext("2d");
 // Each dot has a distinct collision radius, mass, elasticity and surface friction.
 const hash=(x,y)=>{const n=Math.sin(x*127.1+y*311.7)*43758.5453123;return n-Math.floor(n);};
 const heartShape=(x,y)=>{const hX=x/23.5,hY=-y/24;return Math.pow(hX*hX+hY*hY-1,3)-hX*hX*Math.pow(hY,3)<0;};
@@ -289,26 +290,65 @@ function rebuildObstacles(){
  floor=Math.max(document.body.scrollHeight,document.documentElement.scrollHeight)-5;
  const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);
  const range=document.createRange();
- let node,words=0;
+ let node,words=0,glyphs=0;
+ // Hash close-fitting glyph boxes only when particles are released, never per frame.
+ const addBox=(l,r,t,b,el)=>{
+  if(r-l<.35||b-t<.35||b<0||t>floor)return;
+  const box={l,r,t,b,el};
+  const minX=Math.floor(l/gridSize),maxX=Math.floor(r/gridSize);
+  const minY=Math.floor(t/gridSize),maxY=Math.floor(b/gridSize);
+  for(let y=minY;y<=maxY;y++)for(let x=minX;x<=maxX;x++){
+   const key=x+","+y;let group=obstacleCells.get(key);
+   if(!group){group=[];obstacleCells.set(key,group);}
+   group.push(box);
+  }
+ };
  while((node=walker.nextNode())){
   const parent=node.parentElement;
   if(!parent||!parent.closest("main,header,footer")||
    parent.closest("script,style,svg,[hidden],.hero-orb,.vyon-falling-dots,.command-overlay"))continue;
   if(!node.nodeValue||!node.nodeValue.trim())continue;
-  if(getComputedStyle(parent).visibility==="hidden"||getComputedStyle(parent).display==="none")continue;
+  const style=getComputedStyle(parent);
+  if(style.visibility==="hidden"||style.display==="none")continue;
+  const fontSize=parseFloat(style.fontSize)||16;
+  if(inkMeasure)inkMeasure.font=style.font||style.fontWeight+" "+fontSize+"px "+style.fontFamily;
+  const letterSpacing=parseFloat(style.letterSpacing)||0;
   const re=/\S+/g;let match;
   while((match=re.exec(node.nodeValue))&&words<4000){
    range.setStart(node,match.index);range.setEnd(node,match.index+match[0].length);
-   for(const r of range.getClientRects()){
-    if(r.width<2||r.height<2)continue;
-    const box={l:r.left+scrollX-2,r:r.right+scrollX+2,t:r.top+scrollY-2,b:r.bottom+scrollY+2,el:parent};
-    if(box.b<0||box.t>floor)continue;
-    const minX=Math.floor(box.l/gridSize),maxX=Math.floor(box.r/gridSize);
-    const minY=Math.floor(box.t/gridSize),maxY=Math.floor(box.b/gridSize);
-    for(let y=minY;y<=maxY;y++)for(let x=minX;x<=maxX;x++){
-     const key=x+","+y;let group=obstacleCells.get(key);
-     if(!group){group=[];obstacleCells.set(key,group);}
-     group.push(box);
+   const glyphRun=Array.from(match[0]);
+   for(const rect of range.getClientRects()){
+    if(rect.width<2||rect.height<2)continue;
+    // DOM ranges include invisible font ascent/descent; ink metrics move the
+    // collision edge to the visible letters instead of the padded line box.
+    const metrics=inkMeasure?.measureText(match[0]);
+    const ascent=metrics?.actualBoundingBoxAscent||fontSize*.76;
+    const descent=Math.max(0,metrics?.actualBoundingBoxDescent??fontSize*.18);
+    const fontDescent=metrics?.fontBoundingBoxDescent??fontSize*.22;
+    const baseline=rect.bottom-Math.max(0,Math.min(rect.height*.32,fontDescent));
+    const top=Math.max(rect.top+.2,baseline-ascent)-.4+scrollY;
+    const bottom=Math.min(rect.bottom-.2,baseline+descent)+.4+scrollY;
+    if(bottom<=top)continue;
+    if(inkMeasure&&fontSize>=16&&glyphRun.length<=28&&glyphs<3500){
+     const letterMetrics=glyphRun.map(ch=>inkMeasure.measureText(ch));
+     const advances=letterMetrics.map(m=>Math.max(.1,m.width+letterSpacing));
+     const total=advances.reduce((a,b)=>a+b,0);
+     const scale=rect.width/Math.max(1,total);
+     let advance=0;
+     for(let i=0;i<glyphRun.length;i++){
+      const m=letterMetrics[i],step=advances[i]*scale;
+      const left=rect.left+(advance+(m.actualBoundingBoxLeft||0))*scale;
+      const right=rect.left+(advance+(m.actualBoundingBoxRight||m.width))*scale;
+      const glyphTop=Math.max(top,baseline-(m.actualBoundingBoxAscent||ascent)-.4+scrollY);
+      const glyphBottom=Math.min(bottom,baseline+(m.actualBoundingBoxDescent??descent)+.4+scrollY);
+      addBox(Math.max(rect.left,left)-.35+scrollX,
+       Math.min(rect.right,right)+.35+scrollX,glyphTop,glyphBottom,parent);
+      advance+=advances[i];
+     }
+     glyphs+=glyphRun.length;
+    }else{
+     // Fallback uses ink-height bounds too, even for very small UI captions.
+     addBox(rect.left+scrollX+.2,rect.right+scrollX-.2,top,bottom,parent);
     }
    }
    words++;
@@ -339,17 +379,22 @@ function paintDebris(blend=1){
 }
 function bounceText(box,force=1){
  if(reduce||!box.el||typeof box.el.animate!=="function")return;
- const el=box.el.closest("h1,h2,h3,h4,p,small,strong,em,span,summary,a,label,li,button")||box.el;
+ // Animate a transformable text element, rather than an inline span whose
+ // transform may be ignored by the browser.
+ const el=box.el.closest("h1,h2,h3,h4,p,summary,li,blockquote,button,a")||box.el;
  const now=performance.now();
- if(now-(textImpacts.get(el)||0)<560)return;
+ if(now-(textImpacts.get(el)||0)<960)return;
  textImpacts.set(el,now);
- const height=Math.min(5,1.4+force*.008);
- el.animate([
-  {transform:"translate3d(0,0,0)",offset:0},
-  {transform:"translate3d(0,"+(-height).toFixed(1)+"px,0)",offset:.24},
-  {transform:"translate3d(0,"+(height*.18).toFixed(1)+"px,0)",offset:.68},
-  {transform:"translate3d(0,0,0)",offset:1}
- ],{duration:580,easing:"cubic-bezier(.22,.7,.2,1)"});
+ const amplitude=Math.min(8,2.4+force*.008);
+ const frames=[];
+ // Damped spring impulse: instant response, decreasing overshoot, soft settle.
+ // WAAPI keeps the animation on the compositor without modifying layout.
+ for(let i=0;i<=48;i++){
+  const t=i/48;
+  const dy=i===48?0:-amplitude*Math.exp(-6.4*t)*Math.sin(20*t);
+  frames.push({offset:t,transform:"translate3d(0,"+dy.toFixed(3)+"px,0)"});
+ }
+ el.animate(frames,{duration:880,easing:"linear"});
 }
 function resolveDotContacts(){
  // Spatial hashing only tests nearby circular bodies, not every possible pair.
