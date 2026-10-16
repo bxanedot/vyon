@@ -18,6 +18,19 @@ Vyon supports Windows, macOS, Linux, and Android. iOS/iPadOS are excluded. The w
 
 The hero logo stays stationary. Clicking or activating part of the dotted icon with the keyboard detaches a cluster that falls under gravity. Each individual dot has its own circular collision body (mass, bounce and friction): dots collide, bounce and push each other, spread into unique piles, and react to DOM-derived text hitboxes and the document floor. Click the vacated spot again to draw a small dotted heart; click the heart a third time to crumble it: all heart dots become the same independent falling physics bodies as the logo, with extra varied impulses so the heart visibly breaks apart instead of falling as a solid shape. Further clicks can repeat the heart creation and drop cycle. Enter or Space supports the sequence from the keyboard. Dragging through the logo or a heart releases only the touched dots. Text bounces visually on particle impact, while repeated collisions are released to prevent particles from getting stuck above the footer. Button surfaces use a dotted treatment: the first activation keeps its standard function, and the second lets their decorative dots collapse. The falling layer never intercepts site clicks. Reduced-motion preferences skip the animated fall and heart reveal.
 
+## Vercel Web Analytics
+
+The site uses the framework-neutral `@vercel/analytics` package, **not**
+`@vercel/analytics/next` (this is not a Next.js app). The Vercel build bundles
+`analytics-entry.js` into `dist/analytics.js` with esbuild and injects its
+module script into the built `index.html` only, leaving Cloudflare assets
+unchanged. It calls `inject({mode: "production"})` once to track page views.
+
+On the Vercel dashboard, select the **vyon** project, open **Analytics**, and
+choose **Enable** if it is not yet active. Publish a Vercel deployment after
+enabling; visit the site (without an ad/content blocker) and then review
+Analytics for traffic. Vercel Authentication may limit public visitor access.
+
 ## Deploy to Vercel
 
 The marketing site supports Vercel. Import `bxanedot/vyon` with **Root Directory = website** (framework: Other). The `vercel.json` and `npm run build` command build a safe `dist/` with only public frontend assets. Any future push redeploys through the Git integration. Social card URLs are made absolute for the Vercel deployment.
