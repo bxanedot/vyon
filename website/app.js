@@ -538,7 +538,109 @@ thankYou.setAttribute("role","status");
 thankYou.setAttribute("aria-live","polite");
 thankYou.setAttribute("aria-atomic","true");
 region.appendChild(thankYou);
-let thanksIndex=-1,thanksTimer=0;
+let thanksIndex=-1;
+const thankCanvas=document.createElement("canvas");
+thankCanvas.className="vyon-thank-dots";
+thankCanvas.setAttribute("aria-hidden","true");
+const thankCtx=thankCanvas.getContext("2d");
+const thankDots=[];
+let thanksPainting=false;
+function paintThankDots(){
+ if(!thankCtx)return;
+ const w=Number.parseFloat(thankCanvas.style.width)||1;
+ const h=Number.parseFloat(thankCanvas.style.height)||1;
+ thankCtx.clearRect(0,0,w,h);
+ for(const p of thankDots){
+  if(p.fallen)continue;
+  thankCtx.fillStyle=dotColor(p);
+  thankCtx.beginPath();
+  thankCtx.arc(p.tx,p.ty,Math.max(1.05,Math.min(2.15,p.radius)),0,Math.PI*2);
+  thankCtx.fill();
+ }
+}
+function queueThankPaint(){
+ if(thanksPainting)return;
+ thanksPainting=true;
+ requestAnimationFrame(()=>{thanksPainting=false;paintThankDots()});
+}
+function buildThankDots(message){
+ const w=Math.max(190,Math.min(560,region.clientWidth*.79));
+ const h=Math.min(126,Math.max(82,w*.24));
+ const dpr=Math.min(devicePixelRatio||1,compactMotion?1.5:2);
+ thankCanvas.style.width=w+"px";thankCanvas.style.height=h+"px";
+ thankCanvas.width=Math.round(w*dpr);thankCanvas.height=Math.round(h*dpr);
+ if(!thankCtx)return;
+ thankCtx.setTransform(dpr,0,0,dpr,0,0);
+ const sample=document.createElement("canvas");
+ sample.width=Math.ceil(w);sample.height=Math.ceil(h);
+ const sc=sample.getContext("2d",{willReadFrequently:true});
+ if(!sc)return;
+ const family=getComputedStyle(document.body).fontFamily||"sans-serif";
+ let fontSize=Math.min(72,h*.69),textWidth=Infinity;
+ while(fontSize>24){
+  sc.font="750 "+fontSize+"px "+family;
+  textWidth=sc.measureText(message).width;
+  if(textWidth<w*.93)break;
+  fontSize-=2;
+ }
+ sc.clearRect(0,0,sample.width,sample.height);
+ sc.fillStyle="#fff";
+ sc.font="750 "+fontSize+"px "+family;
+ sc.textAlign="center";sc.textBaseline="middle";
+ sc.fillText(message,w/2,h*.51,w*.95);
+ const alpha=sc.getImageData(0,0,sample.width,sample.height).data;
+ const step=Math.max(4.2,Math.sqrt(w*h/(compactMotion?1000:1650)));
+ thankDots.length=0;
+ for(let y=4;y<h-4;y+=step)for(let x=4;x<w-4;x+=step){
+  const j=hash(x*.77,y*.91);
+  const tx=x+(j-.5)*step*.22,ty=y+(hash(y,x)-.5)*step*.22;
+  const px=Math.max(0,Math.min(sample.width-1,Math.floor(tx)));
+  const py=Math.max(0,Math.min(sample.height-1,Math.floor(ty)));
+  if(alpha[(py*sample.width+px)*4+3]<110)continue;
+  thankDots.push({tx,ty,x:tx/w*2-1,y:ty/h*2-1,j,radius:1.15+j*.55,fallen:false});
+ }
+ paintThankDots();
+}
+function brushThankDots(clientX,clientY,prevX=clientX,prevY=clientY,radius=compactMotion?23:18){
+ if(!thankYou.classList.contains("is-visible")||!thankDots.some(p=>!p.fallen))return false;
+ const bounds=thankCanvas.getBoundingClientRect();
+ const fromX=prevX-bounds.left,fromY=prevY-bounds.top;
+ const toX=clientX-bounds.left,toY=clientY-bounds.top;
+ const worldX=bounds.left+scrollX,worldY=bounds.top+scrollY;
+ let hits=0;
+ for(const p of thankDots){
+  if(p.fallen||!pointInBrush(p.tx,p.ty,fromX,fromY,toX,toY,radius))continue;
+  p.fallen=true;
+  // Limit moving dots even if someone repeatedly scratches every word.
+  if(hits++%2===0)releaseDot(p,worldX,worldY,p.tx,p.ty,toX,toY,p.radius,true);
+ }
+ if(hits){
+  queueThankPaint();
+  if(reduce){
+   for(const p of falling){if(!p.resting){p.resting=true;p.py=floor-p.radius;p.vx=p.vy=0;}}
+   paintDebris();
+  }else animateFalls();
+ }
+ return hits>0;
+}
+function shatterThankDots(){
+ if(!thankYou.classList.contains("is-visible"))return false;
+ const intact=thankDots.filter(p=>!p.fallen);
+ if(!intact.length){showThanks();return true;}
+ const b=thankCanvas.getBoundingClientRect();
+ const wx=b.left+scrollX,wy=b.top+scrollY;
+ const stride=Math.max(1,Math.ceil(intact.length/(compactMotion?110:170)));
+ for(let i=0;i<intact.length;i++){
+  const p=intact[i];p.fallen=true;
+  if(i%stride===0)releaseDot(p,wx,wy,p.tx,p.ty,b.width*.5,b.height*.5,p.radius,true);
+ }
+ queueThankPaint();
+ if(reduce){
+  for(const p of falling){if(!p.resting){p.resting=true;p.py=floor-p.radius;p.vx=p.vy=0;}}
+  paintDebris();
+ }else animateFalls();
+ return true;
+}
 const thanksOptions=[
  {message:"Thank you.",sub:"For being part of vyon."},
  {message:"Much love.",sub:"Thanks for listening."},
@@ -547,8 +649,8 @@ const thanksOptions=[
  {message:"Stay in tune.",sub:"Thanks for making vyon yours."}
 ];
 function hideThanks(){
- if(thanksTimer){clearTimeout(thanksTimer);thanksTimer=0}
  thankYou.classList.remove("is-visible");
+ thankDots.length=0;queueThankPaint();
 }
 function restoreLogo(){
  if(!particles.length||particles.some(p=>!p.fallen))return;
@@ -562,22 +664,20 @@ function showThanks(){
  thanksIndex=i;
  const v=thanksOptions[i];
  thankYou.replaceChildren();
- const big=document.createElement("strong"),small=document.createElement("small");
- big.textContent=v.message;small.textContent=v.sub;
- thankYou.append(big,small);
+ const accessible=document.createElement("strong"),small=document.createElement("small");
+ accessible.className="visually-hidden";
+ accessible.textContent=v.message;small.textContent=v.sub;
+ thankYou.append(accessible,thankCanvas,small);
  thankYou.dataset.variant=String(Math.floor(Math.random()*3));
+ buildThankDots(v.message);
+ // No time-based replacement: the dotted message persists when scrolling back.
  thankYou.classList.add("is-visible");
- thanksTimer=setTimeout(()=>{
-  thanksTimer=0;
-  thankYou.classList.remove("is-visible");
-  restoreLogo();
- },2400);
 }
 function stopDotFollow(){
  if(!followActive)return;
  followActive=false;
  root.style.scrollBehavior=followReturnBehavior;
- hideThanks();restoreLogo();
+ // The camera may stop, but the message remains for visitors scrolling back up.
 }
 function beginDotFollow(){
  if(reduce)return;
@@ -648,6 +748,8 @@ function animateFalls(){
 function collapseDottedLogo(){
  if(!w||!h||!particles.length)return false;
  stopDotFollow();
+ // A deliberate replay is the only time we replace a thank-you with a logo.
+ if(thankYou.classList.contains("is-visible"))hideThanks();
  if(particles.every(p=>p.fallen))restoreLogo();
  const available=particles.filter(p=>!p.fallen);
  if(!available.length)return false;
@@ -747,7 +849,8 @@ region.addEventListener("pointerdown",e=>{
  const r=region.getBoundingClientRect();
  pointerTrail={id:e.pointerId,x:e.clientX-r.left,y:e.clientY-r.top,
   startX:e.clientX-r.left,startY:e.clientY-r.top,dragged:false,
-  released:false,spotsStart:clearedSpots.length};
+  released:false,thankStroke:thankYou.classList.contains("is-visible"),
+  spotsStart:clearedSpots.length};
  region.setPointerCapture?.(e.pointerId);
 });
 region.addEventListener("pointermove",e=>{
@@ -755,9 +858,15 @@ region.addEventListener("pointermove",e=>{
  const r=region.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;
  const dx=x-pointerTrail.x,dy=y-pointerTrail.y,dist=Math.hypot(dx,dy);
  if(!pointerTrail.dragged&&Math.hypot(x-pointerTrail.startX,y-pointerTrail.startY)<8)return;
- if(!pointerTrail.dragged){pointerTrail.dragged=true;rebuildObstacles();}
+ if(!pointerTrail.dragged){
+  pointerTrail.dragged=true;
+  if(!pointerTrail.thankStroke)rebuildObstacles();
+ }
  if(dist>0){
-  if(dragDotBrush(x,y,pointerTrail.x,pointerTrail.y))pointerTrail.released=true;
+  if(pointerTrail.thankStroke){
+   if(brushThankDots(e.clientX,e.clientY,
+     pointerTrail.x+r.left,pointerTrail.y+r.top))pointerTrail.released=true;
+  }else if(dragDotBrush(x,y,pointerTrail.x,pointerTrail.y))pointerTrail.released=true;
  }
  pointerTrail.x=x;pointerTrail.y=y;
  if(e.cancelable)e.preventDefault();
@@ -767,7 +876,7 @@ function endDotDrag(e){
  const stroke=pointerTrail;pointerTrail=null;
  if(stroke.dragged)suppressLogoClickUntil=performance.now()+600;
  if(region.hasPointerCapture?.(e.pointerId))region.releasePointerCapture(e.pointerId);
- if(e.type!=="pointercancel"&&stroke.dragged&&stroke.released){
+ if(e.type!=="pointercancel"&&stroke.dragged&&stroke.released&&!stroke.thankStroke){
   const spots=clearedSpots.slice(stroke.spotsStart).filter(s=>s.heartAt===null);
   if(spots.length)makeHeart(spots[spots.length-1]);
  }
@@ -776,16 +885,31 @@ region.addEventListener("pointerup",endDotDrag);
 region.addEventListener("pointercancel",endDotDrag);
 region.addEventListener("click",e=>{
  if(performance.now()<suppressLogoClickUntil)return;
- if((e.detail===0||e.button===0)&&(thankYou.classList.contains("is-visible")||tapTouchesDots(e.clientX,e.clientY))){
-  collapseDottedLogo();
+ if(e.detail!==0&&e.button!==0)return;
+ if(thankYou.classList.contains("is-visible")){
+  // A tap breaks a local patch; if every letter has been broken, the next
+  // tap draws a fresh randomized dotted thank-you.
+  if(!thankDots.some(p=>!p.fallen))showThanks();
+  else brushThankDots(e.clientX,e.clientY,e.clientX,e.clientY,compactMotion?42:36);
   e.vyonParticleHandled=true;
+  return;
+ }
+ if(tapTouchesDots(e.clientX,e.clientY)){
+  collapseDottedLogo();e.vyonParticleHandled=true;
  }
 });
 region.addEventListener("keydown",e=>{
- if(e.key==="Enter"||e.key===" "){e.preventDefault();collapseDottedLogo();}
+ if(e.key!=="Enter"&&e.key!==" ")return;
+ e.preventDefault();
+ if(thankYou.classList.contains("is-visible"))shatterThankDots();
+ else collapseDottedLogo();
 });
 window.addEventListener("resize",()=>{
  obstacleDirty=true;resizeOrb();resizeDebris();if(falling.length)rebuildObstacles();
+ if(thankYou.classList.contains("is-visible")){
+  const phrase=thanksOptions[thanksIndex]?.message;
+  if(phrase)buildThankDots(phrase);
+ }
 },{passive:true});
 window.addEventListener("scroll",()=>{if(!active)paintDebris()},{passive:true});
 document.addEventListener("visibilitychange",()=>{if(document.hidden)stopDotFollow();else if(falling.some(p=>!p.resting))animateFalls();});
