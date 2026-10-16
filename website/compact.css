@@ -3,6 +3,7 @@
 :root[data-accent=acid]{--surface:#151a11;--raised:#222a19;--base:#0d130b;--edge:rgba(199,244,108,.22);--glow:rgba(199,244,108,.1)}
 :root[data-accent=coral]{--surface:#20151a;--raised:#302029;--base:#170d12;--edge:rgba(255,160,139,.22);--glow:rgba(255,160,139,.1)}
 :root[data-accent=ice]{--surface:#112029;--raised:#192e39;--base:#09151b;--edge:rgba(121,220,239,.22);--glow:rgba(121,220,239,.1)}
+:root[data-accent=blood]{--surface:#1a0d11;--raised:#2b1118;--base:#10080b;--edge:rgba(228,61,79,.22);--glow:rgba(228,61,79,.1)}
 html{scroll-padding-top:90px}
 body{background:var(--base);background-image:radial-gradient(ellipse 56% 28% at 90% 4%,var(--glow),transparent 73%);transition:background-color .35s}
 [hidden]{display:none!important}
@@ -132,7 +133,8 @@ body{background:var(--base);background-image:radial-gradient(ellipse 56% 28% at 
 :root[data-accent="violet"],
 :root[data-accent="acid"],
 :root[data-accent="coral"],
-:root[data-accent="ice"]{
+:root[data-accent="ice"],
+:root[data-accent="blood"]{
  --bg:#080808;--base:#080808;--panel:#111111;--panel2:#171717;
  --surface:#101010;--raised:#181818;
  --edge:rgba(var(--accent-rgb),.17);--glow:transparent;

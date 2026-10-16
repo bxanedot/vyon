@@ -77,12 +77,12 @@ if("IntersectionObserver" in window){
 }
 // Accent palette
 function theme(color){
- if(!["violet","acid","coral","ice"].includes(color))return;
+ if(!["violet","acid","coral","ice","blood"].includes(color))return;
  root.dataset.accent=color;
  // The particle colors are derived from the active theme at render time.
  $$("[data-color]").forEach(b=>{const on=b.dataset.color===color;b.classList.toggle("active",on);b.setAttribute("aria-pressed",String(on));});
  const meta=document.querySelector('meta[name="theme-color"]');
- if(meta)meta.content=({violet:"#080808",acid:"#080808",coral:"#080808",ice:"#080808"})[color];
+ if(meta)meta.content=({violet:"#080808",acid:"#080808",coral:"#080808",ice:"#080808",blood:"#080808"})[color];
  try{localStorage.setItem("vyon-accent",color);}catch{}
  requestAnimationFrame(renderOrb);
 }
@@ -96,7 +96,8 @@ const tones={
  violet:["255,151,165","194,154,239","123,205,255"],
  acid:["47,190,128","22,162,143","46,221,190"],
  coral:["255,145,119","255,190,127","250,154,190"],
- ice:["75,205,242","91,155,250","133,239,249"]
+ ice:["75,205,242","91,155,250","133,239,249"],
+ blood:["255,117,129","228,61,79","150,19,44"]
 };
 let w=0,h=0,orbVisible=true,orbAngle=-.13,orbLast=0;
 let orbVelocity=18,boostStarted=-100000;

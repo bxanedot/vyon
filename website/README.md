@@ -54,7 +54,7 @@ APK ONLY: the hero Download APK button checks GitHub stable releases and downloa
 
 ## Theme, socials, inspiration
 
-Your color, your mood switches violet, lime, coral, and ice across entire site backgrounds, foreground accents, navigation and cards; preferences persist in localStorage. The layout is deliberately shorter than the original, inspired by public visual patterns at xan.lat without copying source.
+Your color, your mood switches violet, lime, coral, ice, and blood red across the site accents, navigation, cards, artwork, and interactive previews; preferences persist in localStorage (including on the hidden Listen Together page). The current design deliberately keeps matte-black backgrounds in every theme. The layout is deliberately shorter than the original, inspired by public visual patterns at xan.lat without copying source.
 
 Icon links: https://guns.lol/bxane · https://ko-fi.com/bxane · https://patreon.com/bxane · https://discord.gg/h4Wsu824Uf · https://t.me/+T9avk7iJ7_YyN2Rk
 

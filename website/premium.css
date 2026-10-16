@@ -11,6 +11,7 @@
 :root[data-accent="acid"]{--accent:#d0eda2;--accent-rgb:208,237,162}
 :root[data-accent="coral"]{--accent:#f5b6a3;--accent-rgb:245,182,163}
 :root[data-accent="ice"]{--accent:#a9e1ef;--accent-rgb:169,225,239}
+:root[data-accent="blood"]{--accent:#e43d4f;--accent-rgb:228,61,79}
 html{scroll-padding-top:90px}
 body{background:var(--bg);letter-spacing:-.012em}
 .grain{opacity:.095;z-index:35}

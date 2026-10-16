@@ -5,10 +5,10 @@ const $=s=>document.querySelector(s);
 const setText=(s,value)=>{$(s).textContent=String(value)};
 try {
  const saved=localStorage.getItem("vyon-accent");
- if(["violet","acid","coral","ice"].includes(saved)){
+ if(["violet","acid","coral","ice","blood"].includes(saved)){
   document.documentElement.dataset.accent=saved;
   const meta=document.querySelector('meta[name="theme-color"]');
-  if(meta)meta.content=({violet:"#0b0918",acid:"#0b150a",coral:"#190d13",ice:"#08151b"})[saved];
+  if(meta)meta.content=({violet:"#0b0918",acid:"#0b150a",coral:"#190d13",ice:"#08151b",blood:"#080808"})[saved];
  }
 } catch {}
 const params=new URLSearchParams(location.search);
