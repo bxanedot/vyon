@@ -501,14 +501,14 @@ body{transition:background-color .5s var(--vyon-ease)}
 
 /* Arrows on actionable links/buttons only. Separate layers avoid a transform
    transition competing with an infinitely animated transform on the same node. */
-:root{--vyon-arrow-ease:cubic-bezier(.18,.84,.22,1)}
+:root{--vyon-arrow-ease:cubic-bezier(.22,1,.36,1)}
 .vyon-arrow-shell{
  display:inline-flex;
  align-items:center;
  justify-content:center;
  flex:none;
  transform:translate3d(0,0,0);
- transition:transform .68s var(--vyon-arrow-ease);
+ transition:transform .86s var(--vyon-arrow-ease);
  backface-visibility:hidden;
 }
 .vyon-arrow-glyph{
@@ -519,13 +519,13 @@ body{transition:background-color .5s var(--vyon-ease)}
 @keyframes vyon-arrow-float-diagonal{
  0%,100%{transform:translate3d(0,0,0)}
  25%{transform:translate3d(1.5px,-1.5px,0)}
- 50%{transform:translate3d(2.1px,-2.1px,0)}
+ 50%{transform:translate3d(1.6px,-1.6px,0)}
  75%{transform:translate3d(1.4px,-1.4px,0)}
 }
 @keyframes vyon-arrow-float-down{
  0%,100%{transform:translate3d(0,0,0)}
  25%{transform:translate3d(0,2px,0)}
- 50%{transform:translate3d(0,3.2px,0)}
+ 50%{transform:translate3d(0,2.5px,0)}
  75%{transform:translate3d(0,1.9px,0)}
 }
 @media(prefers-reduced-motion:no-preference){
@@ -536,11 +536,11 @@ body{transition:background-color .5s var(--vyon-ease)}
  .header-github .vyon-arrow-glyph,
  .header-github .vyon-arrow-shell svg,
  .mobile-menu a .vyon-arrow-glyph{
-  animation:vyon-arrow-float-diagonal 3.6s cubic-bezier(.45,0,.55,1) infinite;
+  animation:vyon-arrow-float-diagonal 5s cubic-bezier(.42,0,.58,1) infinite;
  }
  .hero-download-btn .vyon-arrow-glyph,
  .scroll-cue .vyon-arrow-glyph{
-  animation:vyon-arrow-float-down 3.2s cubic-bezier(.45,0,.55,1) infinite;
+  animation:vyon-arrow-float-down 4.6s cubic-bezier(.42,0,.58,1) infinite;
  }
  .platform-card:nth-child(2) .vyon-arrow-glyph,
  .social-card:nth-child(2) .vyon-arrow-glyph,
@@ -557,11 +557,11 @@ body{transition:background-color .5s var(--vyon-ease)}
 .screenshot-tab:is(:hover,:focus-visible,.is-selected) .vyon-arrow-shell,
 .command-results a:is(:hover,:focus-visible,.is-selected) .vyon-arrow-shell,
 .mobile-menu a:is(:hover,:focus-visible) .vyon-arrow-shell{
- transform:translate3d(5px,-5px,0);
+ transform:translate3d(3.5px,-3.5px,0);
 }
-.header-github:is(:hover,:focus-visible) .vyon-arrow-shell{transform:translate3d(5px,0,0)}
+.header-github:is(:hover,:focus-visible) .vyon-arrow-shell{transform:translate3d(3.5px,0,0)}
 .hero-download-btn:is(:hover,:focus-visible) .vyon-arrow-shell,
-.scroll-cue:is(:hover,:focus-visible) .vyon-arrow-shell{transform:translate3d(0,5px,0)}
+.scroll-cue:is(:hover,:focus-visible) .vyon-arrow-shell{transform:translate3d(0,3.5px,0)}
 @media(prefers-reduced-motion:reduce){
  .vyon-arrow-shell{transform:none!important;transition:none!important}
  .vyon-arrow-glyph,.vyon-arrow-shell svg{animation:none!important;transform:none!important}
