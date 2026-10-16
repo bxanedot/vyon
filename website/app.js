@@ -789,9 +789,10 @@ window.addEventListener("resize",()=>{
 },{passive:true});
 window.addEventListener("scroll",()=>{if(!active)paintDebris()},{passive:true});
 document.addEventListener("visibilitychange",()=>{if(document.hidden)stopDotFollow();else if(falling.some(p=>!p.resting))animateFalls();});
-document.fonts?.ready?.then(()=>{obstacleDirty=true});
-$(".faq-item").forEach(el=>el.addEventListener("toggle",()=>{obstacleDirty=true}));
+// Initialize the dotted logo before any optional FAQ listeners.
 resizeOrb();resizeDebris();loadIconParticles();
+document.fonts?.ready?.then(()=>{obstacleDirty=true});
+$$(".faq-item").forEach(el=>el.addEventListener("toggle",()=>{obstacleDirty=true}));
 // Taps and ordinary clicks always activate controls normally.
 // Only intentional dragging removes their decorative dotted layer.
 $$(".btn,.platform-download,.social-card,.header-github,.theme-chip,.screenshot-tab,.eq-toggle,.command-trigger,.mobile-menu-btn").forEach(control=>{
