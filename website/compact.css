@@ -472,3 +472,10 @@ html{scroll-behavior:smooth}
 .vyon-dot-button>*{position:relative;z-index:1}
 .vyon-dot-button.vyon-dots-collapsed::before{opacity:0}
 @media(prefers-reduced-motion:reduce){.vyon-dot-button::before{transition:none}}
+
+/* Lightweight global visitor stats; values come from the shared Supabase server. */
+.visit-counter{display:flex;align-items:center;flex-wrap:wrap;gap:8px 22px;margin-top:14px;color:#a8a6af;font:10px var(--mono);letter-spacing:.03em}
+.visit-stat{display:inline-flex;align-items:center;gap:7px}
+.visit-number{font-variant-numeric:tabular-nums;font-weight:700;font-size:12px;color:#f5f3f6}
+.visit-live-dot{width:6px;height:6px;border-radius:50%;background:#47da8a;box-shadow:0 0 7px #47da8a80}
+@media(max-width:590px){.visit-counter{gap:9px 15px;font-size:9px}}

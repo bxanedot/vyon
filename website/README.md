@@ -27,6 +27,10 @@ Vercel. Platform caches may require time before updating.
 
 `@vercel/analytics` is bundled from `analytics-entry.js` and injected into the generated HTML by `build-vercel.mjs`. This is a plain HTML/JavaScript site, so no Next.js or React component is used. Enable Analytics in the project's Vercel dashboard to start collecting page views.
 
+## Live visitor counters
+
+Under the Get vyon button the site shows **online now** (browser sessions active within the last 90 seconds) and **total visits** (new browser session IDs seen since activation). The source of truth is a private, RLS-protected set of tables in the existing Vyon Supabase project. A CORS-restricted Supabase Edge Function records session heartbeats and returns aggregate counts. No database secrets are shipped in browser JavaScript. Counts are not retroactive and can be affected by content blockers, multiple tabs, session resets and automated traffic. Refresh every 30 seconds while the page is visible.
+
 ## Interactive particles
 
 - The dot-built logo stays still until clicked or dragged. Clicking breaks off a cluster; dragging removes only the individual dots touched.
