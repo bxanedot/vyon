@@ -90,7 +90,9 @@ $$("[data-color]").forEach(b=>b.addEventListener("click",()=>theme(b.dataset.col
 try{theme(localStorage.getItem("vyon-accent")||"blood");}catch{theme("blood");}
 // Actual Vyon icon silhouette, drawn as static dots. Only clicked clusters fall.
 const region=$("#orb-region"),canvas=$("#orb-canvas"),ctx=canvas.getContext("2d",{alpha:true});
-const particles=[],falling=[];
+const particles=[],falling=[],clearedSpots=[];
+let heartAnimating=false;
+const heartPoints=[];
 const tones={
  violet:["255,151,165","194,154,239","123,205,255"],
  acid:["47,190,128","22,162,143","46,221,190"],
@@ -108,8 +110,44 @@ debris.setAttribute("aria-hidden","true");
 document.body.appendChild(debris);
 const debrisCtx=debris.getContext("2d",{alpha:true});
 let vw=0,vh=0,ratio=1,obstacleCells=new Map(),floor=0;
-const gridSize=96;
+const gridSize=96,particleCell=8;
+// Each dot has a distinct collision radius, mass, elasticity and surface friction.
 const hash=(x,y)=>{const n=Math.sin(x*127.1+y*311.7)*43758.5453123;return n-Math.floor(n);};
+const heartShape=(x,y)=>{const hX=x/23.5,hY=-y/24;return Math.pow(hX*hX+hY*hY-1,3)-hX*hX*Math.pow(hY,3)<0;};
+for(let y=-28;y<=28;y+=4)for(let x=-28;x<=28;x+=4){
+ if(heartShape(x,y))heartPoints.push({x:x+(hash(x,y)-.5)*1.4,y:y+(hash(y,x)-.5)*1.4,j:hash(x+48,y+79)});
+}
+function locateSpot(spot){
+ const scale=orbScale*358/360;
+ return {x:w*.5+spot.relX*scale,y:h*.49+spot.relY*scale};
+}
+function paintHearts(){
+ const palette=tones[root.dataset.accent]||tones.blood,now=performance.now();
+ for(const spot of clearedSpots){
+  if(spot.heartAt===null)continue;
+  const anchor=locateSpot(spot),elapsed=now-spot.heartAt;
+  const grow=reduce?1:1-Math.pow(1-Math.min(1,elapsed/490),3);
+  ctx.save();ctx.translate(anchor.x,anchor.y);
+  ctx.scale(.72+.28*grow,.72+.28*grow);
+  for(const p of heartPoints){
+   const alpha=(.34+.66*grow)*(.8+.2*p.j);
+   ctx.fillStyle="rgba("+palette[Math.floor(p.j*3)]+","+alpha.toFixed(3)+")";
+   ctx.beginPath();ctx.arc(p.x,p.y,1.6+p.j*.7,0,Math.PI*2);ctx.fill();
+  }
+  ctx.restore();
+ }
+}
+function animateHearts(){
+ renderOrb();
+ if(clearedSpots.some(s=>s.heartAt!==null&&performance.now()-s.heartAt<530)){
+  requestAnimationFrame(animateHearts);
+ }else heartAnimating=false;
+}
+function makeHeart(spot){
+ spot.heartAt=performance.now();
+ renderOrb();
+ if(!reduce&&!heartAnimating){heartAnimating=true;requestAnimationFrame(animateHearts);}
+}
 function dotColor(p){
  const palette=tones[root.dataset.accent]||tones.blood;
  return "rgba("+palette[Math.min(2,Math.max(0,Math.floor((p.x+p.y+2)/4*3)))]+","+(.58+.38*p.j).toFixed(3)+")";
@@ -142,7 +180,7 @@ function loadIconParticles(){
    if(data[(yi*size+xi)*4+3]<90)continue;
    next.push({x:((xi+.5)/size-.5)*2,y:((yi+.5)/size-.5)*2,j:hash(x+13,y+37),fallen:false});
   }
-  if(next.length>250){particles.splice(0,particles.length,...next);spriteDirty=true;renderOrb();}
+  if(next.length>250&&!falling.length){particles.splice(0,particles.length,...next);spriteDirty=true;renderOrb();}
  };
  img.src="/icons/vyon-mark.svg";
 }
@@ -178,6 +216,7 @@ function renderOrb(){
  if(spriteDirty)buildSprite();
  ctx.clearRect(0,0,w,h);
  ctx.drawImage(sprite,w*.5-orbScale,h*.49-orbScale,orbScale*2,orbScale*2);
+ paintHearts();
 }
 function rebuildObstacles(){
  obstacleCells=new Map();
@@ -231,36 +270,107 @@ function paintDebris(){
   debrisCtx.beginPath();debrisCtx.arc(x,y,p.radius,0,Math.PI*2);debrisCtx.fill();
  }
 }
+function resolveDotContacts(){
+ // Spatial hashing only tests nearby circular bodies, not every possible pair.
+ // Sleeping particles stay solid and can be woken by sufficiently strong impacts.
+ const cells=new Map();
+ for(let i=0;i<falling.length;i++){
+  const p=falling[i],cx=Math.floor(p.px/particleCell),cy=Math.floor(p.py/particleCell);
+  const key=cx+","+cy;
+  let bucket=cells.get(key);
+  if(!bucket){bucket=[];cells.set(key,bucket);}
+  bucket.push(i);
+ }
+ for(let i=0;i<falling.length;i++){
+  const a=falling[i],cx=Math.floor(a.px/particleCell),cy=Math.floor(a.py/particleCell);
+  for(let y=cy-1;y<=cy+1;y++)for(let x=cx-1;x<=cx+1;x++){
+   for(const j of cells.get(x+","+y)||[]){
+    if(j<=i)continue;
+    const b=falling[j],dx=b.px-a.px,dy=b.py-a.py;
+    const minimum=a.radius+b.radius,d2=dx*dx+dy*dy;
+    if(d2>=minimum*minimum)continue;
+    const d=Math.sqrt(d2),angle=((i*37+j*73)%360)*Math.PI/180;
+    const nx=d>.0001?dx/d:Math.cos(angle),ny=d>.0001?dy/d:Math.sin(angle);
+    // Impact energy transfers between dots, including already-settled dots.
+    const impact=Math.hypot(a.vx-b.vx,a.vy-b.vy);
+    if(a.resting&&!b.resting&&impact>290){
+     a.resting=false;a.sleepFor=0;a.vx-=nx*Math.min(110,impact*.12);a.vy-=25;
+    }
+    if(b.resting&&!a.resting&&impact>290){
+     b.resting=false;b.sleepFor=0;b.vx+=nx*Math.min(110,impact*.12);b.vy-=25;
+    }
+    const invA=a.resting?0:1/a.mass,invB=b.resting?0:1/b.mass,sum=invA+invB;
+    if(sum===0)continue;
+    const penetration=minimum-d;
+    const correction=(Math.max(0,penetration-.02)*.86)/sum;
+    a.px-=nx*correction*invA;a.py-=ny*correction*invA;
+    b.px+=nx*correction*invB;b.py+=ny*correction*invB;
+    const relativeX=b.vx-a.vx,relativeY=b.vy-a.vy;
+    const approach=relativeX*nx+relativeY*ny;
+    if(approach<0){
+     const impulse=-(1+Math.min(a.bounce,b.bounce))*approach/sum;
+     a.vx-=impulse*nx*invA;a.vy-=impulse*ny*invA;
+     b.vx+=impulse*nx*invB;b.vy+=impulse*ny*invB;
+     // Tangential friction converts head-on impacts into uneven sideways piles.
+     const tx=-ny,ty=nx;
+     const slide=relativeX*tx+relativeY*ty;
+     const friction=Math.max(-impulse*.3,Math.min(impulse*.3,-slide/sum));
+     a.vx-=friction*tx*invA;a.vy-=friction*ty*invA;
+     b.vx+=friction*tx*invB;b.vy+=friction*ty*invB;
+    }
+    if(b.resting&&ny>.4)a.supported=true;
+    if(a.resting&&ny<-.4)b.supported=true;
+   }
+  }
+ }
+}
 function advanceDebris(dt){
- // Two substeps for stable contact with narrow lines of text.
- const steps=2,step=dt/steps;
+ // Individual dots use independent circular rigid-body contacts, plus DOM text boxes.
+ const steps=3,step=dt/steps;
  for(let n=0;n<steps;n++){
   for(const p of falling){
+   p.supported=false;
    if(p.resting)continue;
-   const prevX=p.px,prevY=p.py;
+   const previousX=p.px,previousY=p.py;
    p.vy=Math.min(1950,p.vy+1800*step);
    p.px+=p.vx*step;p.py+=p.vy*step;
    if(p.px<p.radius){p.px=p.radius;p.vx=Math.abs(p.vx)*.55+9;}
    if(p.px>document.documentElement.clientWidth-p.radius){p.px=document.documentElement.clientWidth-p.radius;p.vx=-Math.abs(p.vx)*.55-9;}
-   // Words provide genuine DOM-derived hitboxes, rather than an arbitrary ground plane.
-   for(const b of getNearby(p.px,p.py)){
-    if(p.px+p.radius<b.l||p.px-p.radius>b.r||p.py+p.radius<b.t||p.py-p.radius>b.b)continue;
-    if(prevY+p.radius<=b.t+4&&p.vy>=0){
-     p.py=b.t-p.radius;
-     p.vy=-Math.abs(p.vy)*.19;
-     // Slide off words, then continue descending toward the footer.
+   // Falling bodies hit actual words and slide around their bounding boxes.
+   for(const box of getNearby(p.px,p.py)){
+    if(p.px+p.radius<box.l||p.px-p.radius>box.r||p.py+p.radius<box.t||p.py-p.radius>box.b)continue;
+    if(previousY+p.radius<=box.t+4&&p.vy>=0){
+     p.py=box.t-p.radius;p.vy=-Math.abs(p.vy)*p.bounce;
      p.vx+=((p.j>.5)?1:-1)*52;
      p.vx=Math.max(-240,Math.min(240,p.vx));
      break;
     }
-    if(prevX+p.radius<=b.l&&p.vx>0){p.px=b.l-p.radius;p.vx=-Math.abs(p.vx)*.6;break;}
-    if(prevX-p.radius>=b.r&&p.vx<0){p.px=b.r+p.radius;p.vx=Math.abs(p.vx)*.6;break;}
+    if(previousX+p.radius<=box.l&&p.vx>0){p.px=box.l-p.radius;p.vx=-Math.abs(p.vx)*.6;break;}
+    if(previousX-p.radius>=box.r&&p.vx<0){p.px=box.r+p.radius;p.vx=Math.abs(p.vx)*.6;break;}
    }
    if(p.py>=floor-p.radius){
-    p.py=floor-p.radius;p.vy=-Math.abs(p.vy)*.22;p.vx*=.74;
-    if(Math.abs(p.vy)<36){p.vy=0;p.vx=0;p.resting=true;}
+    p.py=floor-p.radius;
+    p.vy=-Math.abs(p.vy)*p.bounce;p.vx*=p.surfaceFriction;
+    p.supported=true;
    }
-   p.vx*=Math.pow(.997,step*60);
+   p.vx*=Math.pow(.995,step*60);
+  }
+  resolveDotContacts();
+  for(const p of falling){
+   if(p.resting)continue;
+   if(p.px<p.radius){p.px=p.radius;p.vx=Math.abs(p.vx)*.55;}
+   if(p.px>document.documentElement.clientWidth-p.radius){p.px=document.documentElement.clientWidth-p.radius;p.vx=-Math.abs(p.vx)*.55;}
+   if(p.py>floor-p.radius){
+    p.py=floor-p.radius;
+    p.vy=-Math.abs(p.vy)*p.bounce;
+    p.vx*=p.surfaceFriction;
+    p.supported=true;
+   }
+   const slow=Math.hypot(p.vx,p.vy)<38;
+   p.sleepFor=(slow&&p.supported)?(p.sleepFor+step):0;
+   if(p.sleepFor>.14){
+    p.resting=true;p.vx=0;p.vy=0;
+   }
   }
  }
 }
@@ -302,11 +412,14 @@ function dropCluster(localX,localY){
   falling.push({
    x:p.x,y:p.y,j:p.j,radius:1.1+p.j*.9,
    px:worldX+x,py:worldY+y,
-   vx:Math.cos(angle)*kick*125+(p.j-.5)*35,
-   vy:-kick*(55+70*p.j),resting:false
+   vx:Math.cos(angle)*kick*125+(p.j-.5)*60+Math.sin(p.j*91)*22,
+   vy:-kick*(55+70*p.j),resting:false,
+   mass:Math.pow(1.1+p.j*.9,2),bounce:.15+.14*p.j,
+   surfaceFriction:.68+.21*p.j,supported:false,sleepFor:0
   });
  }
  if(!count)return false;
+ clearedSpots.push({relX:(localX-cx)/scale,relY:(localY-cy)/scale,heartAt:null});
  spriteDirty=true;renderOrb();
  if(reduce){
   for(const p of falling){p.py=floor-p.radius;p.vy=0;p.vx=0;p.resting=true;}
@@ -314,18 +427,32 @@ function dropCluster(localX,localY){
  }else animateFalls();
  return true;
 }
+function activateLogo(localX,localY){
+ // Second click in a previously cleared hitbox draws a heart instead of dislodging more dots.
+ const spot=clearedSpots.find(s=>{
+  const at=locateSpot(s);
+  return Math.hypot(at.x-localX,at.y-localY)<43;
+ });
+ if(spot){makeHeart(spot);return;}
+ dropCluster(localX,localY);
+}
 region.addEventListener("click",event=>{
  const r=region.getBoundingClientRect();
- dropCluster(event.clientX-r.left,event.clientY-r.top);
+ activateLogo(event.clientX-r.left,event.clientY-r.top);
 });
 region.addEventListener("keydown",event=>{
  if(event.key!=="Enter"&&event.key!==" ")return;
  event.preventDefault();
+ const waiting=clearedSpots.find(s=>s.heartAt===null);
+ if(waiting){makeHeart(waiting);return;}
  const remaining=particles.filter(p=>!p.fallen);
- if(!remaining.length)return;
+ if(!remaining.length){
+  if(clearedSpots.length)makeHeart(clearedSpots[clearedSpots.length-1]);
+  return;
+ }
  const chosen=remaining[Math.floor(remaining.length*.5)];
  const scale=orbScale*358/360;
- dropCluster(w*.5+chosen.x*scale,h*.49+chosen.y*scale);
+ activateLogo(w*.5+chosen.x*scale,h*.49+chosen.y*scale);
 });
 window.addEventListener("resize",()=>{
  resizeOrb();resizeDebris();if(falling.length)rebuildObstacles();

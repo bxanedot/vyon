@@ -16,7 +16,7 @@ Vyon is a YouTube Music-powered music player for Windows, macOS, Linux, and Andr
 
 Vyon supports Windows, macOS, Linux, and Android. iOS/iPadOS are excluded. The website scans official stable GitHub Releases for Windows EXE/MSI/MSIX, macOS DMG/PKG, Linux AppImage/DEB/RPM, and Android APK installers, and links to an appropriate published asset. If a release cannot be verified, it links to GitHub Releases instead; it never invents a downloadable file.
 
-The hero logo is stationary until clicked or activated by keyboard. Clicked dot clusters detach from the original icon and drop under gravity, using DOM-derived text hitboxes and the document floor for collisions. The falling layer does not intercept site interactions. Reduced-motion preferences skip the animated fall.
+The hero logo stays stationary. Clicking or activating part of the dotted icon with the keyboard detaches a cluster that falls under gravity. Each individual dot has its own circular collision body (mass, bounce and friction): dots collide, bounce and push each other, spread into unique piles, and react to DOM-derived text hitboxes and the document floor. Click the vacated spot again to draw a small dotted heart in the hole; the heart remains visible. Enter or Space creates a heart for the last opened hole. The falling layer never intercepts site clicks. Reduced-motion preferences skip the animated fall and heart reveal.
 
 ## Auto deployment to Cloudflare
 
@@ -56,7 +56,7 @@ vyon uses **YouTube Music as its music backend**; the website must not describe 
 
 ## Releases
 
-APK ONLY: the hero Download APK button checks GitHub stable releases and downloads directly only when a real Android .apk asset is present. There is no Nightly channel or desktop distribution. Private GitHub releases may be inaccessible to site visitors through the public GitHub API.
+The hero Get vyon button opens the cross-platform downloads section for Windows, macOS, Linux, and Android. Platform cards link directly to a verified stable release asset, if available. Private GitHub releases may be inaccessible through the public GitHub API. iOS is not supported.
 
 ## Theme, socials, inspiration
 
@@ -86,19 +86,19 @@ The displayed project name is consistently written as **vyon** in lowercase. Oth
 
 The marketing website retains a **fixed matte-black header** that stays in view while scrolling. The footer has been removed. The public header and command navigation no longer feature a Connect link; creator support and social cards remain lower on the page. Browser Listen Together stays unadvertised and accessible only by its direct URL.
 
-The hero uses a **single vyon particle silhouette** derived from the original waveform icon artwork. The separate overlaid image and alternate Sphere/Halo/Wave/Sound selectors have been removed. Clicking or pressing Enter/Space on the particle silhouette accelerates its rotation from a gentle ~18 degrees per second (30% of 60°/s) to ~48 degrees per second (80%), then smoothly reduces it to its normal pace. Reduced-motion settings stop continuous spinning.
+The hero uses a **single static vyon particle silhouette** derived from the original waveform icon artwork; alternate particle mode selectors and the continuous rotation were removed. Clicking a cluster releases dots under gravity. Clicking the cleared spot a second time makes a dotted heart. Enter and Space offer the same two-step interaction.
 
 ## Direct stable APK downloads and icon polish
 
 - The hero **Download APK** button points directly to the actual `browser_download_url` for the newest stable Android `.apk` found in the GitHub Releases API. Clicking an available APK link downloads the GitHub-hosted file without first opening a release detail page. No Nightly or prerelease APKs are selected.
 - Until a stable APK is published and publicly discoverable, clicking the hero CTA gives a brief inline unavailable message rather than presenting a fake download. The connected GitHub API listed no published releases on October 15, 2026; visitors may also be unable to retrieve private-repo assets.
 - The favicon is a small optimized **white PNG sourced from the original uploaded icon artwork** at `website/icons/vyon-white-favicon.png`; it replaces the violet favicon.
-- The dot-based vyon waveform is about 25% smaller. Its dots are rendered to a cached texture only on artwork/color changes; the browser rotates that texture at full-frame animation speed with eased click acceleration from 30% to 80%, followed by gradual deceleration.
+- The dot-based vyon waveform stays still until a cluster is clicked. Falling dots are simulated as individual bodies and use a spatial grid for efficient particle-to-particle collisions.
 - Scroll reveals, button transitions and cards use more consistent easing and reduced-motion support.
 
 ## Interactive vyon particles
 
-The only hero icon is the dot-built vyon waveform silhouette. It now sits lower beneath the sticky header (72 px desktop, 56 px tablet, 48 px mobile). Pointer movement repels nearby particles with soft easing, touching/dragging has the same effect where supported, and clicking/tapping produces a gentle expanding particle ripple while accelerating the existing spin. The nearby dots settle back into the exact original icon shape when interaction stops. The cached dotted texture still drives normal rotation; only affected dots are individually redrawn for efficiency. Keyboard users can press Enter or Space to activate the spin, and reduced-motion users do not receive continuous rotation.
+The hero icon stays below the sticky header (72 px desktop, 56 px tablet, 48 px mobile). It does not spin or repel on hover. Tap or click a cluster to release it into gravity-driven dot physics, then tap the same cleared patch to draw a heart. A spatial hash efficiently handles circle-circle collisions between dots, while text boxes and the document floor remain solid. Enter and Space provide keyboard access, and reduced-motion users see dots settle immediately.
 
 ## Compact FAQ replacing the old download panel
 
