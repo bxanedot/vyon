@@ -851,3 +851,86 @@ body{transition:background-color .5s var(--vyon-ease)}
 @media(prefers-reduced-motion:reduce){
  .vyon-thank-you,.vyon-footer-up,.faq-item,.faq-item summary{transition:none!important}
 }
+
+/* Clearer Liquid Glass: translucent cool highlights, genuine blur, no dark
+   opaque gradients or large black drop shadows. The toggle remains reversible. */
+:root[data-glass="on"] .glass-toggle{
+ background:linear-gradient(140deg,rgba(255,255,255,.24),rgba(255,255,255,.08));
+ border-color:rgba(255,255,255,.37);
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 2px 9px rgba(0,0,0,.07);
+}
+:root[data-glass="on"] .site-header,
+:root[data-glass="on"] .site-header.is-scrolled{
+ background:linear-gradient(135deg,rgba(82,79,96,.39),rgba(28,27,39,.34))!important;
+ border-color:rgba(255,255,255,.30)!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 4px 18px rgba(0,0,0,.10)!important;
+ backdrop-filter:blur(24px) saturate(145%)!important;
+ -webkit-backdrop-filter:blur(24px) saturate(145%)!important;
+}
+:root[data-glass="on"] :is(.mobile-menu,.command-dialog){
+ background:linear-gradient(140deg,rgba(80,77,95,.52),rgba(25,23,35,.45))!important;
+ border-color:rgba(255,255,255,.28)!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 8px 22px rgba(0,0,0,.13)!important;
+ backdrop-filter:blur(25px) saturate(140%)!important;
+ -webkit-backdrop-filter:blur(25px) saturate(140%)!important;
+}
+:root[data-glass="on"] .shot-lightbox{
+ background:rgba(10,10,15,.72)!important;
+ box-shadow:none!important;
+ backdrop-filter:blur(16px);
+ -webkit-backdrop-filter:blur(16px);
+}
+:root[data-glass="on"] :is(.platform-card,.social-card,.screenshot-browser,.screenshot-aside,.feature-card){
+ background:linear-gradient(145deg,rgba(255,255,255,.15),rgba(255,255,255,.055) 50%,rgba(255,255,255,.075)),rgba(43,38,53,.24)!important;
+ border-color:rgba(255,255,255,.26)!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.21),0 4px 16px rgba(0,0,0,.065)!important;
+ backdrop-filter:blur(13px) saturate(135%);
+ -webkit-backdrop-filter:blur(13px) saturate(135%);
+}
+:root[data-glass="on"] :is(.platform-card,.social-card,.feature-card):hover{
+ border-color:rgba(var(--accent-rgb),.53)!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.29),0 5px 17px rgba(var(--accent-rgb),.07)!important;
+}
+:root[data-glass="on"] .vyon-footer{
+ background:linear-gradient(140deg,rgba(255,255,255,.07),rgba(24,22,34,.35)),#111014;
+ border-top-color:rgba(255,255,255,.17);
+}
+/* The randomly chosen phrase is rendered as individually breakable dots.
+   Native text remains available to assistive technology, not covered by art. */
+.vyon-thank-dots{
+ display:block!important;
+ flex:none;
+ max-width:100%;
+ object-fit:contain;
+ pointer-events:none;
+ border:0;
+ box-shadow:none;
+ filter:none;
+}
+.vyon-thank-you small{
+ color:#e4d9e7;
+ text-shadow:0 1px 4px rgba(0,0,0,.16);
+}
+@media(max-width:850px){
+ /* One high-quality blurred floating header; avoid expensive blur on every
+    mobile card to keep touch scrolling fluid. */
+ :root[data-glass="on"] :is(.platform-card,.social-card,.feature-card,.screenshot-browser,.screenshot-aside){
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+  background:linear-gradient(135deg,rgba(255,255,255,.17),rgba(255,255,255,.055)),rgba(40,36,49,.44)!important;
+ }
+}
+@media(max-width:590px){
+ :root[data-glass="on"] .site-header,
+ :root[data-glass="on"] .site-header.is-scrolled{
+  backdrop-filter:blur(18px) saturate(130%)!important;
+  -webkit-backdrop-filter:blur(18px) saturate(130%)!important;
+ }
+}
+@media(prefers-reduced-transparency:reduce){
+ :root[data-glass="on"] :is(.site-header,.site-header.is-scrolled,.mobile-menu,.command-dialog,.platform-card,.social-card,.screenshot-browser,.screenshot-aside,.feature-card){
+  background:#292532!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+ }
+}
