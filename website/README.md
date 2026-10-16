@@ -4,7 +4,7 @@ Vyon is a YouTube Music-powered music player for Windows, macOS, Linux, and Andr
 
 ## Directory
 
-- index.html, styles.css, compact.css, app.js — responsive marketing website with cross-platform download cards and falling-dot logo interaction
+- index.html, styles.css, compact.css, app.js — responsive marketing website with cross-platform download cards, draggable individual dots, bouncy text, and destructible dotted buttons
 - icons/*.svg — bundled social SVGs and custom Guns.lol monogram
 - screenshots/ — real Android screenshots (not fabricated; desktop screenshots are not implied)
 - listen/index.html, listen/listen.css, listen/listen.js — browser listening room
@@ -16,7 +16,13 @@ Vyon is a YouTube Music-powered music player for Windows, macOS, Linux, and Andr
 
 Vyon supports Windows, macOS, Linux, and Android. iOS/iPadOS are excluded. The website scans official stable GitHub Releases for Windows EXE/MSI/MSIX, macOS DMG/PKG, Linux AppImage/DEB/RPM, and Android APK installers, and links to an appropriate published asset. If a release cannot be verified, it links to GitHub Releases instead; it never invents a downloadable file.
 
-The hero logo stays stationary. Clicking or activating part of the dotted icon with the keyboard detaches a cluster that falls under gravity. Each individual dot has its own circular collision body (mass, bounce and friction): dots collide, bounce and push each other, spread into unique piles, and react to DOM-derived text hitboxes and the document floor. Click the vacated spot again to draw a small dotted heart; click the heart a third time to crumble it: all heart dots become the same independent falling physics bodies as the logo, with extra varied impulses so the heart visibly breaks apart instead of falling as a solid shape. Further clicks can repeat the heart creation and drop cycle. Enter or Space supports the sequence from the keyboard. The falling layer never intercepts site clicks. Reduced-motion preferences skip the animated fall and heart reveal.
+The hero logo stays stationary. Clicking or activating part of the dotted icon with the keyboard detaches a cluster that falls under gravity. Each individual dot has its own circular collision body (mass, bounce and friction): dots collide, bounce and push each other, spread into unique piles, and react to DOM-derived text hitboxes and the document floor. Click the vacated spot again to draw a small dotted heart; click the heart a third time to crumble it: all heart dots become the same independent falling physics bodies as the logo, with extra varied impulses so the heart visibly breaks apart instead of falling as a solid shape. Further clicks can repeat the heart creation and drop cycle. Enter or Space supports the sequence from the keyboard. Dragging through the logo or a heart releases only the touched dots. Text bounces visually on particle impact, while repeated collisions are released to prevent particles from getting stuck above the footer. Button surfaces use a dotted treatment: the first activation keeps its standard function, and the second lets their decorative dots collapse. The falling layer never intercepts site clicks. Reduced-motion preferences skip the animated fall and heart reveal.
+
+## Deploy to Vercel
+
+The marketing site supports Vercel. Import `bxanedot/vyon` with **Root Directory = website** (framework: Other). The `vercel.json` and `npm run build` command build a safe `dist/` with only public frontend assets. Any future push redeploys through the Git integration. Social card URLs are made absolute for the Vercel deployment.
+
+**Important:** Listen Together's room server uses Cloudflare Durable Objects and WebSockets and is **not supported by this static Vercel build**. The hidden `/listen/` room page and the server source are intentionally excluded from the Vercel output. Use Cloudflare Workers for the real-time rooms.
 
 ## Auto deployment to Cloudflare
 
@@ -92,7 +98,7 @@ The hero uses a **single static vyon particle silhouette** derived from the orig
 
 - The hero **Download APK** button points directly to the actual `browser_download_url` for the newest stable Android `.apk` found in the GitHub Releases API. Clicking an available APK link downloads the GitHub-hosted file without first opening a release detail page. No Nightly or prerelease APKs are selected.
 - Until a stable APK is published and publicly discoverable, clicking the hero CTA gives a brief inline unavailable message rather than presenting a fake download. The connected GitHub API listed no published releases on October 15, 2026; visitors may also be unable to retrieve private-repo assets.
-- The website header and browser favicon use the original background-free white SVG logo. The extra PNG favicon link was removed to avoid browsers choosing an alternate version. The PNG artwork remains available for touch icons.
+- The website header uses a transparent, optimized PNG prepared from the supplied white Vyon logo image. The browser favicon remains the transparent SVG mark; the PNG artwork is available for touch icons.
 - The dot-based vyon waveform stays still until a cluster is clicked. Falling dots are simulated as individual bodies and use a spatial grid for efficient particle-to-particle collisions.
 - Scroll reveals, button transitions and cards use more consistent easing and reduced-motion support.
 

@@ -462,3 +462,13 @@ html{scroll-behavior:smooth}
 
 /* The header uses the original transparent white logo, without a tile or matte. */
 .brand .brand-symbol{background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;filter:none!important;mix-blend-mode:normal;object-fit:contain}
+
+/* Dragging picks individual dots; touch gestures stay inside the interactive art. */
+.hero-orb{touch-action:none;user-select:none}
+.vyon-dot-button{position:relative;isolation:isolate}
+.vyon-dot-button::before{content:"";position:absolute;inset:2px;border-radius:inherit;pointer-events:none;z-index:0;opacity:.48;transition:opacity .18s;
+ background-image:radial-gradient(circle,rgba(255,255,255,.64) 1px,transparent 1.4px);background-size:9px 9px;
+ mask-image:linear-gradient(90deg,black,transparent 88%);}
+.vyon-dot-button>*{position:relative;z-index:1}
+.vyon-dot-button.vyon-dots-collapsed::before{opacity:0}
+@media(prefers-reduced-motion:reduce){.vyon-dot-button::before{transition:none}}

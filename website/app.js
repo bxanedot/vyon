@@ -111,6 +111,7 @@ document.body.appendChild(debris);
 const debrisCtx=debris.getContext("2d",{alpha:true});
 let vw=0,vh=0,ratio=1,obstacleCells=new Map(),floor=0;
 const gridSize=96,particleCell=8;
+const textImpacts=new WeakMap();
 // Each dot has a distinct collision radius, mass, elasticity and surface friction.
 const hash=(x,y)=>{const n=Math.sin(x*127.1+y*311.7)*43758.5453123;return n-Math.floor(n);};
 const heartShape=(x,y)=>{const hX=x/23.5,hY=-y/24;return Math.pow(hX*hX+hY*hY-1,3)-hX*hX*Math.pow(hY,3)<0;};
@@ -129,7 +130,9 @@ function paintHearts(){
   const grow=reduce?1:1-Math.pow(1-Math.min(1,elapsed/490),3);
   ctx.save();ctx.translate(anchor.x,anchor.y);
   ctx.scale(.72+.28*grow,.72+.28*grow);
-  for(const p of heartPoints){
+  for(let i=0;i<heartPoints.length;i++){
+   if(spot.removed?.has(i))continue;
+   const p=heartPoints[i];
    const alpha=(.34+.66*grow)*(.8+.2*p.j);
    ctx.fillStyle="rgba("+palette[Math.floor(p.j*3)]+","+alpha.toFixed(3)+")";
    ctx.beginPath();ctx.arc(p.x,p.y,1.6+p.j*.7,0,Math.PI*2);ctx.fill();
@@ -145,6 +148,7 @@ function animateHearts(){
 }
 function makeHeart(spot){
  spot.heartAt=performance.now();
+ spot.removed=new Set();
  renderOrb();
  if(!reduce&&!heartAnimating){heartAnimating=true;requestAnimationFrame(animateHearts);}
 }
@@ -179,7 +183,9 @@ function dropHeart(spot,hitX,hitY){
  spot.heartAt=null;
  renderOrb();
  rebuildObstacles();
- for(const point of heartPoints){
+ for(let i=0;i<heartPoints.length;i++){
+  if(spot.removed?.has(i))continue;
+  const point=heartPoints[i];
   const x=anchor.x+point.x*scale,y=anchor.y+point.y*scale;
   const r=1.6+point.j*.7;
   releaseDot({x:point.x/28,y:point.y/28,j:point.j},worldX,worldY,x,y,
@@ -279,7 +285,7 @@ function rebuildObstacles(){
    range.setStart(node,match.index);range.setEnd(node,match.index+match[0].length);
    for(const r of range.getClientRects()){
     if(r.width<2||r.height<2)continue;
-    const box={l:r.left+scrollX-2,r:r.right+scrollX+2,t:r.top+scrollY-2,b:r.bottom+scrollY+2};
+    const box={l:r.left+scrollX-2,r:r.right+scrollX+2,t:r.top+scrollY-2,b:r.bottom+scrollY+2,el:parent};
     if(box.b<0||box.t>floor)continue;
     const minX=Math.floor(box.l/gridSize),maxX=Math.floor(box.r/gridSize);
     const minY=Math.floor(box.t/gridSize),maxY=Math.floor(box.b/gridSize);
@@ -313,6 +319,20 @@ function paintDebris(){
   debrisCtx.fillStyle=dotColor(p);
   debrisCtx.beginPath();debrisCtx.arc(x,y,p.radius,0,Math.PI*2);debrisCtx.fill();
  }
+}
+function bounceText(box,force=1){
+ if(reduce||!box.el||typeof box.el.animate!=="function")return;
+ const el=box.el.closest("h1,h2,h3,h4,p,small,strong,em,span,summary,a,label,li,button")||box.el;
+ const now=performance.now();
+ if(now-(textImpacts.get(el)||0)<280)return;
+ textImpacts.set(el,now);
+ const height=Math.min(7,2.8+force*.012);
+ el.animate([
+  {transform:"translateY(0)"},
+  {transform:"translateY("+(-height).toFixed(1)+"px)",offset:.24},
+  {transform:"translateY("+(height*.35).toFixed(1)+"px)",offset:.68},
+  {transform:"translateY(0)"}
+ ],{duration:460,easing:"cubic-bezier(.2,.8,.3,1)"});
 }
 function resolveDotContacts(){
  // Spatial hashing only tests nearby circular bodies, not every possible pair.
@@ -362,8 +382,8 @@ function resolveDotContacts(){
      a.vx-=friction*tx*invA;a.vy-=friction*ty*invA;
      b.vx+=friction*tx*invB;b.vy+=friction*ty*invB;
     }
-    if(b.resting&&ny>.4)a.supported=true;
-    if(a.resting&&ny<-.4)b.supported=true;
+    if(b.resting&&ny>.4&&b.py>floor-85)a.supported=true;
+    if(a.resting&&ny<-.4&&a.py>floor-85)b.supported=true;
    }
   }
  }
@@ -380,17 +400,38 @@ function advanceDebris(dt){
    p.px+=p.vx*step;p.py+=p.vy*step;
    if(p.px<p.radius){p.px=p.radius;p.vx=Math.abs(p.vx)*.55+9;}
    if(p.px>document.documentElement.clientWidth-p.radius){p.px=document.documentElement.clientWidth-p.radius;p.vx=-Math.abs(p.vx)*.55-9;}
-   // Falling bodies hit actual words and slide around their bounding boxes.
-   for(const box of getNearby(p.px,p.py)){
-    if(p.px+p.radius<box.l||p.px-p.radius>box.r||p.py+p.radius<box.t||p.py-p.radius>box.b)continue;
-    if(previousY+p.radius<=box.t+4&&p.vy>=0){
-     p.py=box.t-p.radius;p.vy=-Math.abs(p.vy)*p.bounce;
-     p.vx+=((p.j>.5)?1:-1)*52;
-     p.vx=Math.max(-240,Math.min(240,p.vx));
+   // Words are springy obstacles, not permanent shelves for the particles.
+   // After repeated hits a trapped dot passes through rather than hanging mid-page.
+   if((p.passTextUntil||0)<performance.now()){
+    for(const box of getNearby(p.px,p.py)){
+     if(p.px+p.radius<box.l||p.px-p.radius>box.r||p.py+p.radius<box.t||p.py-p.radius>box.b)continue;
+     bounceText(box,Math.abs(p.vy));
+     p.textHits=(p.textHits||0)+1;
+     if(p.textHits>5){
+      p.passTextUntil=performance.now()+1100;
+      p.textHits=0;p.vy=Math.max(80,p.vy);
+      p.vx+=(p.j>.5?1:-1)*95;
+      break;
+     }
+     if(previousY+p.radius<=box.t+4&&p.vy>=0){
+      p.py=box.t-p.radius;
+      p.vy=-Math.abs(p.vy)*Math.max(.24,p.bounce);
+      // Seek the nearest open edge rather than balancing indefinitely on a word.
+      const left=p.px-box.l,right=box.r-p.px;
+      const direction=left<right?-1:1;
+      p.vx+=direction*(105+18*p.textHits);
+      p.vx=Math.max(-360,Math.min(360,p.vx));
+      break;
+     }
+     if(previousX+p.radius<=box.l&&p.vx>0){p.px=box.l-p.radius;p.vx=-Math.abs(p.vx)*.7-55;break;}
+     if(previousX-p.radius>=box.r&&p.vx<0){p.px=box.r+p.radius;p.vx=Math.abs(p.vx)*.7+55;break;}
+     // The dot spawned inside a moving text hitbox. Expel to the nearest side.
+     const leftGap=p.px-box.l,rightGap=box.r-p.px;
+     if(leftGap<rightGap){p.px=box.l-p.radius-1;p.vx=-Math.max(85,Math.abs(p.vx));}
+     else {p.px=box.r+p.radius+1;p.vx=Math.max(85,Math.abs(p.vx));}
+     p.vy=Math.max(90,p.vy);
      break;
     }
-    if(previousX+p.radius<=box.l&&p.vx>0){p.px=box.l-p.radius;p.vx=-Math.abs(p.vx)*.6;break;}
-    if(previousX-p.radius>=box.r&&p.vx<0){p.px=box.r+p.radius;p.vx=Math.abs(p.vx)*.6;break;}
    }
    if(p.py>=floor-p.radius){
     p.py=floor-p.radius;
@@ -411,7 +452,9 @@ function advanceDebris(dt){
     p.supported=true;
    }
    const slow=Math.hypot(p.vx,p.vy)<38;
-   p.sleepFor=(slow&&p.supported)?(p.sleepFor+step):0;
+   p.sleepFor=(slow&&p.supported&&p.py>floor-85)?(p.sleepFor+step):0;
+   // Any particle still trapped above the footer must remain active and descend.
+   if(p.resting&&p.py<floor-85){p.resting=false;p.sleepFor=0;}
    if(p.sleepFor>.14){
     p.resting=true;p.vx=0;p.vy=0;
    }
@@ -475,7 +518,75 @@ function activateLogo(localX,localY){
  }
  dropCluster(localX,localY);
 }
+// Press and drag over the silhouette to dislodge only the dots the pointer touches.
+let pointerTrail=null,ignoreNextClick=false;
+function dragDotBrush(localX,localY){
+ const cx=w*.5,cy=h*.49,scale=orbScale*358/360;
+ const r=16;
+ const rect=region.getBoundingClientRect();
+ const worldX=rect.left+scrollX,worldY=rect.top+scrollY;
+ let first=false;
+ for(const p of particles){
+  if(p.fallen)continue;
+  const x=cx+p.x*scale,y=cy+p.y*scale;
+  if(Math.hypot(x-localX,y-localY)>r)continue;
+  p.fallen=true;first=true;
+  releaseDot(p,worldX,worldY,x,y,localX,localY);
+ }
+ for(const spot of clearedSpots){
+  if(spot.heartAt===null)continue;
+  const anchor=locateSpot(spot);
+  if(Math.hypot(anchor.x-localX,anchor.y-localY)>51)continue;
+  const progress=reduce?1:1-Math.pow(1-Math.min(1,(performance.now()-spot.heartAt)/490),3);
+  const size=.72+.28*progress;
+  const removed=spot.removed||(spot.removed=new Set());
+  for(let i=0;i<heartPoints.length;i++){
+   if(removed.has(i))continue;
+   const point=heartPoints[i],x=anchor.x+point.x*size,y=anchor.y+point.y*size;
+   if(Math.hypot(x-localX,y-localY)>r)continue;
+   removed.add(i);first=true;
+   const radius=1.6+point.j*.7;
+   releaseDot({x:point.x/28,y:point.y/28,j:point.j},worldX,worldY,x,y,localX,localY,radius,true);
+  }
+  if(removed.size>=heartPoints.length)spot.heartAt=null;
+ }
+ if(first){
+  // Keep one heart target per drag stroke, not one giant cluster per pointer sample.
+  const distance=clearedSpots.length?Math.hypot(locateSpot(clearedSpots[clearedSpots.length-1]).x-localX,locateSpot(clearedSpots[clearedSpots.length-1]).y-localY):Infinity;
+  if(distance>55)clearedSpots.push({relX:(localX-cx)/scale,relY:(localY-cy)/scale,heartAt:null});
+  spriteDirty=true;renderOrb();
+  if(reduce){const count=falling.length;for(let i=0;i<count;i++){if(!falling[i].resting){falling[i].py=floor-falling[i].radius;falling[i].vx=falling[i].vy=0;falling[i].resting=true;}}paintDebris();}
+  else animateFalls();
+ }
+}
+region.addEventListener("pointerdown",e=>{
+ if(e.button!==0&&e.pointerType==="mouse")return;
+ const b=region.getBoundingClientRect();
+ pointerTrail={id:e.pointerId,x:e.clientX-b.left,y:e.clientY-b.top,dragged:false};
+ if(region.setPointerCapture)region.setPointerCapture(e.pointerId);
+},{passive:true});
+region.addEventListener("pointermove",e=>{
+ if(!pointerTrail||e.pointerId!==pointerTrail.id)return;
+ const b=region.getBoundingClientRect(),x=e.clientX-b.left,y=e.clientY-b.top;
+ const dx=x-pointerTrail.x,dy=y-pointerTrail.y,dist=Math.hypot(dx,dy);
+ if(dist>4){
+  if(!pointerTrail.dragged){pointerTrail.dragged=true;rebuildObstacles();}
+  const steps=Math.max(1,Math.ceil(dist/9));
+  for(let n=1;n<=steps;n++)dragDotBrush(pointerTrail.x+dx*n/steps,pointerTrail.y+dy*n/steps);
+  e.preventDefault();
+ }
+ pointerTrail.x=x;pointerTrail.y=y;
+},{passive:false});
+function endDotDrag(e){
+ if(!pointerTrail||e.pointerId!==pointerTrail.id)return;
+ if(pointerTrail.dragged)ignoreNextClick=true;
+ pointerTrail=null;
+ if(region.hasPointerCapture?.(e.pointerId))region.releasePointerCapture(e.pointerId);
+}
+region.addEventListener("pointerup",endDotDrag);
+region.addEventListener("pointercancel",endDotDrag);
 region.addEventListener("click",event=>{
+ if(ignoreNextClick){ignoreNextClick=false;return;}
  const r=region.getBoundingClientRect();
  activateLogo(event.clientX-r.left,event.clientY-r.top);
 });
@@ -498,6 +609,32 @@ window.addEventListener("resize",()=>{
 window.addEventListener("scroll",paintDebris,{passive:true});
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&falling.some(p=>!p.resting))animateFalls();});
 resizeOrb();resizeDebris();loadIconParticles();
+// Dotted button surfaces preserve the first click's normal link/button action.
+// A second activation drops only their decorative particles into the shared physics.
+document.querySelectorAll(".btn,.platform-download,.social-card,.header-github,.theme-chip,.screenshot-tab,.eq-toggle,.command-trigger,.mobile-menu-btn").forEach(control=>{
+ control.classList.add("vyon-dot-button");
+ let activations=0;
+ control.addEventListener("click",event=>{
+  activations++;
+  if(activations!==2)return;
+  if(control.matches("a[href]"))event.preventDefault();
+  const b=control.getBoundingClientRect();
+  if(b.width<10||b.height<8)return;
+  rebuildObstacles();
+  for(let y=7;y<b.height-4;y+=9)for(let x=7;x<b.width-4;x+=9){
+   const seed=hash(x+b.left,y+b.top);
+   if(seed<.24)continue;
+   const p={x:(x/b.width)*2-1,y:(y/b.height)*2-1,j:seed};
+   releaseDot(p,b.left+scrollX,b.top+scrollY,x,y,b.width*.5,b.height*.5,
+    1.1+seed*.6,true);
+  }
+  control.classList.add("vyon-dots-collapsed");
+  if(reduce){
+   for(const p of falling)if(!p.resting){p.py=floor-p.radius;p.vx=p.vy=0;p.resting=true;}
+   paintDebris();
+  }else animateFalls();
+ },{capture:true});
+});
 // The interactive EQ controls live in /equalizer.js; no fake animated-bar visualizer.
 // Cursor-reactive surface light, with no dependency on animation libraries.
 if(window.matchMedia("(hover: hover) and (pointer: fine)").matches){
