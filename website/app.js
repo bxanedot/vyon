@@ -381,6 +381,12 @@ function paintDebris(blend=1){
   debrisCtx.fillStyle=dotColor(p);
   debrisCtx.beginPath();debrisCtx.arc(x,y,p.radius,0,Math.PI*2);debrisCtx.fill();
  }
+ for(const p of regroup){
+  const x=p.px-scrollX,y=p.py-scrollY;
+  if(y<-8||y>vh+8||x<-8||x>vw+8)continue;
+  debrisCtx.fillStyle=dotColor(p);
+  debrisCtx.beginPath();debrisCtx.arc(x,y,p.radius,0,Math.PI*2);debrisCtx.fill();
+ }
 }
 function bounceText(box,force=1){
  if(reduce||!box.el||typeof box.el.animate!=="function")return;
@@ -544,7 +550,78 @@ thankCanvas.className="vyon-thank-dots";
 thankCanvas.setAttribute("aria-hidden","true");
 const thankCtx=thankCanvas.getContext("2d");
 const thankDots=[];
-let thanksPainting=false;
+let thanksPainting=false,regroup=[],regroupStart=0,regrouping=false,regroupPending=false,regroupSeq=0;
+const regroupTime=reduce?0:1330;
+function scheduleRegroup(wait=600){
+ if(regroupPending||regrouping)return;
+ regroupPending=true;
+ const seq=++regroupSeq;
+ setTimeout(()=>{
+  if(seq!==regroupSeq)return;
+  regroupPending=false;
+  startRegroup();
+ },reduce?0:wait);
+}
+function startRegroup(){
+ if(regrouping)return;
+ // Convert existing falling dots into the next phrase rather than teleporting them.
+ let leader=null;
+ if(followActive){
+  for(const p of falling)if(p.tourDot&&!p.resting&&(!leader||p.vy>leader.vy))leader=p;
+ }
+ const sources=[];
+ for(let i=falling.length-1;i>=0;i--){
+  const p=falling[i];
+  if((p.phraseSource||p.tourDot)&&p!==leader){
+   sources.push(p);falling.splice(i,1);
+  }
+ }
+ const oldRect=thankCanvas.getBoundingClientRect();
+ if(!sources.length){
+  for(const p of thankDots)if(p.fallen)
+   sources.push({px:oldRect.left+scrollX+p.tx,py:oldRect.top+scrollY+p.ty,j:p.j});
+ }
+ showThanks();
+ const b=thankCanvas.getBoundingClientRect(),targetX=b.left+scrollX,targetY=b.top+scrollY;
+ const targets=thankDots.slice(),count=Math.min(sources.length,targets.length,maxFalling);
+ for(const p of targets)p.fallen=true;
+ // Shuffle the destination ordering so each new message forms in a unique way.
+ const arranged=targets.map((p,i)=>({p,r:hash(i*13+thanksIndex, i*7+3)})).sort((a,b)=>a.r-b.r);
+ regroup=[];
+ for(let i=0;i<count;i++){
+  const source=sources[i],target=arranged[i].p;
+  regroup.push({sx:source.px,sy:source.py,px:source.px,py:source.py,
+   tx:targetX+target.tx,ty:targetY+target.ty,target,
+   x:target.x,y:target.y,j:source.j??target.j,radius:target.radius,
+   delay:reduce?0:(i%9)*17+hash(i*3,thanksIndex)*70});
+ }
+ for(let i=count;i<arranged.length;i++){
+  arranged[i].p.fallen=false;arranged[i].p.gatherExtra=true;
+ }
+ regroupStart=performance.now();
+ regrouping=!reduce&&regroup.length>0;
+ if(!regrouping){
+  for(const p of targets){p.fallen=false;p.gatherExtra=false;}
+  regroup=[];queueThankPaint();
+ }else{queueThankPaint();animateFalls();}
+}
+function advanceRegroup(now){
+ if(!regrouping)return;
+ const elapsed=now-regroupStart;
+ for(let i=regroup.length-1;i>=0;i--){
+  const p=regroup[i];
+  const t=Math.max(0,Math.min(1,(elapsed-p.delay)/regroupTime));
+  const ease=t>=1?1:1-Math.pow(1-t,3)+Math.sin(12*t)*.06*Math.pow(1-t,2);
+  p.px=p.sx+(p.tx-p.sx)*ease;
+  p.py=p.sy+(p.ty-p.sy)*ease;
+  if(t>=1){p.target.fallen=false;regroup.splice(i,1);}
+ }
+ if(!regroup.length||elapsed>regroupTime+350){
+  regroup=[];regrouping=false;
+  for(const p of thankDots){p.fallen=false;p.gatherExtra=false;}
+ }
+ queueThankPaint();
+}
 function paintThankDots(){
  if(!thankCtx)return;
  const w=Number.parseFloat(thankCanvas.style.width)||1;
@@ -552,11 +629,15 @@ function paintThankDots(){
  thankCtx.clearRect(0,0,w,h);
  for(const p of thankDots){
   if(p.fallen)continue;
+  thankCtx.globalAlpha=p.gatherExtra&&regrouping
+   ?Math.max(0,Math.min(1,(performance.now()-regroupStart-regroupTime*.66)/(regroupTime*.3)))
+   :1;
   thankCtx.fillStyle=dotColor(p);
   thankCtx.beginPath();
   thankCtx.arc(p.tx,p.ty,Math.max(1.05,Math.min(2.15,p.radius)),0,Math.PI*2);
   thankCtx.fill();
  }
+ thankCtx.globalAlpha=1;
 }
 function queueThankPaint(){
  if(thanksPainting)return;
@@ -602,7 +683,7 @@ function buildThankDots(message){
  paintThankDots();
 }
 function brushThankDots(clientX,clientY,prevX=clientX,prevY=clientY,radius=compactMotion?14:12){
- if(!thankYou.classList.contains("is-visible")||!thankDots.some(p=>!p.fallen))return false;
+ if(!thankYou.classList.contains("is-visible")||regrouping||regroupPending||!thankDots.some(p=>!p.fallen))return false;
  const bounds=thankCanvas.getBoundingClientRect();
  const fromX=prevX-bounds.left,fromY=prevY-bounds.top;
  const toX=clientX-bounds.left,toY=clientY-bounds.top;
@@ -612,7 +693,10 @@ function brushThankDots(clientX,clientY,prevX=clientX,prevY=clientY,radius=compa
   if(p.fallen||!pointInBrush(p.tx,p.ty,fromX,fromY,toX,toY,radius))continue;
   p.fallen=true;
   // Limit moving dots even if someone repeatedly scratches every word.
-  if(hits++%2===0)releaseDot(p,worldX,worldY,p.tx,p.ty,toX,toY,p.radius,true);
+  if(hits++%2===0){
+   releaseDot(p,worldX,worldY,p.tx,p.ty,toX,toY,p.radius,true);
+   falling[falling.length-1].phraseSource=true;
+  }
  }
  if(hits){
   queueThankPaint();
@@ -620,25 +704,30 @@ function brushThankDots(clientX,clientY,prevX=clientX,prevY=clientY,radius=compa
    for(const p of falling){if(!p.resting){p.resting=true;p.py=floor-p.radius;p.vx=p.vy=0;}}
    paintDebris();
   }else animateFalls();
+  if(!thankDots.some(p=>!p.fallen))scheduleRegroup(550);
  }
  return hits>0;
 }
 function shatterThankDots(){
- if(!thankYou.classList.contains("is-visible"))return false;
+ if(!thankYou.classList.contains("is-visible")||regrouping)return false;
  const intact=thankDots.filter(p=>!p.fallen);
- if(!intact.length){showThanks();return true;}
+ if(!intact.length){scheduleRegroup(220);return true;}
  const b=thankCanvas.getBoundingClientRect();
  const wx=b.left+scrollX,wy=b.top+scrollY;
  const stride=Math.max(1,Math.ceil(intact.length/(compactMotion?110:170)));
  for(let i=0;i<intact.length;i++){
   const p=intact[i];p.fallen=true;
-  if(i%stride===0)releaseDot(p,wx,wy,p.tx,p.ty,b.width*.5,b.height*.5,p.radius,true);
+  if(i%stride===0){
+   releaseDot(p,wx,wy,p.tx,p.ty,b.width*.5,b.height*.5,p.radius,true);
+   falling[falling.length-1].phraseSource=true;
+  }
  }
  queueThankPaint();
  if(reduce){
   for(const p of falling){if(!p.resting){p.resting=true;p.py=floor-p.radius;p.vx=p.vy=0;}}
   paintDebris();
  }else animateFalls();
+ scheduleRegroup(630);
  return true;
 }
 const thanksOptions=[
@@ -744,8 +833,9 @@ function tick(now){
  }
  pruneFalling(now);
  if(followActive)followFastestDot(now,elapsed);
+ advanceRegroup(now);
  paintDebris(Math.min(1,physicsCarry/physicsStep));
- if((falling.some(p=>!p.resting)||followActive)&&!document.hidden)requestAnimationFrame(tick);
+ if((falling.some(p=>!p.resting)||followActive||regrouping)&&!document.hidden)requestAnimationFrame(tick);
  else {active=false;lastTime=0;physicsCarry=0;stopDotFollow();paintDebris();}
 }
 function animateFalls(){
@@ -775,10 +865,10 @@ function collapseDottedLogo(){
   const x=cx+p.x*scale,y=cy+p.y*scale;
   releaseDot(p,worldX,worldY,x,y,cx,cy,1.1+p.j*.9,true);
   const dot=falling[falling.length-1];
-  dot.tourDot=true;dot.vy-=20+p.j*65;dot.vx+=(p.j-.5)*90;
+  dot.tourDot=true;dot.phraseSource=true;dot.vy-=20+p.j*65;dot.vx+=(p.j-.5)*90;
  }
  clearedSpots.length=0;spriteDirty=true;queueOrbRender();
- showThanks();
+ scheduleRegroup(740);
  if(reduce){
   for(let i=first;i<falling.length;i++){
    const p=falling[i];p.py=floor-p.radius;p.vx=p.vy=0;p.resting=true;
@@ -899,7 +989,8 @@ region.addEventListener("click",e=>{
   // A tap removes only the ink dots directly beneath a fingertip, not a chunk;
   // if every letter has been broken, the next
   // tap draws a fresh randomized dotted thank-you.
-  if(!thankDots.some(p=>!p.fallen))showThanks();
+  if(regrouping||regroupPending)return;
+  if(!thankDots.some(p=>!p.fallen))scheduleRegroup(250);
   else brushThankDots(e.clientX,e.clientY,e.clientX,e.clientY,compactMotion?13:11);
   e.vyonParticleHandled=true;
   return;
@@ -919,6 +1010,7 @@ window.addEventListener("resize",()=>{
  if(thankYou.classList.contains("is-visible")){
   const phrase=thanksOptions[thanksIndex]?.message;
   if(phrase)buildThankDots(phrase);
+  regroup=[];regrouping=false;
  }
 },{passive:true});
 window.addEventListener("scroll",()=>{if(!active)paintDebris()},{passive:true});
