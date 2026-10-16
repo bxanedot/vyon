@@ -28,7 +28,7 @@ const reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: redu
 const clamp=n=>Math.min(limits.max,Math.max(limits.min,Math.round(Number(n)||0)));
 const format=n=>(n>0?"+":"")+n+" dB";
 let bands=presetBands.signature.slice(),display=bands.slice();
-let preset="signature",mode="basic",animation=0;
+let preset="signature",mode="basic",animation=0,lastAnimationTime=0;
 let activeAxis=null;
 function getRanges(values){
  const avg=indices=>indices.reduce((sum,i)=>sum+values[i],0)/indices.length;
@@ -182,19 +182,26 @@ function render(){
 function requestRender(){
  if(reduce){display=bands.slice();render();return;}
  if(animation)return;
+ lastAnimationTime=0;
  animation=requestAnimationFrame(tick);
 }
-function tick(){
+function tick(now){
  animation=0;
+ const dt=lastAnimationTime?Math.min(.05,Math.max(0,(now-lastAnimationTime)/1000)):1/60;
+ lastAnimationTime=now;
+ // Exponential smoothing keeps preset and drag response consistent across
+ // 60Hz, 120Hz and variable-refresh displays.
+ const blend=1-Math.exp(-dt/.075);
  let delta=0;
  for(let i=0;i<bands.length;i++){
   const diff=bands[i]-display[i];
-  display[i]+=diff*.22;
+  display[i]+=diff*blend;
   if(Math.abs(diff)<.018)display[i]=bands[i];
   else delta+=Math.abs(diff);
  }
  render();
  if(delta>.018&&section.isConnected)animation=requestAnimationFrame(tick);
+ else lastAnimationTime=0;
 }
 // Pointer interaction with the original three-axis ring.
 function coords(event){

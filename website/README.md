@@ -51,3 +51,7 @@ Official stable GitHub Releases are inspected for Windows (EXE/MSI/MSIX), macOS 
 - The original theme accents, equalizer demo, links to creator/community profiles, FAQ, and social preview are preserved.
 
 The app uses YouTube Music as its backend and is not affiliated with YouTube. The root repository `LICENSE` applies.
+
+## Motion and accessibility
+
+Logo debris uses a fixed 120 Hz physics step with interpolated rendering, so falling and collisions stay visually consistent at different screen refresh rates. Text reactions are gentler and rate-limited. Section reveals, command palette, mobile menu, FAQ answers, buttons, social cards, and EQ presets use coordinated easing; the equalizer curve applies time-based exponential smoothing instead of frame-dependent interpolation. `prefers-reduced-motion` continues to disable decorative movement.

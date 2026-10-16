@@ -10,7 +10,17 @@ let focusBefore=null,selected=0;
 const visible=()=>items.filter(x=>!x.hidden);
 function highlight(n){const a=visible();if(!a.length)return;selected=(n+a.length)%a.length;a.forEach((x,i)=>x.classList.toggle("is-selected",i===selected));}
 function closePalette(){overlay.hidden=true;document.body.style.overflow="";if(focusBefore?.focus)focusBefore.focus();}
-function openPalette(){focusBefore=document.activeElement;overlay.hidden=false;input.value="";items.forEach(x=>x.hidden=false);highlight(0);document.body.style.overflow="hidden";input.focus();}
+function openPalette(){
+ focusBefore=document.activeElement;
+ overlay.hidden=false;input.value="";items.forEach(x=>x.hidden=false);highlight(0);
+ document.body.style.overflow="hidden";
+ const dialog=overlay.querySelector(".command-dialog");
+ if(!reduce&&dialog?.animate)dialog.animate([
+  {opacity:0,transform:"translate3d(0,9px,0) scale(.985)"},
+  {opacity:1,transform:"translate3d(0,0,0) scale(1)"}
+ ],{duration:320,easing:"cubic-bezier(.16,1,.3,1)"});
+ input.focus();
+}
 $("#command-trigger").addEventListener("click",openPalette);
 $("[data-close-command]").addEventListener("click",closePalette);
 items.forEach(x=>x.addEventListener("click",closePalette));
@@ -24,7 +34,14 @@ document.addEventListener("keydown",e=>{
  if(e.key==="Enter"){const x=visible()[selected];if(x)x.click();}
  if(e.key==="Tab"){e.preventDefault();input.focus();}
 });
-mobBtn.addEventListener("click",()=>{const opened=mobBtn.getAttribute("aria-expanded")!=="true";mobBtn.setAttribute("aria-expanded",String(opened));mob.hidden=!opened;});
+mobBtn.addEventListener("click",()=>{
+ const opened=mobBtn.getAttribute("aria-expanded")!=="true";
+ mobBtn.setAttribute("aria-expanded",String(opened));mob.hidden=!opened;
+ if(opened&&!reduce&&typeof mob.animate==="function"){
+  mob.animate([{opacity:0,transform:"translate3d(0,-8px,0)"},{opacity:1,transform:"translate3d(0,0,0)"}],
+   {duration:300,easing:"cubic-bezier(.16,1,.3,1)"});
+ }
+});
 $$("a",mob).forEach(x=>x.addEventListener("click",()=>{mob.hidden=true;mobBtn.setAttribute("aria-expanded","false");}));
 
 // Header, mobile, and quick-navigation links jump straight to the bottom sections.
@@ -52,11 +69,20 @@ if("IntersectionObserver" in window&&!reduce){
   obs.unobserve(el);
   if(typeof el.animate==="function"){
    el.animate([{opacity:0,transform:"translate3d(0,18px,0)"},{opacity:1,transform:"translate3d(0,0,0)"}],
-     {duration:750,easing:"cubic-bezier(.22,1,.36,1)"});
+     {duration:850,easing:"cubic-bezier(.16,1,.3,1)"});
   }
  }),{threshold:.08,rootMargin:"0px 0px -35px 0px"});
  $$(".reveal").forEach(x=>obs.observe(x));
 }else $$(".reveal").forEach(x=>x.classList.add("is-visible"));
+// FAQ answers slide into view without animating layout or hiding content.
+$(".faq-item").forEach(detail=>detail.addEventListener("toggle",()=>{
+ if(reduce||!detail.open)return;
+ const answer=detail.querySelector(".faq-answer");
+ if(answer?.animate)answer.animate([
+  {opacity:0,transform:"translate3d(0,-7px,0)"},
+  {opacity:1,transform:"translate3d(0,0,0)"}
+ ],{duration:350,easing:"cubic-bezier(.16,1,.3,1)"});
+}));
 // Scroll progress and active navigation
 const progressBar=$("#reading-progress"),siteHeader=$("#site-header"),navLinks=$$(".nav-desktop a");
 let scrollScheduled=false;
@@ -100,7 +126,8 @@ const tones={
  ice:["75,205,242","91,155,250","133,239,249"],
  blood:["255,117,129","228,61,79","150,19,44"]
 };
-let w=0,h=0,orbScale=1,spriteDirty=true,active=false,lastTime=0;
+let w=0,h=0,orbScale=1,spriteDirty=true,active=false,lastTime=0,physicsCarry=0;
+const physicsStep=1/120;
 const sprite=document.createElement("canvas");
 sprite.width=720;sprite.height=720;
 const spr=sprite.getContext("2d",{alpha:true});
@@ -166,7 +193,7 @@ function releaseDot(p,worldX,worldY,x,y,hitX,hitY,radius=1.1+p.j*.9,crumble=fals
   (crumble?-dy*2.3+(hash(y*3+p.j*50,x*2)-.5)*120:0);
  falling.push({
   x:p.x,y:p.y,j:p.j,radius,
-  px:worldX+x,py:worldY+y,vx,vy,resting:false,
+  px:worldX+x,py:worldY+y,prevPX:worldX+x,prevPY:worldY+y,vx,vy,resting:false,
   mass:radius*radius,bounce:.15+.14*p.j,
   surfaceFriction:.68+.21*p.j,supported:false,sleepFor:0
  });
@@ -310,11 +337,12 @@ function getNearby(x,y){
  }
  return out;
 }
-function paintDebris(){
+function paintDebris(blend=1){
  if(!debrisCtx)return;
  debrisCtx.clearRect(0,0,vw,vh);
  for(const p of falling){
-  const x=p.px-scrollX,y=p.py-scrollY;
+  const x=(p.prevPX??p.px)+(p.px-(p.prevPX??p.px))*blend-scrollX;
+  const y=(p.prevPY??p.py)+(p.py-(p.prevPY??p.py))*blend-scrollY;
   if(y<-8||y>vh+8||x<-8||x>vw+8)continue;
   debrisCtx.fillStyle=dotColor(p);
   debrisCtx.beginPath();debrisCtx.arc(x,y,p.radius,0,Math.PI*2);debrisCtx.fill();
@@ -324,15 +352,15 @@ function bounceText(box,force=1){
  if(reduce||!box.el||typeof box.el.animate!=="function")return;
  const el=box.el.closest("h1,h2,h3,h4,p,small,strong,em,span,summary,a,label,li,button")||box.el;
  const now=performance.now();
- if(now-(textImpacts.get(el)||0)<280)return;
+ if(now-(textImpacts.get(el)||0)<560)return;
  textImpacts.set(el,now);
- const height=Math.min(7,2.8+force*.012);
+ const height=Math.min(5,1.4+force*.008);
  el.animate([
-  {transform:"translateY(0)"},
-  {transform:"translateY("+(-height).toFixed(1)+"px)",offset:.24},
-  {transform:"translateY("+(height*.35).toFixed(1)+"px)",offset:.68},
-  {transform:"translateY(0)"}
- ],{duration:460,easing:"cubic-bezier(.2,.8,.3,1)"});
+  {transform:"translate3d(0,0,0)",offset:0},
+  {transform:"translate3d(0,"+(-height).toFixed(1)+"px,0)",offset:.24},
+  {transform:"translate3d(0,"+(height*.18).toFixed(1)+"px,0)",offset:.68},
+  {transform:"translate3d(0,0,0)",offset:1}
+ ],{duration:580,easing:"cubic-bezier(.22,.7,.2,1)"});
 }
 function resolveDotContacts(){
  // Spatial hashing only tests nearby circular bodies, not every possible pair.
@@ -390,7 +418,7 @@ function resolveDotContacts(){
 }
 function advanceDebris(dt){
  // Individual dots use independent circular rigid-body contacts, plus DOM text boxes.
- const steps=3,step=dt/steps;
+ const steps=1,step=dt;
  for(let n=0;n<steps;n++){
   for(const p of falling){
    p.supported=false;
@@ -463,16 +491,25 @@ function advanceDebris(dt){
 }
 function tick(now){
  if(!active)return;
- const dt=lastTime?Math.min(.034,(now-lastTime)/1000):.016;
+ const elapsed=lastTime?Math.max(0,Math.min(.05,(now-lastTime)/1000)):physicsStep;
  lastTime=now;
- if(!document.hidden)advanceDebris(dt);
- paintDebris();
+ physicsCarry=Math.min(physicsCarry+elapsed,physicsStep*6);
+ let passes=0;
+ while(physicsCarry>=physicsStep&&passes<6){
+  // Fixed simulation steps keep collision timing stable at every refresh rate.
+  // Draw between the latest two samples for smoother canvas movement.
+  for(const p of falling){p.prevPX=p.px;p.prevPY=p.py;}
+  advanceDebris(physicsStep);
+  physicsCarry-=physicsStep;
+  passes++;
+ }
+ paintDebris(Math.min(1,physicsCarry/physicsStep));
  if(falling.some(p=>!p.resting)&&!document.hidden)requestAnimationFrame(tick);
- else {active=false;lastTime=0;}
+ else {active=false;lastTime=0;physicsCarry=0;paintDebris();}
 }
 function animateFalls(){
  if(active)return;
- active=true;lastTime=0;
+ active=true;lastTime=0;physicsCarry=0;
  requestAnimationFrame(tick);
 }
 function dropCluster(localX,localY){
@@ -645,7 +682,7 @@ region.addEventListener("keydown",event=>{
 window.addEventListener("resize",()=>{
  resizeOrb();resizeDebris();if(falling.length)rebuildObstacles();
 },{passive:true});
-window.addEventListener("scroll",paintDebris,{passive:true});
+window.addEventListener("scroll",()=>paintDebris(),{passive:true});
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&falling.some(p=>!p.resting))animateFalls();});
 resizeOrb();resizeDebris();loadIconParticles();
 // Dotted button surfaces preserve the first click's normal link/button action.
