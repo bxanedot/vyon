@@ -703,11 +703,20 @@ function followFastestDot(now,dt){
  if(Math.abs(next-scrollY)>.15)window.scrollTo(0,next);
  if(!anyMoving&&Math.abs(target-next)<2)stopDotFollow();
 }
-window.addEventListener("wheel",stopDotFollow,{passive:true});
-window.addEventListener("touchmove",stopDotFollow,{passive:true});
-document.addEventListener("pointerdown",stopDotFollow,{capture:true,passive:true});
+// A manual scroll cancels the camera AND retires the floating overlay.
+ // Leaving particles floating above the copy on the way back up would make
+ // the actual section text difficult to read.
+function cancelDotTour(){
+ if(!followActive)return;
+ stopDotFollow();
+ falling.length=0;
+ paintDebris();
+}
+window.addEventListener("wheel",cancelDotTour,{passive:true});
+window.addEventListener("touchmove",cancelDotTour,{passive:true});
+document.addEventListener("pointerdown",cancelDotTour,{capture:true,passive:true});
 document.addEventListener("keydown",e=>{
- if(["Escape","PageDown","PageUp","ArrowUp","ArrowDown","Home","End"," "].includes(e.key))stopDotFollow();
+ if(["Escape","PageDown","PageUp","ArrowUp","ArrowDown","Home","End"," "].includes(e.key))cancelDotTour();
 });
 function pruneFalling(now){
  if(now-lastDebrisPrune<450)return;
