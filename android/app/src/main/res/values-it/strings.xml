@@ -860,9 +860,9 @@
 
     <string name="export_compatible_downloads">Esporta download compatibili</string>
 
-    <string name="legacy_mesh_gradient">Gradiente fluido classico</string>
+    <string name="dynamic_player_backdrop">Sfondo animato del lettore</string>
 
-    <string name="legacy_mesh_gradient_subtitle">Ripristina le sfumature di colore animate dietro il lettore della v1.5</string>
+    <string name="dynamic_player_backdrop_subtitle">Segue il brano in riproduzione con un delicato movimento di colore dietro il lettore.</string>
 
     <string name="lyrics_debug_logs">Log di debug dei testi</string>
 

@@ -847,9 +847,9 @@
 
     <string name="export_compatible_downloads">Exporter les téléchargements compatibles</string>
 
-    <string name="legacy_mesh_gradient">Dégradé fluide classique</string>
+    <string name="dynamic_player_backdrop">Fond animé du lecteur</string>
 
-    <string name="legacy_mesh_gradient_subtitle">Restaure les formes colorées animées de la v1.5</string>
+    <string name="dynamic_player_backdrop_subtitle">Suit le morceau en cours avec un doux mouvement de couleur derrière le lecteur.</string>
 
     <string name="liquid_glass">Verre liquide</string>
 

@@ -1216,10 +1216,10 @@ fun TvAboutDialog(onDismiss: () -> Unit) {
     TvDialog(title = "vyon", message = "Version ${BuildConfig.VERSION_NAME}", onDismissRequest = onDismiss) {
         TvAppMark(size = 77.dp, modifier = Modifier.padding(bottom = 21.dp))
         Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
-            TvListRow(title = "bxane", value = "Lead developer", enabled = false, onClick = {})
-            TvListRow(title = "Vantom", value = "Collaborator · inspector", onClick = { open("https://guns.lol/vantom0101") })
-            TvListRow(title = "Website", value = "vyon.bxane.workers.dev", onClick = { open("https://vyon.bxane.workers.dev") })
-            TvListRow(title = "Source code", value = "vyon", onClick = { open("https://github.com/bxandot/vyon") })
+            TvListRow(title = "Lead Developer", value = "bxane", enabled = false, onClick = {})
+            TvListRow(title = "Inspector", value = "Vantom", onClick = { open("https://guns.lol/vantom0101") })
+            TvListRow(title = "Website", value = "vyon.live", onClick = { open("https://vyon.live") })
+            TvListRow(title = "Source code", value = "vyon", onClick = { open("https://github.com/bxanedot/vyon") })
         }
         Spacer(modifier = Modifier.height(14.dp))
         Text(

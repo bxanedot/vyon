@@ -1,10 +1,11 @@
 <resources>
     <string name="vyon_tagline">موسيقاك، بطريقتك</string>
     <string name="vyon_lead_dev">المطور الرئيسي</string>
-    <string name="vyon_inspector">متعاون · مراجع</string>
+    <string name="vyon_inspector">مفتش</string>
     <string name="vyon_app_info">معلومات التطبيق</string>
     <string name="vyon_website">الموقع الإلكتروني</string>
     <string name="vyon_source">الشيفرة المصدرية</string>
+    <string name="vyon_github_stars">نجوم GitHub</string>
     <string name="vyon_community">المجتمع</string>
     <string name="vyon_support">ادعم vyon</string>
     <string name="vyon_reserved">قريبًا</string>

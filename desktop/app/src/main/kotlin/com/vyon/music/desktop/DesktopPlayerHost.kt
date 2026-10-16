@@ -193,7 +193,7 @@ internal object DesktopPlayerSettings : PlayerSettingsSource {
         runCatching { LastPlayerScreen.valueOf(persistence.string(KEY_LAST_SCREEN, "MAIN")) }
             .getOrDefault(LastPlayerScreen.MAIN),
     )
-    override val legacyMeshGradient = MutableStateFlow(false)
+    override val dynamicArtworkBackdrop = MutableStateFlow(false)
     override val lyricsBlur = MutableStateFlow(true)
     override val lyricsOffsetMs = MutableStateFlow(
         persistence.int(KEY_LYRICS_OFFSET, 0).coerceIn(MIN_LYRICS_OFFSET_MS, MAX_LYRICS_OFFSET_MS),

@@ -1,7 +1,10 @@
 import { DurableObject } from "cloudflare:workers";
+import { PartyRoom } from "./party";
+export { PartyRoom };
 
 interface Env {
   ROOMS: DurableObjectNamespace;
+  PARTIES: DurableObjectNamespace;
   ASSETS: Fetcher;
   CREATE_KEY?: string;
 }
@@ -46,6 +49,16 @@ function safeEqual(a: string, b: string): boolean {
     difference |= (a.charCodeAt(i) || 0) ^ (b.charCodeAt(i) || 0);
   }
   return difference === 0;
+}
+
+function partyCode(): string {
+  const chars = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
+  return Array.from(crypto.getRandomValues(new Uint8Array(6)), (byte) => chars[byte % chars.length]).join("");
+}
+
+function partyRequest(env: Env, code: string, path: string, request: Request): Promise<Response> {
+  const room = env.PARTIES.getByName("party:" + code);
+  return room.fetch(new Request("https://party.internal" + path, request));
 }
 
 function validTrack(value: unknown): value is Track {
@@ -216,7 +229,42 @@ export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const path = new URL(request.url).pathname;
 
+    if (path === "/healthz" && request.method === "GET") return json({ ok: true });
     if (path === "/api/health") return json({ ok: true, service: "listen-together" });
+
+    if (path === "/api/parties" && request.method === "POST") {
+      const ip = request.headers.get("cf-connecting-ip") ?? "local";
+      const limiter = env.PARTIES.getByName("rate:" + await sha256(ip));
+      const limited = await limiter.fetch("https://party.internal/_rate", { method: "POST" });
+      if (!limited.ok) return limited;
+
+      const text = await request.text();
+      if (new TextEncoder().encode(text).byteLength > 16_384) return json({ error: "request_too_large", message: "Request is too large." }, 413);
+      let body: unknown;
+      try { body = JSON.parse(text); } catch { return json({ error: "validation_error", message: "Party identity is invalid." }, 422); }
+      for (let attempt = 0; attempt < 12; attempt++) {
+        const code = partyCode();
+        const room = env.PARTIES.getByName("party:" + code);
+        const result = await room.fetch("https://party.internal/_party/create", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ code, identity: body }),
+        });
+        if (result.status !== 409) return result;
+      }
+      return json({ error: "code_exhausted", message: "Could not allocate a party code." }, 503);
+    }
+
+    const join = /^\/api\/parties\/([A-Za-z0-9]{6})\/join$/.exec(path);
+    if (join && request.method === "POST") return partyRequest(env, join[1].toUpperCase(), "/_party/join", request);
+    const preview = /^\/api\/parties\/([A-Za-z0-9]{6})\/preview$/.exec(path);
+    if (preview && request.method === "GET") return partyRequest(env, preview[1].toUpperCase(), "/_party/preview", request);
+    const getParty = /^\/api\/parties\/([A-Za-z0-9]{6})$/.exec(path);
+    if (getParty && request.method === "GET") return partyRequest(env, getParty[1].toUpperCase(), "/_party/get", request);
+    const leave = /^\/api\/parties\/([A-Za-z0-9]{6})\/leave$/.exec(path);
+    if (leave && request.method === "POST") return partyRequest(env, leave[1].toUpperCase(), "/_party/leave", request);
+    const socket = /^\/ws\/parties\/([A-Za-z0-9]{6})$/.exec(path);
+    if (socket && request.method === "GET") return partyRequest(env, socket[1].toUpperCase(), "/_party/ws", request);
 
     if (path === "/api/rooms") {
       if (request.method !== "POST") return json({ error: "POST required" }, 405);

@@ -74,7 +74,7 @@
     <string name="d_top_result">Hasil teratas</string>
     <string name="d_tray_icon">Ikon baki</string>
     <string name="d_turn_off">Matikan</string>
-    <string name="d_use_the_older_blob_backdrop_behind_the_player">Gunakan latar blob lama di belakang pemutar</string>
+    <string name="dynamic_player_backdrop_subtitle">Mengikuti lagu saat ini dengan gerakan warna lembut di belakang pemutar.</string>
     <string name="d_volume">Volume</string>
     <string name="d_what_follows_the_verb_on_the_profile">Yang mengikuti kata kerja di profil. Kosongkan untuk memakai %1$s.</string>
     <string name="d_your_collection">KOLEKSIMU</string>

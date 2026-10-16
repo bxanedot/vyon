@@ -74,7 +74,7 @@
     <string name="d_top_result">Risultato migliore</string>
     <string name="d_tray_icon">Icona nell\'area di notifica</string>
     <string name="d_turn_off">Disattiva</string>
-    <string name="d_use_the_older_blob_backdrop_behind_the_player">Usa il vecchio sfondo a macchie dietro il player</string>
+    <string name="dynamic_player_backdrop_subtitle">Segue il brano in riproduzione con un delicato movimento di colore dietro il lettore.</string>
     <string name="d_volume">Volume</string>
     <string name="d_what_follows_the_verb_on_the_profile">Ciò che segue il verbo sul profilo. Lascialo vuoto per usare %1$s.</string>
     <string name="d_your_collection">LA TUA RACCOLTA</string>

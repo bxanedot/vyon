@@ -74,7 +74,7 @@
     <string name="d_top_result">En iyi sonuç</string>
     <string name="d_tray_icon">Tepsi simgesi</string>
     <string name="d_turn_off">Kapat</string>
-    <string name="d_use_the_older_blob_backdrop_behind_the_player">Oynatıcının arkasında eski leke arka planını kullan</string>
+    <string name="dynamic_player_backdrop_subtitle">Çalan parçaya, oynatıcının arkasındaki yumuşak renk hareketiyle eşlik eder.</string>
     <string name="d_volume">Ses düzeyi</string>
     <string name="d_what_follows_the_verb_on_the_profile">Profilde fiilden sonra gelen ifade. %1$s kullanmak için boş bırak.</string>
     <string name="d_your_collection">KOLEKSİYONUN</string>

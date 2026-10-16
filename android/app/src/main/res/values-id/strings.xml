@@ -825,9 +825,9 @@
 
     <string name="export_compatible_downloads">Ekspor unduhan yang kompatibel</string>
 
-    <string name="legacy_mesh_gradient">Gradien mesh klasik</string>
+    <string name="dynamic_player_backdrop">Latar pemutar dinamis</string>
 
-    <string name="legacy_mesh_gradient_subtitle">Kembalikan efek warna mengalir di belakang pemutar dari v1.5</string>
+    <string name="dynamic_player_backdrop_subtitle">Mengikuti lagu saat ini dengan gerakan warna lembut di belakang pemutar.</string>
 
     <string name="liquid_glass">Kaca Cair</string>
 

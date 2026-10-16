@@ -941,9 +941,9 @@
 
     <string name="dolby_atmos_unavailable">このデバイスは Atmos を再生できないため、通常バージョンで再生されます</string>
 
-    <string name="legacy_mesh_gradient">従来のメッシュ グラデーション</string>
+    <string name="dynamic_player_backdrop">プレーヤーの背景アニメーション</string>
 
-    <string name="legacy_mesh_gradient_subtitle">v1.5 のプレーヤー背面の流れるカラー アニメーションを復元します</string>
+    <string name="dynamic_player_backdrop_subtitle">再生中の曲に合わせて、プレーヤーの背後に柔らかな色の動きを表示します。</string>
 
     <string name="liquid_glass">リキッド グラス</string>
 

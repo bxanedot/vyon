@@ -74,7 +74,7 @@
     <string name="d_top_result">शीर्ष परिणाम</string>
     <string name="d_tray_icon">ट्रे आइकन</string>
     <string name="d_turn_off">बंद करें</string>
-    <string name="d_use_the_older_blob_backdrop_behind_the_player">प्लेयर के पीछे पुराना ब्लॉब बैकड्रॉप उपयोग करें</string>
+    <string name="dynamic_player_backdrop_subtitle">प्लेयर के पीछे हल्की रंगीन गति के साथ मौजूदा गीत का अनुसरण करें।</string>
     <string name="d_volume">वॉल्यूम</string>
     <string name="d_what_follows_the_verb_on_the_profile">प्रोफ़ाइल पर क्रिया के बाद जो आता है। %1$s उपयोग करने के लिए इसे खाली छोड़ें।</string>
     <string name="d_your_collection">आपका संग्रह</string>

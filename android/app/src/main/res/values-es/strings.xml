@@ -830,9 +830,9 @@
 
     <string name="export_compatible_downloads">Exportar descargas compatibles</string>
 
-    <string name="legacy_mesh_gradient">Gradiente de malla clásico</string>
+    <string name="dynamic_player_backdrop">Fondo animado del reproductor</string>
 
-    <string name="legacy_mesh_gradient_subtitle">Recupera las manchas de color en movimiento detrás del reproductor de la v1.5</string>
+    <string name="dynamic_player_backdrop_subtitle">Sigue la canción actual con un suave movimiento de color detrás del reproductor.</string>
 
     <string name="lyrics_debug_logs">Registros de depuración de letras</string>
 

@@ -184,7 +184,7 @@ class VyonApplication : Application(), SingletonImageLoader.Factory {
                     chain.request().newBuilder()
                         .header(
                             "User-Agent",
-                            "vyon/${BuildConfig.VERSION_NAME} (Android; +https://github.com/bxandot/vyon)",
+                            "vyon/${BuildConfig.VERSION_NAME} (Android; +https://github.com/bxanedot/vyon)",
                         )
                         .build(),
                 )

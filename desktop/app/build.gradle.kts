@@ -231,7 +231,7 @@ val buildAnalysisNative by tasks.registering {
     val cmakeSource = project.file("native")
     val outputDir = analysisNativeDir.get().asFile
     val crossing = crossBuildingForWindows
-    val toolchain = rootProject.file("desktop/windows/toolchain.cmake")
+    val toolchain = rootProject.file("desktop/platforms/windows/toolchain.cmake")
     inputs.dir(rootProject.file("core/native/analyzer"))
     inputs.dir(rootProject.file("android/app/src/main/cpp/jni"))
     inputs.dir(project.file("native"))
@@ -304,10 +304,10 @@ val buildAnalysisNative by tasks.registering {
  * sole owner of decoration and behaviour.
  */
 val buildWindowNative by tasks.registering {
-    val cmakeSource = rootProject.file("desktop/windows/native")
+    val cmakeSource = rootProject.file("desktop/platforms/windows/native")
     val outputDir = windowNativeDir.get().asFile
     val crossing = crossBuildingForWindows
-    val toolchain = rootProject.file("desktop/windows/toolchain.cmake")
+    val toolchain = rootProject.file("desktop/platforms/windows/toolchain.cmake")
     inputs.dir(cmakeSource)
     inputs.property("target", targetOs)
     outputs.dir(outputDir)
@@ -559,7 +559,7 @@ compose.desktop {
             )
 
             macOS {
-                iconFile.set(rootProject.file("desktop/macos/icons/vyon.icns"))
+                iconFile.set(rootProject.file("desktop/platforms/macos/icons/vyon.icns"))
                 bundleID = "com.vyon.music"
                 appCategory = "public.app-category.music"
                 dockName = "vyon"
@@ -572,7 +572,7 @@ compose.desktop {
             }
 
             linux {
-                iconFile.set(rootProject.file("desktop/linux/icons/vyon.png"))
+                iconFile.set(rootProject.file("desktop/platforms/linux/icons/vyon.png"))
                 menuGroup = "Audio"
                 appCategory = "AudioVideo;Audio;Player"
                 debMaintainer = "bxane@users.noreply.github.com"
@@ -580,7 +580,7 @@ compose.desktop {
             }
 
             windows {
-                iconFile.set(rootProject.file("desktop/windows/icons/vyon.ico"))
+                iconFile.set(rootProject.file("desktop/platforms/windows/icons/vyon.ico"))
                 upgradeUuid = "8f3c1d24-6a2b-4f5e-9c17-2b8d54e0a913"
                 menuGroup = "vyon"
                 shortcut = true

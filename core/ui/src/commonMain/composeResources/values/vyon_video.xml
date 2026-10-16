@@ -2,6 +2,8 @@
     <string name="vyon_music">Music</string>
     <string name="vyon_video_search">Search YouTube videos</string>
     <string name="vyon_video_feed">Back to video feed</string>
+    <string name="vyon_video_suggestions">Suggested for you</string>
+    <string name="vyon_video_explore">Explore videos</string>
     <string name="vyon_video_empty">Search for a video to start watching.</string>
     <string name="vyon_video_no_results">No videos found. Try another search.</string>
     <string name="vyon_video_more">Load more videos</string>

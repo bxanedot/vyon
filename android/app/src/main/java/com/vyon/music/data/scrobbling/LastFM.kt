@@ -86,7 +86,7 @@ object LastFM {
         extra: Map<String, String> = emptyMap(),
         format: String = "json",
     ) {
-        headers.append(HttpHeaders.UserAgent, "vyon (https://github.com/bxandot/vyon)")
+        headers.append(HttpHeaders.UserAgent, "vyon (https://github.com/bxanedot/vyon)")
         val paramsForSig =
             mutableMapOf(
                 "method" to method,

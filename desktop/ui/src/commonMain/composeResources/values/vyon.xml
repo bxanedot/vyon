@@ -1,10 +1,11 @@
 <resources>
     <string name="vyon_tagline">Your music, your way</string>
-    <string name="vyon_lead_dev">Lead developer</string>
-    <string name="vyon_inspector">Collaborator · inspector</string>
+    <string name="vyon_lead_dev">Lead Developer</string>
+    <string name="vyon_inspector">Inspector</string>
     <string name="vyon_app_info">App info</string>
     <string name="vyon_website">Website</string>
     <string name="vyon_source">Source code</string>
+    <string name="vyon_github_stars">GitHub stars</string>
     <string name="vyon_community">Community</string>
     <string name="vyon_support">Support vyon</string>
     <string name="vyon_reserved">Reserved</string>

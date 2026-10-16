@@ -9,6 +9,7 @@ This is a Cloudflare Worker backed by one SQLite Durable Object per room. The in
 - synchronize track IDs, track titles, play/pause, seek position, and queue
 - estimate current playback time using a timestamp
 - persist the last playback state across room reconnects
+- serve Vyon Android Listen Together parties using the app's `/api/parties` and `/ws/parties` protocol
 
 **This server does not stream or redistribute audio.** Integrate its events with the music player that each listener is authorized to use. It is not a YouTube Music integration.
 
@@ -35,7 +36,7 @@ This is a Cloudflare Worker backed by one SQLite Durable Object per room. The in
        npx wrangler login
        npm run deploy
 
-3. Configure the required Worker secret:
+3. Configure the required Worker secret for the browser demo:
 
        npx wrangler secret put CREATE_KEY
 
@@ -46,6 +47,19 @@ This is a Cloudflare Worker backed by one SQLite Durable Object per room. The in
 Cloudflare Durable Objects can incur usage charges outside included allowances; check your plan and limits.
 
 ## API
+
+### Vyon app
+
+- GET `/healthz` — health JSON used by the Android app
+- POST `/api/parties` — creates an app party, capped at two per IP per minute
+- POST `/api/parties/<CODE>/join` — joins an app party
+- GET `/api/parties/<CODE>/preview` — shows names and capacity before joining
+- GET `/api/parties/<CODE>` and POST `/api/parties/<CODE>/leave` — authenticated membership operations
+- WSS `/ws/parties/<CODE>` — authenticated party sync, queue, presence, and playback controls
+
+App parties keep the app's six-character codes and host/member tokens. They use a separate Durable Object namespace from the browser demo.
+
+### Browser demo
 
 - GET /api/health — health JSON
 - POST /api/rooms with header x-create-key: <CREATE_KEY>
@@ -97,7 +111,9 @@ Use a proper clock-offset calculation for low-drift production syncing.
 - The server stores only a SHA-256 hash of the host key. The room ID has 96 random bits.
 - Rooms are capped at 50 connections and queue length at 100 items. For public production, add rate limiting to the room-creation endpoint, room expiration/cleanup, monitoring, and optional user account authorization.
 - Playback metadata is not end-to-end encrypted, and anyone with a room link can read it.
-- This is a starter service, not yet integrated with the vyon desktop application or any external music API.
+- App party identities and profile fields are supplied by the client; this Worker does not verify an account-provider token.
+- The app party-creation endpoint is public and limited to two rooms per IP per minute. Add account verification or stronger abuse controls before opening it to a large public audience.
+- This service does not connect to an external music API; each device plays audio through its own configured source.
 - The Cloudflare Worker and the existing Vercel website can be deployed separately.
 
 ## Commands

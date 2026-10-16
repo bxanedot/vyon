@@ -1,10 +1,11 @@
 <resources>
     <string name="vyon_tagline">موسیقی تو، به سبک تو</string>
     <string name="vyon_lead_dev">توسعه‌دهندهٔ اصلی</string>
-    <string name="vyon_inspector">همکار · بازبین</string>
+    <string name="vyon_inspector">بازرس</string>
     <string name="vyon_app_info">اطلاعات برنامه</string>
     <string name="vyon_website">وب‌سایت</string>
     <string name="vyon_source">کد منبع</string>
+    <string name="vyon_github_stars">ستاره‌های GitHub</string>
     <string name="vyon_community">انجمن</string>
     <string name="vyon_support">حمایت از vyon</string>
     <string name="vyon_reserved">به‌زودی</string>

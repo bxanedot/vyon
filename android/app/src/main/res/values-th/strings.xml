@@ -937,9 +937,9 @@
 
     <string name="eq_preset_custom">Custom</string>
 
-    <string name="legacy_mesh_gradient">Legacy mesh gradient</string>
+    <string name="dynamic_player_backdrop">พื้นหลังเครื่องเล่นแบบเคลื่อนไหว</string>
 
-    <string name="legacy_mesh_gradient_subtitle">Brings back the drifting colour blobs behind the player from v1.5</string>
+    <string name="dynamic_player_backdrop_subtitle">ปรับสีให้เคลื่อนไหวอย่างนุ่มนวลตามเพลงที่กำลังเล่น</string>
 
     <string name="add_addon">Add an addon</string>
 

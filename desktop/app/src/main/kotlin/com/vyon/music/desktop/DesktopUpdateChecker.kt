@@ -33,7 +33,7 @@ internal object DesktopUpdateChecker {
     )
 
     private const val LATEST_RELEASE_URL =
-        "https://api.github.com/repos/bxandot/vyon/releases/latest"
+        "https://api.github.com/repos/bxanedot/vyon/releases/latest"
 
     val currentVersion: String = System.getProperty("vyon.version") ?: "1.0.0"
 

@@ -74,7 +74,7 @@
     <string name="d_top_result">Meilleur résultat</string>
     <string name="d_tray_icon">Icône de la zone de notification</string>
     <string name="d_turn_off">Désactiver</string>
-    <string name="d_use_the_older_blob_backdrop_behind_the_player">Utiliser l\'ancien fond à taches derrière le lecteur</string>
+    <string name="dynamic_player_backdrop_subtitle">Suit le morceau en cours avec un doux mouvement de couleur derrière le lecteur.</string>
     <string name="d_volume">Volume</string>
     <string name="d_what_follows_the_verb_on_the_profile">Ce qui suit le verbe sur le profil. Laisse vide pour utiliser %1$s.</string>
     <string name="d_your_collection">TA COLLECTION</string>

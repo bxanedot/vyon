@@ -3,7 +3,7 @@
 # Wraps the app image jpackage produced into an AppImage, the one Linux format
 # Gradle cannot make itself.
 #
-# Usage: desktop/linux/appimage.sh <app-image-dir> <out.AppImage> [appimagetool]
+# Usage: desktop/platforms/linux/appimage.sh <app-image-dir> <out.AppImage> [appimagetool]
 set -euo pipefail
 
 APP_DIR_SRC=${1:?usage: appimage.sh <app-image-dir> <out.AppImage> [appimagetool]}
@@ -12,7 +12,7 @@ TOOL=${3:-appimagetool}
 
 [ -x "$APP_DIR_SRC/bin/vyon" ] || { echo "no launcher in $APP_DIR_SRC" >&2; exit 1; }
 
-ROOT=$(cd "$(dirname "$0")/../.." && pwd)
+ROOT=$(cd "$(dirname "$0")/../../.." && pwd)
 STAGE=$(mktemp -d)
 trap 'rm -rf "$STAGE"' EXIT
 APPDIR="$STAGE/vyon.AppDir"
@@ -42,8 +42,8 @@ StartupWMClass=com-vyon-music-desktop-MainKt
 DESKTOP
 
 # appimagetool reads the icon by the desktop entry; the desktop reads .DirIcon.
-cp "$ROOT/desktop/linux/icons/vyon.png" "$APPDIR/vyon.png"
-cp "$ROOT/desktop/linux/icons/vyon.png" "$APPDIR/.DirIcon"
+cp "$ROOT/desktop/platforms/linux/icons/vyon.png" "$APPDIR/vyon.png"
+cp "$ROOT/desktop/platforms/linux/icons/vyon.png" "$APPDIR/.DirIcon"
 
 mkdir -p "$(dirname "$OUT")"
 # APPIMAGE_EXTRACT_AND_RUN rather than the flag of the same name: it is read by the AppImage

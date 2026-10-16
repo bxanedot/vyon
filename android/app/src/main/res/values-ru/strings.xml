@@ -874,9 +874,9 @@
 
     <string name="export_compatible_downloads">Экспорт совместимых загрузок</string>
 
-    <string name="legacy_mesh_gradient">Классический сетчатый градиент</string>
+    <string name="dynamic_player_backdrop">Анимированный фон плеера</string>
 
-    <string name="legacy_mesh_gradient_subtitle">Возвращает мягкие анимированные цветные пятна из v1.5</string>
+    <string name="dynamic_player_backdrop_subtitle">Мягкое движение цвета за плеером подстраивается под текущий трек.</string>
 
     <string name="liquid_glass">Жидкое стекло</string>
 

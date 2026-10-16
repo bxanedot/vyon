@@ -313,11 +313,11 @@ internal object DesktopDiscordRpc {
         val settings = DesktopDiscordSettings
         if (settings.button1Visible.value) {
             val text = settings.button1Text.value.ifEmpty { DesktopDiscordSettings.DEFAULT_BUTTON_1 }
-            add(settings.resolveVariables(text, song.title, song.artist, song.albumName) to watchUrl(song))
+            add(settings.resolveVariables(text, song.title, song.artist, song.albumName) to WEBSITE_URL)
         }
         if (settings.button2Visible.value) {
             val text = settings.button2Text.value.ifEmpty { DesktopDiscordSettings.DEFAULT_BUTTON_2 }
-            add(settings.resolveVariables(text, song.title, song.artist, song.albumName) to PROJECT_URL)
+            add(settings.resolveVariables(text, song.title, song.artist, song.albumName) to watchUrl(song))
         }
     }
 
@@ -361,7 +361,8 @@ internal object DesktopDiscordRpc {
 
     /** How long a scan that found no local Discord holds off the next one. */
     private const val PROBE_BACKOFF_MS = 10_000L
-    private const val PROJECT_URL = "https://github.com/bxandot/vyon"
+    private const val PROJECT_URL = "https://github.com/bxanedot/vyon"
+    private const val WEBSITE_URL = "https://vyon.live"
     private const val ART_PX = 480
     private const val CLIENT_VERSION = "0.0.83"
     private const val CLIENT_BUILD = "352675"

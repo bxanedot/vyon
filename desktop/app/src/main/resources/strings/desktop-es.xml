@@ -74,7 +74,7 @@
     <string name="d_top_result">Mejor resultado</string>
     <string name="d_tray_icon">Icono de la bandeja</string>
     <string name="d_turn_off">Desactivar</string>
-    <string name="d_use_the_older_blob_backdrop_behind_the_player">Usar el fondo de manchas anterior detrás del reproductor</string>
+    <string name="dynamic_player_backdrop_subtitle">Sigue la canción actual con un suave movimiento de color detrás del reproductor.</string>
     <string name="d_volume">Volumen</string>
     <string name="d_what_follows_the_verb_on_the_profile">Lo que sigue al verbo en el perfil. Déjalo vacío para usar %1$s.</string>
     <string name="d_your_collection">TU COLECCIÓN</string>

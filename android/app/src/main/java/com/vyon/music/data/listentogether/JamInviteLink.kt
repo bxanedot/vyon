@@ -16,10 +16,11 @@ data class ParsedJamInvite(
 /** Relays a Vyon web or scheme invite from [com.vyon.music.MainActivity] to Compose. */
 object JamInviteLink {
 
-    const val ORIGIN = "https://vyon.bxane.workers.dev"
+    const val ORIGIN = "https://vyon-listen-together.bxane.workers.dev"
 
     private const val EXTRA_CONSUMED = "vyon.jamInviteConsumed"
-    private const val HOST = "vyon.bxane.workers.dev"
+    private const val HOST = "vyon-listen-together.bxane.workers.dev"
+    private const val LEGACY_HOST = "vyon.bxane.workers.dev"
     private const val CUSTOM_SCHEME = "vyon"
     private const val CUSTOM_HOST = "party"
 
@@ -50,7 +51,7 @@ object JamInviteLink {
     /**
      * Parses an incoming invite:
      * 1. vyon://party/<CODE>?server=<SERVER>
-     * 2. https://vyon.bxane.workers.dev/invite/<CODE>?server=<SERVER>
+     * 2. https://vyon-listen-together.bxane.workers.dev/invite/<CODE>?server=<SERVER>
      */
     fun parseInvite(value: String?): ParsedJamInvite? {
         val uri = runCatching { URI(value ?: return null) }.getOrNull() ?: return null
@@ -67,8 +68,8 @@ object JamInviteLink {
             return ParsedJamInvite(code = code, serverUrl = server)
         }
 
-        // 2. Official web domain: https://vyon.bxane.workers.dev/invite/<CODE>
-        if (scheme == "https" && host == HOST) {
+        // 2. Official web domain: https://vyon-listen-together.bxane.workers.dev/invite/<CODE>
+        if (scheme == "https" && (host == HOST || host == LEGACY_HOST)) {
             val match = INVITE_PATH.matchEntire(uri.path.orEmpty()) ?: return null
             val code = match.groupValues[1].uppercase()
             return ParsedJamInvite(code = code, serverUrl = server)

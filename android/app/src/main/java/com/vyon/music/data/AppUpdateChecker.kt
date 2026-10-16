@@ -43,7 +43,7 @@ object AppUpdateChecker {
     private const val CACHE_SUBDIR = "updates"
 
     private const val LATEST_RELEASE_URL =
-        "https://api.github.com/repos/bxandot/vyon/releases/latest"
+        "https://api.github.com/repos/bxanedot/vyon/releases/latest"
 
     private val json = Json { ignoreUnknownKeys = true }
 
@@ -116,8 +116,8 @@ object AppUpdateChecker {
      * One release carries the phone app and the TV app, each as a universal
      * APK plus per-ABI splits:
      *
-     *     Vyon-v1.8.apk     Vyon-v1.8_arm64-v8a.apk     ...
-     *     VyonTV-v1.8.apk   VyonTV-v1.8_arm64-v8a.apk   ...
+     *     Vyon-v1.0.0.apk     Vyon-v1.0.0_arm64-v8a.apk     ...
+     *     VyonTV-v1.0.0.apk   VyonTV-v1.0.0_arm64-v8a.apk   ...
      *
      * so this app's APKs are the ones named with its own
      * [BuildConfig.UPDATE_APK_PREFIX] — "vyon-android-" never matches a TV file,

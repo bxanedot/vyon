@@ -1,5 +1,7 @@
 package com.vyon.music.ui.components
 
+import androidx.compose.animation.core.animateIntAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -22,13 +24,35 @@ import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Send
 import androidx.compose.material.icons.rounded.Forum
 import com.vyon.music.sharedui.resources.*
+import com.vyon.music.data.Http
+import com.vyon.music.ui.icons.VyonBrandIcons
 import com.vyon.music.ui.icons.VyonSymbols
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.intOrNull
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import okhttp3.Request
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun VyonAbout(modifier: Modifier = Modifier, onLicenses: (() -> Unit)? = null) {
     val uri = LocalUriHandler.current
+    var stars by remember { mutableIntStateOf(-1) }
+    LaunchedEffect(Unit) {
+        stars = withContext(Dispatchers.IO) {
+            runCatching {
+                Http.client.newCall(Request.Builder().url("https://api.github.com/repos/bxanedot/vyon").header("Accept", "application/vnd.github+json").build())
+                    .execute().use { response ->
+                        if (!response.isSuccessful) -1
+                        else Json.parseToJsonElement(response.body?.string().orEmpty()).jsonObject["stargazers_count"]?.jsonPrimitive?.intOrNull ?: -1
+                    }
+            }.getOrDefault(-1)
+        }
+    }
+    val displayedStars by animateIntAsState(stars.coerceAtLeast(0), animationSpec = tween(900), label = "github-stars")
     Column(modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Column(Modifier.fillMaxWidth().padding(bottom = 8.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
             VyonLogo(Modifier.size(88.dp))
@@ -39,7 +63,8 @@ fun VyonAbout(modifier: Modifier = Modifier, onLicenses: (() -> Unit)? = null) {
             AboutPerson(painterResource(Res.drawable.bxane_avatar), "bxane", stringResource(Res.string.vyon_lead_dev), Icons.Rounded.Code) {
                 uri.openUri("https://github.com/bxanedot")
             }
-            HorizontalDivider(Modifier.padding(start = 68.dp), color = MaterialTheme.colorScheme.outline.copy(alpha = 0.45f))
+        }
+        AboutSection(stringResource(Res.string.vyon_inspector)) {
             AboutPerson(painterResource(Res.drawable.vantom_avatar), "Vantom", stringResource(Res.string.vyon_inspector), Icons.Rounded.Info) {
                 uri.openUri("https://guns.lol/vantom0101")
             }
@@ -47,28 +72,33 @@ fun VyonAbout(modifier: Modifier = Modifier, onLicenses: (() -> Unit)? = null) {
         AboutSection(stringResource(Res.string.vyon_app_info)) {
             AboutRow(VyonSymbols.Version, "Version", "1.0.0")
             HorizontalDivider(Modifier.padding(start = 48.dp), color = MaterialTheme.colorScheme.outline.copy(alpha = 0.45f))
-            AboutRow(VyonSymbols.Website, stringResource(Res.string.vyon_website), "vyon.bxane.workers.dev") {
-                uri.openUri("https://vyon.bxane.workers.dev")
+            AboutRow(VyonSymbols.Website, stringResource(Res.string.vyon_website), "vyon.live") {
+                uri.openUri("https://vyon.live")
             }
             HorizontalDivider(Modifier.padding(start = 48.dp), color = MaterialTheme.colorScheme.outline.copy(alpha = 0.45f))
-            AboutRow(Icons.Rounded.Code, stringResource(Res.string.vyon_source), "github.com/bxandot/vyon") {
-                uri.openUri("https://github.com/bxandot/vyon")
+            AboutRow(VyonBrandIcons.GitHub, stringResource(Res.string.vyon_source), "github.com/bxanedot/vyon") {
+                uri.openUri("https://github.com/bxanedot/vyon")
             }
             onLicenses?.let {
-                AboutRow(VyonSymbols.About, "Open source licenses", null, it)
+            AboutRow(VyonSymbols.About, "Open source licenses", null, onClick = it)
             }
         }
         AboutSection(stringResource(Res.string.vyon_community)) {
-            AboutRow(Icons.Rounded.Forum, "Discord", null) { uri.openUri("https://discord.gg/h4Wsu824Uf") }
+            AboutRow(null, "Discord", null, painter = painterResource(Res.drawable.discord)) { uri.openUri("https://discord.gg/h4Wsu824Uf") }
             HorizontalDivider(Modifier.padding(start = 48.dp), color = MaterialTheme.colorScheme.outline.copy(alpha = 0.45f))
-            AboutRow(Icons.Rounded.Send, "Telegram", null) { uri.openUri("https://t.me/+T9avk7iJ7_YyN2Rk") }
+            AboutRow(null, "Telegram", null, painter = painterResource(Res.drawable.telegram)) { uri.openUri("https://t.me/+T9avk7iJ7_YyN2Rk") }
+        }
+        AboutSection("GitHub") {
+            AboutRow(VyonBrandIcons.GitHub, stringResource(Res.string.vyon_github_stars), if (stars < 0) "—" else "$displayedStars ★") {
+                uri.openUri("https://github.com/bxanedot/vyon")
+            }
         }
         AboutSection(stringResource(Res.string.vyon_support)) {
-            AboutRow(VyonSymbols.Credits, "Patreon", null) { uri.openUri("https://www.patreon.com/cw/bxane") }
+            AboutRow(null, "Patreon", null, painter = painterResource(Res.drawable.patreon)) { uri.openUri("https://www.patreon.com/cw/bxane") }
             HorizontalDivider(Modifier.padding(start = 48.dp), color = MaterialTheme.colorScheme.outline.copy(alpha = 0.45f))
-            AboutRow(Icons.Rounded.Favorite, "Ko-fi", null) { uri.openUri("https://ko-fi.com/bxane") }
+            AboutRow(null, "Ko-fi", null, painter = painterResource(Res.drawable.kofi)) { uri.openUri("https://ko-fi.com/bxane") }
             HorizontalDivider(Modifier.padding(start = 48.dp), color = MaterialTheme.colorScheme.outline.copy(alpha = 0.45f))
-            AboutRow(Icons.Rounded.Favorite, "bxane", "guns.lol/bxane") { uri.openUri("https://guns.lol/bxane") }
+            AboutRow(null, "bxane", "guns.lol/bxane", painter = painterResource(Res.drawable.guns_lol)) { uri.openUri("https://guns.lol/bxane") }
         }
         Text("GPL v3 · Not affiliated with YouTube or Google.", Modifier.fillMaxWidth().padding(top = 8.dp), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
     }
@@ -97,10 +127,11 @@ private fun AboutPerson(painter: androidx.compose.ui.graphics.painter.Painter, n
 }
 
 @Composable
-private fun AboutRow(icon: ImageVector, title: String, detail: String?, onClick: (() -> Unit)? = null) {
+private fun AboutRow(icon: ImageVector?, title: String, detail: String?, painter: androidx.compose.ui.graphics.painter.Painter? = null, onClick: (() -> Unit)? = null) {
     val row: @Composable () -> Unit = {
         Row(Modifier.fillMaxWidth().heightIn(min = 50.dp).padding(horizontal = 15.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(13.dp)) {
-            Icon(icon, null, Modifier.size(21.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+            if (icon != null) Icon(icon, null, Modifier.size(21.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+            else painter?.let { Icon(it, null, Modifier.size(21.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant) }
             Text(title, Modifier.weight(1f), style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface)
             detail?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.End) }
             if (onClick != null) Icon(VyonSymbols.Navigate, null, Modifier.size(18.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.72f))

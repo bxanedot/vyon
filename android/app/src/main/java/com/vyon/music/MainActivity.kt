@@ -3073,6 +3073,24 @@ private fun VyonApp(
                                     playDetailSongs(songs, songs.indices.random())
                                 }
                             },
+                            onDownloadCatalog = if (!page.browseId.startsWith("local:") &&
+                                page.type in setOf(BrowseType.ALBUM, BrowseType.PLAYLIST, BrowseType.ARTIST)
+                            ) {
+                                { songs ->
+                                    startDownload(
+                                        songs,
+                                        if (page.type == BrowseType.ARTIST) null else DownloadTarget(
+                                            id = page.browseId,
+                                            title = page.title,
+                                            subtitle = page.subtitle,
+                                            thumbnailUrl = page.thumbnailUrl,
+                                            playlist = page.type == BrowseType.PLAYLIST,
+                                        ),
+                                    )
+                                }
+                            } else {
+                                null
+                            },
                             onSectionItemClick = { item ->
                                 item.browseId?.let { id ->
                                     viewModel.openDetail(

@@ -74,7 +74,7 @@
     <string name="d_top_result">最佳结果</string>
     <string name="d_tray_icon">托盘图标</string>
     <string name="d_turn_off">关闭</string>
-    <string name="d_use_the_older_blob_backdrop_behind_the_player">在播放器背后使用旧版色块背景</string>
+    <string name="dynamic_player_backdrop_subtitle">随当前歌曲在播放器后方呈现柔和的色彩流动。</string>
     <string name="d_volume">音量</string>
     <string name="d_what_follows_the_verb_on_the_profile">个人资料中动词之后的内容。 留空则使用 %1$s。</string>
     <string name="d_your_collection">你的收藏</string>

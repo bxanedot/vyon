@@ -825,9 +825,9 @@
 
     <string name="export_compatible_downloads">导出兼容的下载</string>
 
-    <string name="legacy_mesh_gradient">经典网格渐变</string>
+    <string name="dynamic_player_backdrop">动态播放器背景</string>
 
-    <string name="legacy_mesh_gradient_subtitle">恢复 v1.5 中播放器背后的流动色块效果</string>
+    <string name="dynamic_player_backdrop_subtitle">随当前歌曲在播放器后方呈现柔和的色彩流动。</string>
 
     <string name="liquid_glass">液态玻璃 (Liquid Glass)</string>
 

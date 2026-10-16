@@ -76,7 +76,7 @@
     <string name="d_top_result">Top result</string>
     <string name="d_tray_icon">Tray icon</string>
     <string name="d_turn_off">Turn off</string>
-    <string name="d_use_the_older_blob_backdrop_behind_the_player">Use the older blob backdrop behind the player</string>
+    <string name="dynamic_player_backdrop_subtitle">Follows the current song with soft colour motion behind the player.</string>
     <string name="d_volume">Volume</string>
     <string name="d_what_follows_the_verb_on_the_profile">What follows the verb on the profile. Leave it empty to use %1$s.</string>
     <string name="d_your_collection">YOUR COLLECTION</string>

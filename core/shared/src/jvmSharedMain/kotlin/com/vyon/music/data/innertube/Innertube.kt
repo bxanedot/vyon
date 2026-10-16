@@ -1262,4 +1262,7 @@ object Innertube {
             .joinToString("") { "%02x".format(Locale.ROOT, it) }
         return "SAPISIDHASH ${timestamp}_$digest"
     }
+
+    fun authorizationHeader(origin: String, cookieHeader: String? = cookie): String? =
+        cookieHeader?.let(::sapisidFrom)?.let { sapisidHash(it, origin) }
 }

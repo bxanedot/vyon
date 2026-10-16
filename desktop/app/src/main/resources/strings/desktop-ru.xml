@@ -74,7 +74,7 @@
     <string name="d_top_result">Лучший результат</string>
     <string name="d_tray_icon">Значок в трее</string>
     <string name="d_turn_off">Выключить</string>
-    <string name="d_use_the_older_blob_backdrop_behind_the_player">Использовать прежний фон с пятнами за плеером</string>
+    <string name="dynamic_player_backdrop_subtitle">Мягкое движение цвета за плеером подстраивается под текущий трек.</string>
     <string name="d_volume">Громкость</string>
     <string name="d_what_follows_the_verb_on_the_profile">Что следует за глаголом в профиле. Оставьте пустым, чтобы использовать %1$s.</string>
     <string name="d_your_collection">ВАША КОЛЛЕКЦИЯ</string>

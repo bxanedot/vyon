@@ -38,13 +38,20 @@ object FlowYouTubeRepository {
         })
     }
 
-    private suspend fun post(endpoint: String, identity: YouTubeClient = YouTubeClient.WEB, build: JsonObjectBuilder.() -> Unit): JsonObject {
+    private suspend fun post(endpoint: String, identity: YouTubeClient = YouTubeClient.WEB, authenticated: Boolean = false, build: JsonObjectBuilder.() -> Unit): JsonObject {
         val visitor = Innertube.ensureVisitorData()
         val locale = YouTubeLocale(Innertube.currentRegion, Innertube.currentLanguage)
         val body = buildJsonObject { put("context", json.encodeToJsonElement(identity.toContext(locale, visitor, null))); build() }
+        val session = if (authenticated) Innertube.cookie else null
         val request = Request.Builder().url("$ORIGIN/youtubei/v1/$endpoint?prettyPrint=false")
             .header("User-Agent", identity.userAgent).header("Origin", ORIGIN).header("Referer", "$ORIGIN/")
             .header("X-YouTube-Client-Name", identity.clientId).header("X-YouTube-Client-Version", identity.clientVersion)
+            .apply {
+                if (session != null) {
+                    header("Cookie", session)
+                    Innertube.authorizationHeader(ORIGIN, session)?.let { header("Authorization", it) }
+                }
+            }
             .post(body.toString().toRequestBody("application/json".toMediaType())).build()
         return client.newCall(request).await().use { response ->
             check(response.isSuccessful) { "YouTube returned HTTP ${response.code}" }
@@ -53,7 +60,21 @@ object FlowYouTubeRepository {
     }
 
     suspend fun home(continuation: String? = null): Result<YouTubeVideoPage> = result {
-        parsePage(post("browse") { if (continuation == null) put("browseId", "FEwhat_to_watch") else put("continuation", continuation) })
+        val authenticated = Innertube.authorizationHeader(ORIGIN) != null
+        val browse: suspend (Boolean) -> JsonObject = { useSession ->
+            post("browse", authenticated = useSession) {
+                if (continuation == null) put("browseId", "FEwhat_to_watch") else put("continuation", continuation)
+            }
+        }
+        val response = try {
+            browse(authenticated)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            if (!authenticated || continuation != null) throw e
+            browse(false)
+        }
+        parsePage(response)
     }
 
     suspend fun search(query: String, continuation: String? = null): Result<YouTubeVideoPage> = result {

@@ -74,7 +74,7 @@
     <string name="d_top_result">התוצאה המובילה</string>
     <string name="d_tray_icon">סמל במגש</string>
     <string name="d_turn_off">כבה</string>
-    <string name="d_use_the_older_blob_backdrop_behind_the_player">השתמש ברקע הכתמים הישן מאחורי הנגן</string>
+    <string name="dynamic_player_backdrop_subtitle">עוקב אחר השיר הנוכחי בתנועת צבע עדינה מאחורי הנגן.</string>
     <string name="d_volume">עוצמת קול</string>
     <string name="d_what_follows_the_verb_on_the_profile">מה שבא אחרי הפועל בפרופיל. השאר ריק כדי להשתמש ב-%1$s.</string>
     <string name="d_your_collection">האוסף שלך</string>

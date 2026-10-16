@@ -137,7 +137,7 @@ kotlin {
     }
 }
 
-// Named after the phone APKs (Vyon-v1.8.apk) but with their own prefix, so
+// Named after the phone APKs (Vyon-v1.0.0.apk) but with their own prefix, so
 // the phone's updater — which only takes assets starting "vyon-" — can never
 // pick a watch APK by mistake.
 base.archivesName.set("vyonWear")

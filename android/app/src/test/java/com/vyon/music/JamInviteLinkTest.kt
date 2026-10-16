@@ -23,7 +23,7 @@ class JamInviteLinkTest {
     fun `parses and normalizes a public invite`() {
         assertEquals(
             "A1B2C3",
-            JamInviteLink.parse("https://vyon.bxane.workers.dev/invite/a1b2c3"),
+            JamInviteLink.parse("https://vyon-listen-together.bxane.workers.dev/invite/a1b2c3"),
         )
     }
 
@@ -31,25 +31,25 @@ class JamInviteLinkTest {
     fun `accepts query parameters without making them part of the code`() {
         assertEquals(
             "ABC123",
-            JamInviteLink.parse("https://vyon.bxane.workers.dev/invite/ABC123?from=share"),
+            JamInviteLink.parse("https://vyon-listen-together.bxane.workers.dev/invite/ABC123?from=share"),
         )
     }
 
     @Test
     fun `rejects other hosts schemes paths and malformed codes`() {
-        assertNull(JamInviteLink.parse("http://vyon.bxane.workers.dev/invite/ABC123"))
+        assertNull(JamInviteLink.parse("http://vyon-listen-together.bxane.workers.dev/invite/ABC123"))
         assertNull(JamInviteLink.parse("https://example.com/invite/ABC123"))
-        assertNull(JamInviteLink.parse("https://vyon.bxane.workers.dev/"))
-        assertNull(JamInviteLink.parse("https://vyon.bxane.workers.dev/download"))
-        assertNull(JamInviteLink.parse("https://vyon.bxane.workers.dev/invite/ABC123/"))
-        assertNull(JamInviteLink.parse("https://vyon.bxane.workers.dev/invite/ABC123/extra"))
-        assertNull(JamInviteLink.parse("https://vyon.bxane.workers.dev/invite/TOO-LONG"))
+        assertNull(JamInviteLink.parse("https://vyon-listen-together.bxane.workers.dev/"))
+        assertNull(JamInviteLink.parse("https://vyon-listen-together.bxane.workers.dev/download"))
+        assertNull(JamInviteLink.parse("https://vyon-listen-together.bxane.workers.dev/invite/ABC123/"))
+        assertNull(JamInviteLink.parse("https://vyon-listen-together.bxane.workers.dev/invite/ABC123/extra"))
+        assertNull(JamInviteLink.parse("https://vyon-listen-together.bxane.workers.dev/invite/TOO-LONG"))
     }
 
     @Test
     fun `builds the canonical share URL`() {
         assertEquals(
-            "https://vyon.bxane.workers.dev/invite/ABC123",
+            "https://vyon-listen-together.bxane.workers.dev/invite/ABC123",
             JamInviteLink.url("abc123"),
         )
     }
@@ -65,7 +65,7 @@ class JamInviteLinkTest {
             JamInviteLink.url("abc123", "https://my-party.onrender.com/"),
         )
         assertEquals(
-            "https://vyon.bxane.workers.dev/invite/ABC123",
+            "https://vyon-listen-together.bxane.workers.dev/invite/ABC123",
             JamInviteLink.url("abc123", ""),
         )
         assertEquals(
@@ -135,7 +135,7 @@ class JamInviteLinkTest {
         } else {
             JamInviteLink.url(code, activePartyHost)
         }
-        assertEquals("https://vyon.bxane.workers.dev/invite/JAM001", link)
+        assertEquals("https://vyon-listen-together.bxane.workers.dev/invite/JAM001", link)
     }
 
     @Test
@@ -148,7 +148,7 @@ class JamInviteLinkTest {
             JamInviteLink.url(code, customHost)
         }
         assertEquals("https://custom.jam.example.com/invite/JAM002", link)
-        assertNotEquals("https://vyon.bxane.workers.dev/invite/JAM002", link)
+        assertNotEquals("https://vyon-listen-together.bxane.workers.dev/invite/JAM002", link)
     }
 
     @Test
@@ -165,7 +165,7 @@ class JamInviteLinkTest {
 
     @Test
     fun `invariant 4 explicit invite target ignores idle fallback`() {
-        val explicitInvite = "https://vyon.bxane.workers.dev/invite/JAM004?server=https%3A%2F%2Ftarget.party.com"
+        val explicitInvite = "https://vyon-listen-together.bxane.workers.dev/invite/JAM004?server=https%3A%2F%2Ftarget.party.com"
         val parsed = JamInviteLink.parseInvite(explicitInvite)
         assertEquals("JAM004", parsed?.code)
         assertEquals("https://target.party.com", parsed?.serverUrl)

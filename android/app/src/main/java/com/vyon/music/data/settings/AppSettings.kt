@@ -410,7 +410,7 @@ object AppSettings {
     val reduceDynamicBlur = MutableStateFlow(false)
 
     /** Real backdrop-sampled glass (blur, lens refraction) on the floating nav bar, Android 12+ only. */
-    val liquidGlass = MutableStateFlow(false)
+    val liquidGlass = MutableStateFlow(true)
 
     /** Blurs unfocused lyric lines, keeping the active line sharp. */
     val lyricsBlur = MutableStateFlow(true)
@@ -482,22 +482,8 @@ object AppSettings {
      */
     val fullBleedArtwork = MutableStateFlow(true)
 
-    /**
-     * Puts v1.5's backdrop back on the player: four quantised blobs drifting
-     * behind the whole screen, rather than the artwork's own colours hung off
-     * the sleeve's bottom edge.
-     *
-     * Off by default, because the current backdrop replaced it for two reasons
-     * that have not gone away — see [ArtworkMesh][com.vyon.music.ui.player.ArtworkMesh]
-     * for the colour one (a cover that is nine-tenths black with a red stripe
-     * comes back from the quantiser as a red screen) and
-     * [ArtworkMeshBackdrop][com.vyon.music.ui.player.ArtworkMeshBackdrop]
-     * for the cost one (blobs that drift are a full-screen blur redrawn while
-     * they move, where a mesh is drawn once per track and then composited).
-     * Kept as a switch because people asked for the old look back, and neither
-     * reason is one a listener has to agree with.
-     */
-    val legacyMeshGradient = MutableStateFlow(false)
+    /** Shows a softly animated artwork-colour backdrop behind the player. */
+    val dynamicArtworkBackdrop = MutableStateFlow(false)
 
     /** Restores the expanded player to the surface the listener left open. */
     val lastPlayerScreen = MutableStateFlow(LastPlayerScreen.MAIN)
@@ -687,7 +673,7 @@ object AppSettings {
     val discordRpcEnabled = MutableStateFlow(true)
 
     /** Put the track title on the bold profile line, in place of the artist. */
-    val discordUseDetails = MutableStateFlow(false)
+    val discordUseDetails = MutableStateFlow(true)
 
     /** Show measured Hi-Res, Lossless, or Dolby specs on the presence card. */
     val discordShowAudioQuality = MutableStateFlow(true)
@@ -704,7 +690,7 @@ object AppSettings {
     val discordButton1Text = MutableStateFlow("")
     val discordButton1Visible = MutableStateFlow(true)
     val discordButton2Text = MutableStateFlow("")
-    val discordButton2Visible = MutableStateFlow(true)
+    val discordButton2Visible = MutableStateFlow(false)
 
     /** The notice about what connecting an account actually does has been read. */
     val discordInfoDismissed = MutableStateFlow(false)
@@ -889,7 +875,7 @@ object AppSettings {
         preferMusicOnly.value = prefs.getBoolean(KEY_PREFER_MUSIC_ONLY, false)
         smartVersionAlignment.value = prefs.getBoolean(KEY_SMART_VERSION_ALIGNMENT, true)
         reduceDynamicBlur.value = prefs.getBoolean(KEY_REDUCE_BLUR, false)
-        liquidGlass.value = prefs.getBoolean(KEY_LIQUID_GLASS, false)
+        liquidGlass.value = prefs.getBoolean(KEY_LIQUID_GLASS, true)
         lyricsBlur.value = prefs.getBoolean(KEY_LYRICS_BLUR, true)
         lyricsOffsetMs.value = prefs.getInt(KEY_LYRICS_OFFSET_MS, 0)
             .coerceIn(MIN_LYRICS_OFFSET_MS, MAX_LYRICS_OFFSET_MS)
@@ -905,7 +891,7 @@ object AppSettings {
         signatureApiEnabled.value = prefs.getBoolean(KEY_SIGNATURE_API_ENABLED, false)
         signatureApiUrl.value = normalizeSignatureApiUrl(prefs.getString(KEY_SIGNATURE_API_URL, "").orEmpty())
         fullBleedArtwork.value = prefs.getBoolean(KEY_FULL_BLEED_ARTWORK, true)
-        legacyMeshGradient.value = prefs.getBoolean(KEY_LEGACY_MESH_GRADIENT, false)
+        dynamicArtworkBackdrop.value = prefs.getBoolean(KEY_DYNAMIC_ARTWORK_BACKDROP, false)
         lastPlayerScreen.value = runCatching {
             LastPlayerScreen.valueOf(
                 prefs.getString(KEY_LAST_PLAYER_SCREEN, null) ?: LastPlayerScreen.MAIN.name,
@@ -974,16 +960,18 @@ object AppSettings {
         discordName.value = prefs.getString(KEY_DISCORD_NAME, "").orEmpty()
         discordAvatar.value = prefs.getString(KEY_DISCORD_AVATAR, "").orEmpty()
         discordRpcEnabled.value = prefs.getBoolean(KEY_DISCORD_RPC_ENABLED, true)
-        discordUseDetails.value = prefs.getBoolean(KEY_DISCORD_USE_DETAILS, false)
+        discordUseDetails.value = prefs.getBoolean(KEY_DISCORD_USE_DETAILS, true)
         discordShowAudioQuality.value = prefs.getBoolean(KEY_DISCORD_SHOW_AUDIO_QUALITY, true)
         discordAdvancedMode.value = prefs.getBoolean(KEY_DISCORD_ADVANCED_MODE, false)
         discordStatus.value = prefs.getString(KEY_DISCORD_STATUS, "online").orEmpty()
         discordActivityType.value = prefs.getString(KEY_DISCORD_ACTIVITY_TYPE, "listening").orEmpty()
         discordActivityName.value = prefs.getString(KEY_DISCORD_ACTIVITY_NAME, "").orEmpty()
         discordButton1Text.value = prefs.getString(KEY_DISCORD_BUTTON_1_TEXT, "").orEmpty()
+            .takeUnless { it == "Listen on YouTube Music" }.orEmpty()
         discordButton1Visible.value = prefs.getBoolean(KEY_DISCORD_BUTTON_1_VISIBLE, true)
         discordButton2Text.value = prefs.getString(KEY_DISCORD_BUTTON_2_TEXT, "").orEmpty()
-        discordButton2Visible.value = prefs.getBoolean(KEY_DISCORD_BUTTON_2_VISIBLE, true)
+            .takeUnless { it == "Visit vyon" }.orEmpty()
+        discordButton2Visible.value = prefs.getBoolean(KEY_DISCORD_BUTTON_2_VISIBLE, false)
         discordInfoDismissed.value = prefs.getBoolean(KEY_DISCORD_INFO_DISMISSED, false)
     }
 
@@ -1489,9 +1477,9 @@ object AppSettings {
         prefs.edit().putBoolean(KEY_FULL_BLEED_ARTWORK, value).apply()
     }
 
-    fun setLegacyMeshGradient(value: Boolean) {
-        legacyMeshGradient.value = value
-        prefs.edit().putBoolean(KEY_LEGACY_MESH_GRADIENT, value).apply()
+    fun setDynamicArtworkBackdrop(value: Boolean) {
+        dynamicArtworkBackdrop.value = value
+        prefs.edit().putBoolean(KEY_DYNAMIC_ARTWORK_BACKDROP, value).apply()
     }
 
     fun setLastPlayerScreen(value: LastPlayerScreen) {
@@ -2066,7 +2054,7 @@ object AppSettings {
     private const val KEY_SIGNATURE_API_ENABLED = "signature_api_enabled"
     private const val KEY_SIGNATURE_API_URL = "signature_api_url"
     private const val KEY_FULL_BLEED_ARTWORK = "full_bleed_artwork"
-    private const val KEY_LEGACY_MESH_GRADIENT = "legacy_mesh_gradient"
+    private const val KEY_DYNAMIC_ARTWORK_BACKDROP = "legacy_mesh_gradient"
     private const val KEY_LAST_PLAYER_SCREEN = "last_player_screen"
     private const val KEY_SYNCED_LYRICS = "synced_lyrics"
     private const val KEY_LYRICS_SOURCES = "lyrics_sources"

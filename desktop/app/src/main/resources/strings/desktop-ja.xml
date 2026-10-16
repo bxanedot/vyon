@@ -74,7 +74,7 @@
     <string name="d_top_result">トップの結果</string>
     <string name="d_tray_icon">トレイアイコン</string>
     <string name="d_turn_off">オフにする</string>
-    <string name="d_use_the_older_blob_backdrop_behind_the_player">プレーヤーの背景に以前のブロブ背景を使用します</string>
+    <string name="dynamic_player_backdrop_subtitle">再生中の曲に合わせて、プレーヤーの背後に柔らかな色の動きを表示します。</string>
     <string name="d_volume">音量</string>
     <string name="d_what_follows_the_verb_on_the_profile">プロフィールで動詞のあとに続く言葉。 空欄にすると %1$s が使われます。</string>
     <string name="d_your_collection">あなたのコレクション</string>

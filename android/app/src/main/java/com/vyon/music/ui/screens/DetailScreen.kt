@@ -282,6 +282,7 @@ fun DetailScreen(
     onSongLongPress: (Song) -> Unit,
     onSongSwipe: (Song) -> Unit,
     onShuffle: (List<Song>) -> Unit,
+    onDownloadCatalog: ((List<Song>) -> Unit)? = null,
     onSectionItemClick: (ShelfItem) -> Unit,
     onArtistClick: (String, String) -> Unit,
     onAddSuggested: (Song) -> Unit,
@@ -556,6 +557,7 @@ fun DetailScreen(
                         songs = songs,
                         onPlay = { onSongClick(songs, 0) },
                         onShuffle = { onShuffle(songs) },
+                        onDownload = onDownloadCatalog?.let { download -> { download(rawSongs) } },
                         // A folder's credit says where its tracks live, not who made them.
                         onArtistClick = onArtistClick.takeIf { folder == null },
                         onToggleLibrary = onToggleLibrary,
@@ -586,6 +588,7 @@ fun DetailScreen(
                         onShuffle = { onShuffle(songs) },
                         subscription = page.subscription?.takeIf { onToggleSubscription != null },
                         onToggleSubscription = onToggleSubscription,
+                        onDownload = onDownloadCatalog?.let { download -> { download(rawSongs) } },
                         bottomSpace = 22.dp,
                         playColor = appleArt?.keyColor?.let { Color(it) },
                     )
@@ -878,6 +881,7 @@ private fun ReleaseHeader(
     songs: List<Song>,
     onPlay: () -> Unit,
     onShuffle: () -> Unit,
+    onDownload: (() -> Unit)?,
     onArtistClick: ((String, String) -> Unit)?,
     onToggleLibrary: (() -> Unit)?,
 ) {
@@ -1056,6 +1060,14 @@ private fun ReleaseHeader(
                         onClick = {},
                         size = RELEASE_SIDE_BUTTON,
                         enabled = false,
+                    )
+                }
+                if (onDownload != null) {
+                    CircleIconButton(
+                        icon = VyonBrandIcons.Download,
+                        contentDescription = stringResource(R.string.download_all),
+                        onClick = onDownload,
+                        size = RELEASE_SIDE_BUTTON,
                     )
                 }
             }
@@ -1477,6 +1489,7 @@ private fun ActionRow(
     /** The artist header's subscribe state, or null where it isn't offered. */
     subscription: SubscriptionState? = null,
     onToggleSubscription: (() -> Unit)? = null,
+    onDownload: (() -> Unit)? = null,
     /** Apple's fill for the Play circle; null leaves it white. */
     playColor: Color? = null,
 ) {
@@ -1519,6 +1532,14 @@ private fun ActionRow(
                 onClick = {},
                 size = ARTIST_SIDE_BUTTON,
                 enabled = false,
+            )
+        }
+        if (onDownload != null) {
+            CircleIconButton(
+                icon = VyonBrandIcons.Download,
+                contentDescription = stringResource(R.string.download_all),
+                onClick = onDownload,
+                size = ARTIST_SIDE_BUTTON,
             )
         }
     }

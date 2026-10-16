@@ -1,6 +1,7 @@
 package com.vyon.music.ui.screens
 
 import com.vyon.music.ui.components.VyonLogo
+import com.vyon.music.data.innertube.Innertube
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.*
@@ -54,7 +55,6 @@ fun VyonVideosPage(onMusic: () -> Unit, onVideo: (YouTubeVideo) -> Unit, onSetti
     Surface(modifier = modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background, contentColor = MaterialTheme.colorScheme.onBackground) {
     Column(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing)) {
         Row(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            VyonLogo(Modifier.size(44.dp))
             Text("vyon", style = MaterialTheme.typography.headlineMedium, modifier = Modifier.weight(1f))
             FilterChip(selected = false, onClick = onMusic, label = { Text(stringResource(Res.string.vyon_music)) })
             FilterChip(colors = FilterChipDefaults.filterChipColors(selectedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = .18f), selectedLabelColor = MaterialTheme.colorScheme.primary), selected = true, onClick = {}, label = { Text("YouTube") })
@@ -68,6 +68,11 @@ fun VyonVideosPage(onMusic: () -> Unit, onVideo: (YouTubeVideo) -> Unit, onSetti
             suggestions.forEach { suggestion -> TextButton(onClick = { submit(suggestion) }, modifier = Modifier.fillMaxWidth()) { Text(suggestion, modifier = Modifier.fillMaxWidth()) } }
         }
         if (submitted.isNotBlank()) TextButton(onClick = { query = ""; submitted = "" }) { Text(stringResource(Res.string.vyon_video_feed)) }
+        else Text(
+            stringResource(if (Innertube.cookie != null) Res.string.vyon_video_suggestions else Res.string.vyon_video_explore),
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp),
+        )
         val displayedPage = page
         when {
             loading && page == null -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }

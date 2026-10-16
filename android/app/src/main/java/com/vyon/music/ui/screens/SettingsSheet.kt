@@ -10,6 +10,8 @@ import android.net.Uri
 import android.provider.Settings
 import android.widget.Toast
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -128,6 +130,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -214,6 +217,10 @@ fun SettingsScreen(
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
+    val settingsViewportHeight = LocalConfiguration.current.screenHeightDp.dp
+    val systemAnimationsOff = remember(context) {
+        Settings.Global.getFloat(context.contentResolver, Settings.Global.ANIMATOR_DURATION_SCALE, 1f) == 0f
+    }
 
     val wifiQuality by AppSettings.audioQualityWifi.collectAsStateWithLifecycle()
     val cellularQuality by AppSettings.audioQualityCellular.collectAsStateWithLifecycle()
@@ -239,7 +246,7 @@ fun SettingsScreen(
     val signatureApiEnabled by AppSettings.signatureApiEnabled.collectAsStateWithLifecycle()
     val signatureApiUrl by AppSettings.signatureApiUrl.collectAsStateWithLifecycle()
     val fullBleedArtwork by AppSettings.fullBleedArtwork.collectAsStateWithLifecycle()
-    val legacyMeshGradient by AppSettings.legacyMeshGradient.collectAsStateWithLifecycle()
+    val dynamicArtworkBackdrop by AppSettings.dynamicArtworkBackdrop.collectAsStateWithLifecycle()
     val syncedLyrics by AppSettings.syncedLyrics.collectAsStateWithLifecycle()
     val lyricsSources by AppSettings.lyricsSources.collectAsStateWithLifecycle()
     val translationLanguage by AppSettings.translationLanguage.collectAsStateWithLifecycle()
@@ -392,35 +399,37 @@ fun SettingsScreen(
 
     // What is left after a keystroke is a different list, and the offset the
     // last one was scrolled to means nothing in it.
-    val scrollState = rememberSaveable(page, saver = ScrollState.Saver) { ScrollState(0) }
-    var isFirstSearchComposition by remember { mutableStateOf(true) }
-    LaunchedEffect(searchQuery) {
-        if (isFirstSearchComposition && searchQuery.isEmpty()) {
-            // Skip the initial composition during Activity recreation:
-            // rememberSaveable already restored the scroll position.
-            isFirstSearchComposition = false
-        } else {
-            isFirstSearchComposition = false
-            scrollState.scrollTo(0)
-        }
-    }
-
     AnimatedContent(
+        modifier = modifier.fillMaxWidth().height(settingsViewportHeight),
         targetState = page,
         transitionSpec = {
-            (slideInHorizontally(spring(stiffness = 420f)) { it / 8 } + fadeIn(tween(160))) togetherWith
-                (slideOutHorizontally(tween(140)) { -it / 12 } + fadeOut(tween(120)))
+            if (reduceAnimation || systemAnimationsOff) {
+                EnterTransition.None togetherWith ExitTransition.None
+            } else {
+                (slideInHorizontally(spring(stiffness = 420f)) { it / 8 } + fadeIn(tween(160))) togetherWith
+                    (slideOutHorizontally(tween(140)) { -it / 12 } + fadeOut(tween(120)))
+            }
         },
         label = "settings pages",
     ) { targetPage ->
+        // AnimatedContent pages need separate states because outgoing content overwrites maxValue.
+        val scrollState = rememberSaveable(targetPage, saver = ScrollState.Saver) { ScrollState(0) }
+        var lastSearchQuery by remember(targetPage) { mutableStateOf(searchQuery) }
+        LaunchedEffect(searchQuery) {
+            if (lastSearchQuery != searchQuery) {
+                scrollState.scrollTo(0)
+                lastSearchQuery = searchQuery
+            }
+        }
         if (targetPage == VyonSettingsPage.ABOUT) {
-            Column(modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(contentPadding)) {
+            Column(modifier.fillMaxWidth().height(settingsViewportHeight).verticalScroll(rememberScrollState()).padding(contentPadding)) {
                 Text(stringResource(R.string.vyon_about), color = MaterialTheme.colorScheme.onBackground, style = MaterialTheme.typography.displayLarge, modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp))
                 com.vyon.music.ui.components.VyonAbout()
             }
         } else Column(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxWidth()
+            .height(settingsViewportHeight)
             .verticalScroll(scrollState)
             .padding(contentPadding),
     ) {
@@ -924,23 +933,23 @@ fun SettingsScreen(
                     )
                 }
             }
-            val legacyMeshGradientTitle = stringResource(R.string.legacy_mesh_gradient)
-            row(legacyMeshGradientTitle, "background", "player") {
+            val dynamicArtworkBackdropTitle = stringResource(R.string.dynamic_player_backdrop)
+            row(dynamicArtworkBackdropTitle, "background", "player") {
                 SettingsRow(
                     icon = Icons.Rounded.Gradient,
-                    title = legacyMeshGradientTitle,
-                    subtitle = stringResource(R.string.legacy_mesh_gradient_subtitle),
+                    title = dynamicArtworkBackdropTitle,
+                    subtitle = stringResource(R.string.dynamic_player_backdrop_subtitle),
                     trailing = {
                         Switch(
-                            checked = legacyMeshGradient,
-                            onCheckedChange = AppSettings::setLegacyMeshGradient,
+                            checked = dynamicArtworkBackdrop,
+                            onCheckedChange = AppSettings::setDynamicArtworkBackdrop,
                             colors = SwitchDefaults.colors(
                                 checkedTrackColor = MaterialTheme.colorScheme.primary,
                                 checkedBorderColor = MaterialTheme.colorScheme.primary,
                             ),
                         )
                     },
-                    onClick = { AppSettings.setLegacyMeshGradient(!legacyMeshGradient) },
+                    onClick = { AppSettings.setDynamicArtworkBackdrop(!dynamicArtworkBackdrop) },
                 )
             }
             val animatedCoverArtTitle = stringResource(R.string.animated_cover_art)

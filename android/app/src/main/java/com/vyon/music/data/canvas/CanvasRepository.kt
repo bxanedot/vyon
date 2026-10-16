@@ -12,17 +12,11 @@ import kotlinx.coroutines.withContext
  * Finds the looping video that belongs behind a track's or a release's cover
  * art — Spotify's Canvas, Apple's motion artwork.
  *
- * Four sources, asked in turn until one answers. They cover genuinely
- * different ground rather than being four routes to the same catalogue:
- * Apple has the most, Tidal has square covers on a lot of what Apple misses,
- * the community index is the only one that reaches back catalogue, and
- * Spotify has the original Canvas but needs the listener's own session
- * cookie to reach (see [SpotifyCanvas]) and is a free no-op without one.
- * Spotify goes last by default even once it's set up: it's the heaviest of the
- * four to reach (an offscreen WebView, not just a request) and the other three
- * between them already cover most of what it would have answered. The Spotify
- * integration setting can deliberately put it first when its original Canvas
- * is more important to the listener than that lookup cost.
+ * Three sources, asked in turn until one answers: Apple and Tidal provide
+ * motion artwork for some releases, and Spotify can return original Canvas
+ * artwork when the listener has supplied a session cookie. Spotify goes last
+ * by default because it uses an offscreen WebView; the setting can move it
+ * first when its original artwork matters more than lookup cost.
  *
  * Every one of them is a public endpoint belonging to someone else, reached
  * without an account, and all of them will confidently answer a search with
@@ -94,13 +88,11 @@ object CanvasRepository {
                     { SpotifyCanvas.search(title, artist, album) },
                     { AppleMusicCanvas.search(title, artist, album) },
                     { TidalCanvas.search(title, artist, album) },
-                    { CommunityCanvas.search(title, artist, album) },
                 ) { it.matches(title, artist, album) }
             } else {
                 firstHit(
                     { AppleMusicCanvas.search(title, artist, album) },
                     { TidalCanvas.search(title, artist, album) },
-                    { CommunityCanvas.search(title, artist, album) },
                     { SpotifyCanvas.search(title, artist, album) },
                 ) { it.matches(title, artist, album) }
             }
@@ -142,13 +134,11 @@ object CanvasRepository {
                     { SpotifyCanvas.searchAlbum(name, credit) },
                     { AppleMusicCanvas.searchAlbum(name, credit) },
                     { TidalCanvas.searchAlbum(name, credit) },
-                    { CommunityCanvas.searchAlbum(name, credit) },
                 ) { it.matches(name, credit, name) }
             } else {
                 firstHit(
                     { AppleMusicCanvas.searchAlbum(name, credit) },
                     { TidalCanvas.searchAlbum(name, credit) },
-                    { CommunityCanvas.searchAlbum(name, credit) },
                     { SpotifyCanvas.searchAlbum(name, credit) },
                 ) { it.matches(name, credit, name) }
             }

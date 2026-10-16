@@ -846,9 +846,9 @@
 
     <string name="export_compatible_downloads">संगत डाउनलोड निर्यात करें</string>
 
-    <string name="legacy_mesh_gradient">क्लासिक मेश ग्रेडिएंट</string>
+    <string name="dynamic_player_backdrop">प्लेयर की एनिमेटेड पृष्ठभूमि</string>
 
-    <string name="legacy_mesh_gradient_subtitle">v1.5 से प्लेयर के पीछे बहने वाले रंग लौटाएं</string>
+    <string name="dynamic_player_backdrop_subtitle">प्लेयर के पीछे हल्की रंगीन गति के साथ मौजूदा गीत का अनुसरण करें।</string>
 
     <string name="liquid_glass">लिक्विड ग्लास</string>
 

@@ -12,15 +12,15 @@ internal object DesktopDiscordSettings {
 
     private val persistence = DesktopPersistence()
 
-    private val _useDetails = MutableStateFlow(persistence.boolean(KEY_USE_DETAILS, false))
+    private val _useDetails = MutableStateFlow(persistence.boolean(KEY_USE_DETAILS, true))
     private val _advancedMode = MutableStateFlow(persistence.boolean(KEY_ADVANCED, false))
     private val _status = MutableStateFlow(persistence.string(KEY_STATUS, "").ifBlank { "online" })
     private val _activityType = MutableStateFlow(persistence.string(KEY_ACTIVITY_TYPE, "").ifBlank { "listening" })
     private val _activityName = MutableStateFlow(persistence.string(KEY_ACTIVITY_NAME, ""))
-    private val _button1Text = MutableStateFlow(persistence.string(KEY_BUTTON_1_TEXT, ""))
+    private val _button1Text = MutableStateFlow(persistence.string(KEY_BUTTON_1_TEXT, "").takeUnless { it == "Listen on YouTube Music" }.orEmpty())
     private val _button1Visible = MutableStateFlow(persistence.boolean(KEY_BUTTON_1_VISIBLE, true))
-    private val _button2Text = MutableStateFlow(persistence.string(KEY_BUTTON_2_TEXT, ""))
-    private val _button2Visible = MutableStateFlow(persistence.boolean(KEY_BUTTON_2_VISIBLE, true))
+    private val _button2Text = MutableStateFlow(persistence.string(KEY_BUTTON_2_TEXT, "").takeUnless { it == "Visit vyon" }.orEmpty())
+    private val _button2Visible = MutableStateFlow(persistence.boolean(KEY_BUTTON_2_VISIBLE, false))
     private val _showAudioQuality = MutableStateFlow(persistence.boolean(KEY_SHOW_AUDIO_QUALITY, true))
 
     /** Whether the song goes on the bold line instead of the artist. */
@@ -91,8 +91,8 @@ internal object DesktopDiscordSettings {
     fun activityLabel(id: String) = activities.firstOrNull { it.id == id }?.label ?: id
     fun activityVerb(id: String) = activities.firstOrNull { it.id == id }?.detail ?: "Listening to"
 
-    const val DEFAULT_BUTTON_1 = "Listen on YouTube Music"
-    const val DEFAULT_BUTTON_2 = "Visit vyon"
+    const val DEFAULT_BUTTON_1 = "Visit Vyon"
+    const val DEFAULT_BUTTON_2 = "Open song"
     const val APP_NAME = "vyon"
 
     private const val KEY_USE_DETAILS = "discord_use_details"

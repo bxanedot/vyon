@@ -2,6 +2,8 @@
     <string name="vyon_music">موسیقی</string>
     <string name="vyon_video_search">جستجوی ویدیوهای YouTube</string>
     <string name="vyon_video_feed">بازگشت به ویدیوها</string>
+    <string name="vyon_video_suggestions">پیشنهادها برای شما</string>
+    <string name="vyon_video_explore">کاوش ویدیوها</string>
     <string name="vyon_video_empty">برای شروع تماشا، یک ویدیو جستجو کنید.</string>
     <string name="vyon_video_no_results">ویدیویی پیدا نشد. جستجوی دیگری را امتحان کنید.</string>
     <string name="vyon_video_more">بارگیری ویدیوهای بیشتر</string>

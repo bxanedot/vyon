@@ -74,13 +74,7 @@ data class DesktopCanvasArtwork(
     }
 }
 
-/**
- * The four providers, asked in turn until one answers with a clip that is really this track's.
- *
- * Apple and Tidal first because their clips are square and belong to the release; the community
- * index next because it is the only one covering back catalogue; Spotify last because it is the
- * one that needs a credential.
- */
+/** Three providers, asked in turn until one returns artwork that matches the track. */
 object DesktopCanvasClient {
 
     private const val CACHE_SIZE = 64
@@ -103,7 +97,7 @@ object DesktopCanvasClient {
         override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, Entry>) = size > CACHE_SIZE
     }
 
-    // Skipping through a queue fires a lookup per track. Serialising them keeps four providers'
+    // Skipping through a queue fires a lookup per track. Serialising them keeps three providers'
     // worth of requests off the wire at once.
     private val gate = Mutex()
 
@@ -126,7 +120,6 @@ object DesktopCanvasClient {
             firstHit(
                 { DesktopAppleMusicCanvas.search(title, artist, album) },
                 { DesktopTidalCanvas.search(title, artist, album) },
-                { DesktopCommunityCanvas.search(title, artist, album) },
                 { DesktopSpotifyCanvas.search(title, artist, album) },
             ) { it.matches(title, artist, album) }
         }
@@ -150,7 +143,6 @@ object DesktopCanvasClient {
             firstHit(
                 { DesktopAppleMusicCanvas.searchAlbum(name, credit) },
                 { DesktopTidalCanvas.searchAlbum(name, credit) },
-                { DesktopCommunityCanvas.searchAlbum(name, credit) },
                 { DesktopSpotifyCanvas.searchAlbum(name, credit) },
             ) { it.matches(name, credit, name) }
         }

@@ -96,7 +96,7 @@ android {
             "\"${listenTogetherServer.replace("\\", "\\\\").replace("\"", "\\\"")}\"",
         )
         // The TV APKs share a GitHub release with the phone ones and are told
-        // apart by name (VyonTV-v1.8.apk, VyonTV-v1.8_x86_64.apk), so
+        // apart by name (VyonTV-v1.0.0.apk, VyonTV-v1.0.0_x86_64.apk), so
         // the updater installs the TV app here, never the phone app. See
         // AppUpdateChecker.apkAssetUrl.
         buildConfigField("String", "UPDATE_APK_PREFIX", "\"vyon-tv-\"")

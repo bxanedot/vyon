@@ -842,9 +842,9 @@
 
     <string name="export_compatible_downloads">Uyumlu indirmeleri dışa aktar</string>
 
-    <string name="legacy_mesh_gradient">Klasik ağ gradyanı</string>
+    <string name="dynamic_player_backdrop">Hareketli oynatıcı arka planı</string>
 
-    <string name="legacy_mesh_gradient_subtitle">v1.5\'teki oynatıcı arkasındaki akıcı renk geçişlerini geri getirir</string>
+    <string name="dynamic_player_backdrop_subtitle">Çalan parçaya, oynatıcının arkasındaki yumuşak renk hareketiyle eşlik eder.</string>
 
     <string name="lyrics_debug_logs">Şarkı sözü hata ayıklama günlükleri</string>
 

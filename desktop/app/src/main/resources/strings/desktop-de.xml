@@ -74,7 +74,7 @@
     <string name="d_top_result">Bestes Ergebnis</string>
     <string name="d_tray_icon">Infobereichssymbol</string>
     <string name="d_turn_off">Ausschalten</string>
-    <string name="d_use_the_older_blob_backdrop_behind_the_player">Den älteren Blob-Hintergrund hinter dem Player verwenden</string>
+    <string name="dynamic_player_backdrop_subtitle">Folgt dem aktuellen Titel mit sanften Farbbewegungen hinter dem Player.</string>
     <string name="d_volume">Lautstärke</string>
     <string name="d_what_follows_the_verb_on_the_profile">Was im Profil auf das Verb folgt. Leer lassen, um %1$s zu verwenden.</string>
     <string name="d_your_collection">DEINE SAMMLUNG</string>

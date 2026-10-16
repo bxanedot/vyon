@@ -53,6 +53,8 @@ import androidx.compose.runtime.SideEffect
 import com.vyon.music.data.model.QueueTier
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -701,8 +703,8 @@ fun VyonDesktopApp() {
     var dolbyAtmos by remember { mutableStateOf(persistence.boolean("dolby_atmos", true)) }
     var skipSilence by remember { mutableStateOf(persistence.boolean("skip_silence", false)) }
     var outputPrecision by remember { mutableStateOf(persistence.string("output_precision", "PCM_16")) }
-    // The blob backdrop the mesh replaced, kept as an opt-out.
-    var legacyMeshGradient by remember { mutableStateOf(persistence.boolean("legacy_mesh_gradient", false)) }
+    // The softly animated artwork-colour backdrop setting.
+    var dynamicArtworkBackdrop by remember { mutableStateOf(persistence.boolean("legacy_mesh_gradient", false)) }
     var animatedCanvas by remember { mutableStateOf(persistence.boolean("animated_canvas", true)) }
     var spotifyCanvasCookie by remember { mutableStateOf(DesktopSpotifyToken.cookie()) }
     // Held here rather than by the Integrations page, so leaving the page does not close the
@@ -3029,7 +3031,7 @@ fun VyonDesktopApp() {
     SideEffect {
         DesktopPlayerSettings.animatedCanvas.value = animatedCanvas
         DesktopPlayerSettings.fullBleedArtwork.value = fullBleedArtwork
-        DesktopPlayerSettings.legacyMeshGradient.value = legacyMeshGradient
+        DesktopPlayerSettings.dynamicArtworkBackdrop.value = dynamicArtworkBackdrop
         DesktopPlayerSettings.lyricsBlur.value = lyricsBlur
         DesktopPlayerSettings.syncedLyrics.value = syncedLyrics
         DesktopPlayerSettings.showNerdStats.value = showNerdStats
@@ -3906,9 +3908,9 @@ fun VyonDesktopApp() {
                                         fullBleedArtwork = it
                                         persistence.saveBoolean("full_bleed_artwork", it)
                                     },
-                                    legacyMeshGradient = legacyMeshGradient,
-                                    onLegacyMeshGradientChange = {
-                                        legacyMeshGradient = it
+                                    dynamicArtworkBackdrop = dynamicArtworkBackdrop,
+                                    onDynamicArtworkBackdropChange = {
+                                        dynamicArtworkBackdrop = it
                                         persistence.saveBoolean("legacy_mesh_gradient", it)
                                     },
                                     spatialAudio = spatialAudio,
@@ -5950,8 +5952,8 @@ private fun DesktopSettingsScreen(
     onShowNerdStatsChange: (Boolean) -> Unit,
     fullBleedArtwork: Boolean,
     onFullBleedArtworkChange: (Boolean) -> Unit,
-    legacyMeshGradient: Boolean,
-    onLegacyMeshGradientChange: (Boolean) -> Unit,
+    dynamicArtworkBackdrop: Boolean,
+    onDynamicArtworkBackdropChange: (Boolean) -> Unit,
     trayIconEnabled: Boolean,
     closeToTray: Boolean,
     onCloseToTrayChange: (Boolean) -> Unit,
@@ -5983,6 +5985,7 @@ private fun DesktopSettingsScreen(
     onOpenIntegrations: () -> Unit,
     onOpenLicenses: () -> Unit,
 ) {
+    val reduceMotion by DesktopAppearanceSettings.reduceAnimation.collectAsState()
     var editingSource by remember { mutableStateOf<DesktopSourceConfig?>(null) }
     val sourceProbeKey = sourceConfigs
         .filter { it.kind.needsServer && it.isComplete }
@@ -6032,8 +6035,12 @@ private fun DesktopSettingsScreen(
                 targetState = category,
                 modifier = Modifier.weight(1f),
                 transitionSpec = {
-                    (slideInHorizontally(spring(stiffness = 420f)) { it / 8 } + fadeIn(tween(160))) togetherWith
-                        (slideOutHorizontally(tween(140)) { -it / 12 } + fadeOut(tween(120)))
+                    if (reduceMotion) {
+                        EnterTransition.None togetherWith ExitTransition.None
+                    } else {
+                        (slideInHorizontally(spring(stiffness = 420f)) { it / 8 } + fadeIn(tween(160))) togetherWith
+                            (slideOutHorizontally(tween(140)) { -it / 12 } + fadeOut(tween(120)))
+                    }
                 },
                 label = "desktop settings pages",
             ) { activeCategory ->
@@ -6393,6 +6400,13 @@ private fun DesktopSettingsScreen(
             }
             if (section == DesktopSettingsSection.APPEARANCE) item {
                 SettingsGroup(DesktopStrings["appearance", "Appearance"]) {
+                    val reduceAnimation by DesktopAppearanceSettings.reduceAnimation.collectAsState()
+                    SettingsToggle(
+                        DesktopStrings["reduce_animation", "Reduce motion"],
+                        DesktopStrings["reduce_animation_subtitle", "Minimizes animation across app transitions"],
+                        reduceAnimation,
+                        DesktopAppearanceSettings::setReduceAnimation,
+                    )
                     val reduceDynamicBlur by DesktopAppearanceSettings.reduceDynamicBlur.collectAsState()
                     SettingsToggle(
                         DesktopStrings["reduce_dynamic_blur", "Reduce dynamic blur"],
@@ -6484,10 +6498,10 @@ private fun DesktopSettingsScreen(
                         onFullBleedArtworkChange,
                     )
                     SettingsToggle(
-                        DesktopStrings["legacy_mesh_gradient", "Legacy mesh gradient"],
-                        DesktopStrings["d_use_the_older_blob_backdrop_behind_the_player", "Use the older blob backdrop behind the player"],
-                        legacyMeshGradient,
-                        onLegacyMeshGradientChange,
+                        DesktopStrings["dynamic_player_backdrop", "Animated player backdrop"],
+                        DesktopStrings["dynamic_player_backdrop_subtitle", "Follows the current song with soft colour motion behind the player."],
+                        dynamicArtworkBackdrop,
+                        onDynamicArtworkBackdropChange,
                     )
                     SettingsToggle(
                         DesktopStrings["d_animated_canvas", "Animated canvas"],

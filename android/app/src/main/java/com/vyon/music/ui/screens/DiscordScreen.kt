@@ -659,7 +659,7 @@ private fun RichPresencePreview(
                 onClick = {
                     song?.let {
                         context.startActivity(
-                            Intent(Intent.ACTION_VIEW, DiscordRPC.watchUrl(it).toUri()),
+                            Intent(Intent.ACTION_VIEW, DiscordRPC.WEBSITE_URL.toUri()),
                         )
                     }
                 },
@@ -669,11 +669,11 @@ private fun RichPresencePreview(
             Spacer(Modifier.height(8.dp))
             PresenceButton(
                 label = resolved(button2Text, DiscordRPC.DEFAULT_BUTTON_2),
-                enabled = true,
+                enabled = song != null,
                 onClick = {
-                    context.startActivity(
-                        Intent(Intent.ACTION_VIEW, DiscordRPC.PROJECT_URL.toUri()),
-                    )
+                    song?.let {
+                        context.startActivity(Intent(Intent.ACTION_VIEW, DiscordRPC.watchUrl(it).toUri()))
+                    }
                 },
             )
         }

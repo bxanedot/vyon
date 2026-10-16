@@ -834,15 +834,15 @@ fun NowPlayingScreen(
     // frame of the fade, and the still art it governs is an AsyncImage whose
     // request is rebuilt on each pass and so would not be skipped.
     val canvasCover = remember(canvas?.url) { mutableFloatStateOf(0f) }
-    // v1.5's backdrop, kept behind a switch — see [PlayerSettings.legacyMeshGradient].
-    val legacyMesh by PlayerSettings.legacyMeshGradient.collectAsStateWithLifecycle()
+    // Optional artwork-colour backdrop selected in player settings.
+    val dynamicBackdrop by PlayerSettings.dynamicArtworkBackdrop.collectAsStateWithLifecycle()
     // The backdrop's colours, taken off the artwork's own arrangement rather
     // than quantised out of it — see [ArtworkMesh].
     //
     // Only read for the backdrop that uses it. Each of these keeps a decode and
     // a pixel readback of its own on every track change, and the two answer the
     // same picture in two different ways, so whichever is not on screen is pure
-    // cost — the legacy path pays [rememberArtworkColors] instead.
+    // cost — the colour backdrop uses [rememberArtworkColors] instead.
     // Asked of every non-Spotify clip — see CanvasArtworkPlayer's
     // refreshFrameEveryMs. Spotify now occupies the full phone screen and has no
     // frame-derived backdrop to re-tint; other providers retain that treatment.
@@ -1333,9 +1333,9 @@ fun NowPlayingScreen(
     LaunchedEffect(spotifyCanvasPresentation, mixing) {
         if (spotifyCanvasPresentation && mixing) spotifyCanvasControlsOpen = true
     }
-    // Portrait clips always use the existing artwork mesh, even if the user
-    // selected the legacy backdrop for ordinary artwork.
-    val artMesh = if (legacyMesh && !canvasFirstPortrait) null else
+    // Portrait clips keep the artwork-matched mesh so the video and cover stay
+    // visually connected.
+    val artMesh = if (dynamicBackdrop && !canvasFirstPortrait) null else
         key(song.videoId) { rememberArtworkMesh(remoteArt, canvasFrame, ART_PX) }
     // Whether the banner is the presentation at all: full-bleed is on, and there
     // is something to blow out. The collapse is deliberately *not* part of this:
@@ -2067,26 +2067,22 @@ fun NowPlayingScreen(
                 // retained layers' alpha changes when a panel opens, so the full-cover
                 // blur is neither rebuilt nor switched in on a hard frame boundary.
                 // The tablet has no mirrored main-player treatment to crossfade from.
-                // Legacy mesh is the whole backdrop on every page, so the lyrics and
-                // queue panels must not crossfade the blurred artwork over it.
-                val legacyMeshBackdrop = !tabletArtworkBackdrop && !spotifyCanvasPresentation &&
-                    legacyMesh && !canvasFirstPortrait
+                // The colour mesh fills the player, so lyrics and queue panels must not
+                // crossfade the blurred artwork over it.
+                val dynamicBackdrop = !tabletArtworkBackdrop && !spotifyCanvasPresentation &&
+                    dynamicBackdrop && !canvasFirstPortrait
                 val fullArtworkBackdropAlpha by animateFloatAsState(
                     targetValue = if (
-                        !legacyMeshBackdrop &&
+                        !dynamicBackdrop &&
                         (tabletArtworkBackdrop || lyricsOpen || queueOpen) &&
                         (tabletArtworkBackdrop || fullArtworkBlurImage != null)
                     ) 1f else 0f,
                     animationSpec = tween(durationMillis = 360, easing = FastOutSlowInEasing),
                     label = "fullArtworkBackdropCrossfade",
                 )
-                if (legacyMeshBackdrop) {
-                    // v1.5's backdrop, restored verbatim: no seam, because the blobs
-                    // are not anchored to anything on screen — they fill the player and
-                    // the artwork simply sits on top of them. Keyed on the track, so
-                    // they drift when the player opens and on every skip, then rest.
-                    // Position ticks recompose this screen twice a second and must not
-                    // drag a full-screen blur along with them, which is why the palette
+                if (dynamicBackdrop) {
+                    // This backdrop fills the player independently of the artwork seam.
+                    // Position ticks recompose this screen twice a second, so its palette
                     // is passed as one immutable value.
                     MeshGradientBackground(
                         palette = rememberArtworkColors(remoteArt, canvasFrame),

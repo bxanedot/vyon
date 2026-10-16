@@ -851,9 +851,9 @@
 
     <string name="export_compatible_downloads">ייצא הורדות תואמות</string>
 
-    <string name="legacy_mesh_gradient">גרדיאנט רשת קלאסי</string>
+    <string name="dynamic_player_backdrop">רקע נגן מונפש</string>
 
-    <string name="legacy_mesh_gradient_subtitle">מחזיר את כתמי הצבע הנעים מגרסה v1.5</string>
+    <string name="dynamic_player_backdrop_subtitle">עוקב אחר השיר הנוכחי בתנועת צבע עדינה מאחורי הנגן.</string>
 
     <string name="liquid_glass">זכוכית נוזלית</string>
 
