@@ -1,0 +1,2 @@
+# For local development only. Never commit .dev.vars.
+CREATE_KEY=replace-with-a-long-random-dev-secret
