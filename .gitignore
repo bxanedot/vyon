@@ -1,0 +1,15 @@
+**/build/
+.gradle/
+.kotlin/
+**/.cxx/
+.idea/
+*.iml
+local.properties
+keystore.properties
+signing.properties
+*.jks
+*.keystore
+.env
+.env.*
+.DS_Store
+Thumbs.db

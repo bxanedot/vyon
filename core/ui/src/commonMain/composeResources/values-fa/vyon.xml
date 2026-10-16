@@ -1,0 +1,14 @@
+<resources>
+    <string name="vyon_tagline">موسیقی تو، به سبک تو</string>
+    <string name="vyon_lead_dev">توسعه‌دهندهٔ اصلی</string>
+    <string name="vyon_inspector">همکار · بازبین</string>
+    <string name="vyon_app_info">اطلاعات برنامه</string>
+    <string name="vyon_website">وب‌سایت</string>
+    <string name="vyon_source">کد منبع</string>
+    <string name="vyon_community">انجمن</string>
+    <string name="vyon_support">حمایت از vyon</string>
+    <string name="vyon_reserved">به‌زودی</string>
+    <string name="vyon_reserved_detail">فضایی مشترک برای موسیقی شما. گوش دادن گروهی پس از آماده شدن سرویس vyon در دسترس خواهد بود.</string>
+    <string name="vyon_speed_dial">دسترسی سریع</string>
+    <string name="vyon_daily_discover">کشف روزانهٔ شما</string>
+</resources>

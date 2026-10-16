@@ -1,0 +1,10 @@
+<resources>
+    <string name="cast_casting">پخش در دستگاه دیگر</string>
+    <string name="hdmi_output">HDMI</string>
+    <string name="shelf_charts">چارت‌ها</string>
+    <string name="shelf_forgotten_favorites">موارد دلخواه فراموش شده</string>
+    <string name="shelf_from_the_community">از انجمن</string>
+    <string name="shelf_top_music_videos">موزیک ویدیوهای برتر</string>
+    <string name="shelf_trending">پرطرفدارها</string>
+    <string name="import_spotify">Spotify را وارد کنید</string>
+</resources>

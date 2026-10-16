@@ -1,0 +1,13 @@
+<resources>
+    <string name="vyon_music">موسیقی</string>
+    <string name="vyon_video_search">جستجوی ویدیوهای YouTube</string>
+    <string name="vyon_video_feed">بازگشت به ویدیوها</string>
+    <string name="vyon_video_empty">برای شروع تماشا، یک ویدیو جستجو کنید.</string>
+    <string name="vyon_video_no_results">ویدیویی پیدا نشد. جستجوی دیگری را امتحان کنید.</string>
+    <string name="vyon_video_more">بارگیری ویدیوهای بیشتر</string>
+    <string name="vyon_loading">در حال بارگیری…</string>
+    <string name="vyon_retry">تلاش دوباره</string>
+    <string name="vyon_search">جستجو</string>
+    <string name="vyon_settings">تنظیمات</string>
+    <string name="vyon_video_failure">بارگیری YouTube ممکن نشد. دوباره تلاش کنید.</string>
+</resources>

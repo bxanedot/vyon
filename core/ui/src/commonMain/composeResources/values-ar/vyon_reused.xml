@@ -1,0 +1,10 @@
+<resources>
+    <string name="cast_casting">كاستين</string>
+    <string name="hdmi_output">HDMI</string>
+    <string name="shelf_charts">المخططات</string>
+    <string name="shelf_forgotten_favorites">مفضلات مهملة</string>
+    <string name="shelf_from_the_community">من المجتمع</string>
+    <string name="shelf_top_music_videos">أفضل مقاطع الفيديو الموسيقيه</string>
+    <string name="shelf_trending">الأكثر رواجًا</string>
+    <string name="import_spotify">استيراد Spotify</string>
+</resources>

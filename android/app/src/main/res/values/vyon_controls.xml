@@ -1,0 +1,11 @@
+<resources>
+<string name="vyon_edit">Edit</string>
+<string name="vyon_done">Done</string>
+<string name="vyon_pin_hint">Pin music here for one-tap access.</string>
+<string name="vyon_auto_update">Automatic update checks</string>
+<string name="vyon_update_notices">Update notifications</string>
+<string name="vyon_bluetooth_resume">Resume on Bluetooth connection</string>
+<string name="vyon_about">About vyon</string>
+<string name="arabic">العربية</string>
+<string name="persian">فارسی</string>
+</resources>

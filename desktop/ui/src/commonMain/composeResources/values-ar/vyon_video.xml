@@ -1,0 +1,13 @@
+<resources>
+    <string name="vyon_music">الموسيقى</string>
+    <string name="vyon_video_search">البحث في فيديوهات YouTube</string>
+    <string name="vyon_video_feed">العودة إلى الفيديوهات</string>
+    <string name="vyon_video_empty">ابحث عن فيديو لبدء المشاهدة.</string>
+    <string name="vyon_video_no_results">لم يتم العثور على فيديوهات. جرّب بحثًا آخر.</string>
+    <string name="vyon_video_more">تحميل المزيد من الفيديوهات</string>
+    <string name="vyon_loading">جارٍ التحميل…</string>
+    <string name="vyon_retry">إعادة المحاولة</string>
+    <string name="vyon_search">بحث</string>
+    <string name="vyon_settings">الإعدادات</string>
+    <string name="vyon_video_failure">تعذّر تحميل YouTube. حاول مرة أخرى.</string>
+</resources>

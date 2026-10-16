@@ -1,0 +1,11 @@
+<resources>
+    <string name="vyon_updates">Updates</string>
+    <string name="vyon_account_summary">Connected accounts and Listen Together</string>
+    <string name="vyon_playback_summary">Sound, quality and playback</string>
+    <string name="vyon_appearance_summary">Theme, icons and language</string>
+    <string name="vyon_library_summary">Downloads, local music and storage</string>
+    <string name="vyon_performance_summary">Motion, refresh rate and diagnostics</string>
+    <string name="vyon_updates_summary">Automatic checks and notifications</string>
+    <string name="vyon_about_summary">vyon 1.0.0 · People and community</string>
+    <string name="vyon_reserved">Reserved</string>
+</resources>
