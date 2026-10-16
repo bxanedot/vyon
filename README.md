@@ -1,32 +1,63 @@
-<p align="center">
-  <img src="assets/branding/vyon-feature-banner.png" alt="vyon — Music, on your terms." width="100%">
-</p>
+<div align="center">
 
-<h1 align="center">vyon</h1>
+<img src="assets/branding/vyon-feature-banner.png" alt="vyon — Music, on your terms." width="100%">
 
-<p align="center"><strong>Music, on your terms.</strong></p>
+<br>
 
-<p align="center">
-  An open-source, cross-platform music player powered by YouTube Music.<br>
-  Built for the way you listen, from your phone to your desktop and TV.
-</p>
+# vyon
 
-<p align="center">
-  <a href="https://vyon.live">Website</a> ·
-  <a href="https://github.com/bxanedot/vyon/releases">Downloads</a> ·
-  <a href="https://github.com/bxanedot/vyon/issues">Issues</a> ·
-  <a href="#building-from-source">Build from source</a>
-</p>
+### Music, on your terms.
+
+**A different kind of listening.**  
+An open-source music player powered by YouTube Music, designed for your desktop, phone, TV, and watch.
+
+<br>
+
+[![GitHub stars](https://img.shields.io/github/stars/bxanedot/vyon?style=for-the-badge&logo=github&logoColor=white&label=Stars&labelColor=161616&color=c44759)](https://github.com/bxanedot/vyon/stargazers)
+[![GitHub downloads](https://img.shields.io/github/downloads/bxanedot/vyon/total?style=for-the-badge&logo=github&logoColor=white&label=Downloads&labelColor=161616&color=c44759)](https://github.com/bxanedot/vyon/releases)
+[![GitHub forks](https://img.shields.io/github/forks/bxanedot/vyon?style=for-the-badge&logo=github&logoColor=white&label=Forks&labelColor=161616&color=464646)](https://github.com/bxanedot/vyon/forks)
+
+[![License](https://img.shields.io/github/license/bxanedot/vyon?style=flat-square&labelColor=161616&color=646464)](LICENSE)
+[![Last commit](https://img.shields.io/github/last-commit/bxanedot/vyon?style=flat-square&labelColor=161616&color=646464)](https://github.com/bxanedot/vyon/commits/main/)
+[![Issues](https://img.shields.io/github/issues/bxanedot/vyon?style=flat-square&labelColor=161616&color=646464)](https://github.com/bxanedot/vyon/issues)
+
+<br>
+
+[**🌐 Website**](https://vyon.live) &nbsp;·&nbsp;
+[**⬇️ Get vyon**](https://github.com/bxanedot/vyon/releases) &nbsp;·&nbsp;
+[**✨ Features**](#-highlights) &nbsp;·&nbsp;
+[**🛠️ Build**](#-building-from-source) &nbsp;·&nbsp;
+[**💬 Report an issue**](https://github.com/bxanedot/vyon/issues)
+
+<br>
+
+[![Windows](https://img.shields.io/badge/Windows-181818?style=flat-square&logo=windows11&logoColor=white)](desktop/windows/)
+[![macOS](https://img.shields.io/badge/macOS-181818?style=flat-square&logo=apple&logoColor=white)](desktop/macos/)
+[![Linux](https://img.shields.io/badge/Linux-181818?style=flat-square&logo=linux&logoColor=white)](desktop/linux/)
+[![Android](https://img.shields.io/badge/Android-181818?style=flat-square&logo=android&logoColor=white)](android/app/)
+[![Android TV](https://img.shields.io/badge/Android_TV-181818?style=flat-square&logo=androidtv&logoColor=white)](tv/)
+[![Wear OS](https://img.shields.io/badge/Wear_OS-181818?style=flat-square&logo=wearos&logoColor=white)](android/wearos/)
+
+</div>
 
 ---
 
-## About
+## 🎧 About
 
 **vyon** is a music player built around a custom listening experience: a YouTube Music-powered catalog, expressive interfaces, and deep playback controls. The project includes native Android and Android TV apps, a Compose Multiplatform desktop app for Windows, macOS, and Linux, a Wear OS companion, a marketing website, and optional listening-room infrastructure.
 
 The platform apps share music data and playback-related code, but their interfaces and supported integrations can differ.
 
-## Highlights
+### One player. Different screens.
+
+<p align="center">
+  <a href="desktop/"><img src="assets/branding/vyon-desktop-banner.png" width="49%" alt="vyon desktop experience"></a>
+  <a href="tv/"><img src="assets/branding/vyon-tv-banner.png" width="49%" alt="vyon TV experience"></a>
+</p>
+
+<p align="center"><sub>Native interfaces built for desktop and TV · Branding artwork from this repository</sub></p>
+
+## ✨ Highlights
 
 - **Your music, your way** — browse, search, play, queue, and organize music from the YouTube Music catalog, with a music/video playback switch.
 - **A player that feels alive** — album-art-driven visuals, polished transitions, and dynamic artwork treatments.
@@ -38,7 +69,7 @@ The platform apps share music data and playback-related code, but their interfac
 
 > **Note:** Individual features depend on the platform, music source, device capabilities, and configured services. This is not an official YouTube or YouTube Music application.
 
-## Platforms
+## 📱 Platforms
 
 | Platform | Project | Notes |
 | --- | --- | --- |
@@ -51,13 +82,20 @@ The platform apps share music data and playback-related code, but their interfac
 
 **iOS and iPadOS are not supported.** Platform source code does not necessarily mean a prebuilt installer is available for that platform.
 
-## Download
+## ⬇️ Download
 
 Get published builds from the **[GitHub Releases page](https://github.com/bxanedot/vyon/releases)**, or visit **[vyon.live](https://vyon.live)** to find available downloads for your device.
 
+<p align="center">
+  <a href="https://github.com/bxanedot/vyon/releases"><img alt="View GitHub Releases" src="https://img.shields.io/badge/VIEW%20OFFICIAL%20RELEASES-%E2%86%92-c44759?style=for-the-badge&labelColor=161616"></a>
+  <a href="https://vyon.live"><img alt="Visit vyon.live" src="https://img.shields.io/badge/EXPLORE%20VYON.LIVE-%E2%86%97-303030?style=for-the-badge&labelColor=161616"></a>
+</p>
+
 Only download installers from sources you trust. The website links to a direct installer only when it can verify a matching published release asset.
 
-## Building from source
+<sub>**About the counters:** Stars and forks reflect this GitHub repository. The downloads badge counts **GitHub Release asset downloads**, not website visits or installs. It may show zero or unavailable until release assets have been published.</sub>
+
+## 🛠️ Building from source
 
 ### Prerequisites
 
@@ -121,7 +159,7 @@ Some integrations need configuration before they can work. The Android and deskt
 
 These settings are optional for a basic local build. Consult the source for integration-specific setup; do not publish secrets.
 
-## Project structure
+## 🗂️ Project structure
 
 ```text
 vyon/
@@ -163,7 +201,7 @@ Serve `website/dist/` with a local static server to preview the production build
 
 See **[listen-together-server/README.md](listen-together-server/README.md)** for the Worker setup, API, and security limitations. Server deployment and app integration are separate from installing the player.
 
-## Contributing
+## 🤝 Contributing
 
 Issues, bug reports, and pull requests are welcome. Before submitting a change:
 
@@ -172,12 +210,21 @@ Issues, bug reports, and pull requests are welcome. Before submitting a change:
 3. Describe the behavior you changed and how you tested it.
 4. Avoid committing generated builds, local settings, signing material, or API secrets.
 
-## License & disclaimer
+## 📜 License & disclaimer
 
 This repository is distributed under the **[GNU General Public License v3.0](LICENSE)**. Some bundled components and dependencies have their own licenses and notices; keep those notices intact.
 
 vyon is an independent project and is **not affiliated with, endorsed by, or sponsored by Google or YouTube**. YouTube and YouTube Music are trademarks of their respective owners.
 
-<p align="center">
-  Made with ♥ by <a href="https://github.com/bxanedot">bxane</a>.
-</p>
+---
+
+<div align="center">
+
+**If vyon is useful to you, consider giving the project a ⭐.**  
+It helps people discover the project.
+
+[![Star this project](https://img.shields.io/badge/STAR%20VYON-ON%20GITHUB-c44759?style=for-the-badge&logo=github&logoColor=white&labelColor=161616)](https://github.com/bxanedot/vyon)
+
+<sub>Made with ♥ by <a href="https://github.com/bxanedot">bxane</a> · <a href="https://vyon.live">vyon.live</a></sub>
+
+</div>
