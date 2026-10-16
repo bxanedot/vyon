@@ -741,3 +741,113 @@ body{transition:background-color .5s var(--vyon-ease)}
 @media(prefers-reduced-motion:no-preference){
  :is(.btn,.platform-download,.social-card,.screenshot-tab,.theme-chip,.glass-toggle){transition-timing-function:cubic-bezier(.18,.8,.18,1)!important}
 }
+
+/* Bounded dot animation: randomized thank-you takes the logo's place briefly. */
+.hero-orb{isolation:isolate;cursor:pointer}
+.vyon-thank-you{
+ position:absolute;inset:0;z-index:4;display:flex;flex-direction:column;
+ justify-content:center;align-items:center;gap:12px;text-align:center;
+ padding:20px;pointer-events:none;opacity:0;visibility:hidden;
+ transform:translate3d(0,12px,0) scale(.96);
+ transition:opacity .4s ease,transform .65s cubic-bezier(.2,.85,.2,1),visibility 0s linear .65s;
+}
+.vyon-thank-you.is-visible{
+ opacity:1;visibility:visible;transform:translate3d(0,0,0) scale(1);
+ transition:opacity .4s ease,transform .65s cubic-bezier(.2,.85,.2,1),visibility 0s;
+}
+.vyon-thank-you strong{
+ font:750 clamp(29px,5vw,67px)/1.07 var(--display);
+ letter-spacing:-.065em;color:#f7f5f8;
+ text-shadow:0 6px 32px rgba(0,0,0,.56);
+}
+.vyon-thank-you small{
+ font:11px/1.7 var(--mono);letter-spacing:.065em;color:#d7cbd4;
+}
+.vyon-thank-you[data-variant="1"] strong{color:var(--accent)}
+.vyon-thank-you[data-variant="2"] strong{font-style:italic;font-weight:600}
+@media(max-width:590px){
+ .vyon-thank-you strong{font-size:clamp(30px,10vw,50px)}
+ .vyon-thank-you small{font-size:10px}
+}
+
+/* Footer: readable credits, light motion and clickable attribution. */
+.vyon-footer{
+ position:relative;padding-block:37px;background:#0c0a0e;
+ border-top:1px solid var(--edge);
+}
+.vyon-footer::before{
+ content:"";position:absolute;inset:0;pointer-events:none;
+ background:radial-gradient(ellipse 55% 180% at 92% 135%,rgba(var(--accent-rgb),.075),transparent 75%);
+}
+.vyon-footer-inner{
+ position:relative;display:flex;align-items:center;justify-content:space-between;
+ gap:25px;max-width:1480px;margin-inline:auto;
+}
+.vyon-footer-brand{
+ display:inline-flex;align-items:center;gap:13px;
+ color:#f7f5f8;text-decoration:none;font:800 31px/1 var(--display);letter-spacing:-.09em;
+}
+.vyon-footer-period,.vyon-footer-heart{color:var(--accent)}
+.vyon-footer-up{
+ display:grid;place-items:center;width:32px;height:32px;border-radius:50%;
+ border:1px solid var(--edge);font:16px var(--mono);color:var(--accent);
+ transition:transform .5s cubic-bezier(.2,.8,.2,1);
+}
+.vyon-footer-brand:hover .vyon-footer-up,.vyon-footer-brand:focus-visible .vyon-footer-up{
+ transform:translateY(-4px);
+}
+.vyon-footer-credits{
+ display:flex;align-items:center;flex-wrap:wrap;gap:10px 28px;
+ color:#a9a5af;font:11px/1.7 var(--mono);
+}
+.vyon-footer-credits a{
+ color:#eeeaf2;text-decoration:underline;text-underline-offset:4px;transition:color .25s;
+}
+.vyon-footer-credits a:hover,.vyon-footer-credits a:focus-visible{color:var(--accent)}
+.vyon-footer-heart{font-size:14px}
+:root[data-glass="on"] .vyon-footer{
+ background:linear-gradient(130deg,rgba(255,255,255,.065),rgba(12,10,17,.88)),#111014;
+ border-top-color:rgba(255,255,255,.16);
+}
+
+/* FAQ remains opaque in either theme: comfortable rounded question pills. */
+.faq-list,:root[data-glass="on"] .faq-list{
+ background:transparent!important;border:0!important;box-shadow:none!important;
+ backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+ display:grid;gap:12px;
+}
+.faq-item{
+ background:#171419;
+ border:1px solid rgba(255,255,255,.13);
+ border-radius:24px;
+ overflow:hidden;
+ transition:border-color .35s ease,background-color .35s ease;
+}
+.faq-item:is(:hover,[open]){border-color:rgba(var(--accent-rgb),.43);background:#1d1820}
+.faq-item summary{
+ min-height:69px;padding:16px 20px 16px 24px;border-radius:99px;
+ transition:color .35s ease;
+}
+.faq-item[open] summary{border-radius:24px 24px 0 0}
+.faq-item summary:focus-visible{border-radius:24px;outline-offset:-4px}
+.faq-answer{padding:0 24px 23px}
+.faq-answer p{line-height:1.85}
+.faq-plus{background:rgba(255,255,255,.04)}
+@media(max-width:590px){
+ .faq-list{gap:10px}
+ .faq-item{border-radius:22px}
+ .faq-item summary{min-height:64px;padding:14px 16px 14px 18px;gap:12px;font-size:14px}
+ .faq-answer{padding:0 18px 18px}
+ .faq-answer p{font-size:12px}
+ .vyon-footer{padding-block:29px 37px}
+ .vyon-footer-inner{flex-direction:column;align-items:flex-start;gap:18px}
+ .vyon-footer-credits{font-size:10px;gap:6px 14px}
+ :root[data-glass="on"] .site-header,
+ :root[data-glass="on"] .site-header.is-scrolled{
+  backdrop-filter:blur(12px) saturate(135%)!important;
+  -webkit-backdrop-filter:blur(12px) saturate(135%)!important;
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ .vyon-thank-you,.vyon-footer-up,.faq-item,.faq-item summary{transition:none!important}
+}
