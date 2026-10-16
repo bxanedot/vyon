@@ -499,86 +499,70 @@ body{transition:background-color .5s var(--vyon-ease)}
  .btn,.social-card,.feature-card,.theme-chip,.screenshot-tab,.header-github{transition:none!important}
 }
 
-/* The scroll cue is an inline span, so make it transformable before animating. */
-.scroll-cue-arrow{
+/* Arrows on actionable links/buttons only. Separate layers avoid a transform
+   transition competing with an infinitely animated transform on the same node. */
+:root{--vyon-arrow-ease:cubic-bezier(.18,.84,.22,1)}
+.vyon-arrow-shell{
+ display:inline-flex;
+ align-items:center;
+ justify-content:center;
+ flex:none;
+ transform:translate3d(0,0,0);
+ transition:transform .68s var(--vyon-arrow-ease);
+ backface-visibility:hidden;
+}
+.vyon-arrow-glyph{
  display:inline-block;
  transform:translate3d(0,0,0);
- animation:vyon-scroll-glide 2.6s cubic-bezier(.45,0,.55,1) infinite;
- will-change:transform;
+ backface-visibility:hidden;
 }
-@keyframes vyon-scroll-glide{
+@keyframes vyon-arrow-float-diagonal{
  0%,100%{transform:translate3d(0,0,0)}
- 50%{transform:translate3d(0,6px,0)}
+ 25%{transform:translate3d(1.5px,-1.5px,0)}
+ 50%{transform:translate3d(2.1px,-2.1px,0)}
+ 75%{transform:translate3d(1.4px,-1.4px,0)}
 }
-@media(prefers-reduced-motion:reduce){
- .scroll-cue-arrow{animation:none!important;transform:none;will-change:auto}
-}
-
-/* Smooth transform-only arrow motion for clickable links and buttons.
-   Decorative arrows next to headings remain still. */
-:root{--vyon-arrow-ease:cubic-bezier(.16,1,.3,1)}
-:where(.platform-download > span:last-child,
- .social-card .social-chevron,
- .screenshot-tab .tab-arrow,
- .command-results a > span:last-child,
- .hero-download-btn .btn-download-icon,
- .header-github svg,
- .mobile-menu a .mobile-link-arrow){
- display:inline-block;
- translate:0 0;
- transition:translate .55s var(--vyon-arrow-ease);
-}
-@keyframes vyon-link-arrow{
+@keyframes vyon-arrow-float-down{
  0%,100%{transform:translate3d(0,0,0)}
- 50%{transform:translate3d(2px,-2px,0)}
-}
-@keyframes vyon-download-arrow{
- 0%,100%{transform:translate3d(0,0,0)}
- 50%{transform:translate3d(0,3px,0)}
+ 25%{transform:translate3d(0,2px,0)}
+ 50%{transform:translate3d(0,3.2px,0)}
+ 75%{transform:translate3d(0,1.9px,0)}
 }
 @media(prefers-reduced-motion:no-preference){
- :where(.platform-download > span:last-child,
-  .social-card .social-chevron,
-  .screenshot-tab .tab-arrow,
-  .command-results a > span:last-child,
-  .header-github svg,
-  .mobile-menu a .mobile-link-arrow){
-  animation:vyon-link-arrow 3.8s ease-in-out infinite;
+ .platform-download .vyon-arrow-glyph,
+ .social-card .vyon-arrow-glyph,
+ .screenshot-tab .vyon-arrow-glyph,
+ .command-results a .vyon-arrow-glyph,
+ .header-github .vyon-arrow-glyph,
+ .header-github .vyon-arrow-shell svg,
+ .mobile-menu a .vyon-arrow-glyph{
+  animation:vyon-arrow-float-diagonal 3.6s cubic-bezier(.45,0,.55,1) infinite;
  }
- .hero-download-btn .btn-download-icon{
-  animation:vyon-download-arrow 3.2s ease-in-out infinite;
+ .hero-download-btn .vyon-arrow-glyph,
+ .scroll-cue .vyon-arrow-glyph{
+  animation:vyon-arrow-float-down 3.2s cubic-bezier(.45,0,.55,1) infinite;
  }
- .platform-card:nth-child(2) .platform-download > span:last-child,
- .social-card:nth-child(2) .social-chevron,
- .screenshot-tab:nth-child(2) .tab-arrow{animation-delay:-.95s}
- .platform-card:nth-child(3) .platform-download > span:last-child,
- .social-card:nth-child(3) .social-chevron,
- .screenshot-tab:nth-child(3) .tab-arrow{animation-delay:-1.9s}
- .platform-card:nth-child(4) .platform-download > span:last-child,
- .social-card:nth-child(4) .social-chevron{animation-delay:-2.85s}
+ .platform-card:nth-child(2) .vyon-arrow-glyph,
+ .social-card:nth-child(2) .vyon-arrow-glyph,
+ .screenshot-tab:nth-child(2) .vyon-arrow-glyph{animation-delay:-.9s}
+ .platform-card:nth-child(3) .vyon-arrow-glyph,
+ .social-card:nth-child(3) .vyon-arrow-glyph,
+ .screenshot-tab:nth-child(3) .vyon-arrow-glyph{animation-delay:-1.8s}
+ .platform-card:nth-child(4) .vyon-arrow-glyph,
+ .social-card:nth-child(4) .vyon-arrow-glyph{animation-delay:-2.7s}
 }
-.platform-download:is(:hover,:focus-visible) > span:last-child,
-.platform-card:hover .platform-download > span:last-child,
-.social-card:is(:hover,:focus-visible) .social-chevron,
-.screenshot-tab:is(:hover,:focus-visible,.is-selected) .tab-arrow,
-.command-results a:is(:hover,:focus-visible,.is-selected) > span:last-child,
-.mobile-menu a:is(:hover,:focus-visible) .mobile-link-arrow{
- translate:5px -5px;
+.platform-download:is(:hover,:focus-visible) .vyon-arrow-shell,
+.platform-card:hover .platform-download .vyon-arrow-shell,
+.social-card:is(:hover,:focus-visible) .vyon-arrow-shell,
+.screenshot-tab:is(:hover,:focus-visible,.is-selected) .vyon-arrow-shell,
+.command-results a:is(:hover,:focus-visible,.is-selected) .vyon-arrow-shell,
+.mobile-menu a:is(:hover,:focus-visible) .vyon-arrow-shell{
+ transform:translate3d(5px,-5px,0);
 }
-.header-github:is(:hover,:focus-visible) svg{translate:5px 0}
-.hero-download-btn:is(:hover,:focus-visible) .btn-download-icon{translate:0 5px}
-.scroll-cue:is(:hover,:focus-visible) .scroll-cue-arrow{translate:0 4px;transition:translate .55s var(--vyon-arrow-ease)}
+.header-github:is(:hover,:focus-visible) .vyon-arrow-shell{transform:translate3d(5px,0,0)}
+.hero-download-btn:is(:hover,:focus-visible) .vyon-arrow-shell,
+.scroll-cue:is(:hover,:focus-visible) .vyon-arrow-shell{transform:translate3d(0,5px,0)}
 @media(prefers-reduced-motion:reduce){
- :where(.platform-download > span:last-child,
- .social-card .social-chevron,
- .screenshot-tab .tab-arrow,
- .command-results a > span:last-child,
- .hero-download-btn .btn-download-icon,
- .header-github svg,
- .mobile-menu a .mobile-link-arrow){
-  animation:none!important;
-  transition:none!important;
-  translate:0 0!important;
- }
- .scroll-cue:is(:hover,:focus-visible) .scroll-cue-arrow{translate:0 0;transition:none}
+ .vyon-arrow-shell{transform:none!important;transition:none!important}
+ .vyon-arrow-glyph,.vyon-arrow-shell svg{animation:none!important;transform:none!important}
 }
