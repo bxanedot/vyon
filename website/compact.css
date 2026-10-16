@@ -498,3 +498,18 @@ body{transition:background-color .5s var(--vyon-ease)}
  body,.platform-card,.platform-download,.faq-plus,.faq-item summary,.nav-desktop a,.brand .brand-symbol,.vyon-dot-button::before{transition:none!important}
  .btn,.social-card,.feature-card,.theme-chip,.screenshot-tab,.header-github{transition:none!important}
 }
+
+/* The scroll cue is an inline span, so make it transformable before animating. */
+.scroll-cue-arrow{
+ display:inline-block;
+ transform:translate3d(0,0,0);
+ animation:vyon-scroll-glide 2.6s cubic-bezier(.45,0,.55,1) infinite;
+ will-change:transform;
+}
+@keyframes vyon-scroll-glide{
+ 0%,100%{transform:translate3d(0,0,0)}
+ 50%{transform:translate3d(0,6px,0)}
+}
+@media(prefers-reduced-motion:reduce){
+ .scroll-cue-arrow{animation:none!important;transform:none;will-change:auto}
+}
