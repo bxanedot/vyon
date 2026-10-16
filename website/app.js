@@ -87,7 +87,7 @@ function theme(color){
  requestAnimationFrame(renderOrb);
 }
 $$("[data-color]").forEach(b=>b.addEventListener("click",()=>theme(b.dataset.color)));
-try{theme(localStorage.getItem("vyon-accent")||"violet");}catch{theme("violet");}
+try{theme(localStorage.getItem("vyon-accent")||"blood");}catch{theme("blood");}
 // A single particle sculpture generated from the actual vyon icon silhouette.
 // The original SVG is used only as an alpha mask: no image is laid over the dots.
 const region=$("#orb-region"),canvas=$("#orb-canvas"),ctx=canvas.getContext("2d",{alpha:true});
