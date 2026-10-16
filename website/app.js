@@ -229,18 +229,7 @@ function dotColor(p){
  const palette=tones[root.dataset.accent]||tones.blood;
  return "rgba("+palette[Math.min(2,Math.max(0,Math.floor((p.x+p.y+2)/4*3)))]+","+(.58+.38*p.j).toFixed(3)+")";
 }
-function seedFallback(){
- particles.length=0;
- for(let i=0;i<500;i++){
-  const theta=i/500*Math.PI*2;
-  for(let band=0;band<3;band++){
-   const radius=.66+.06*Math.cos(theta*6)+(band-1)*.035;
-   particles.push({x:Math.cos(theta)*radius,y:Math.sin(theta)*radius,j:hash(i,band),fallen:false});
-  }
- }
- spriteDirty=true;
-}
-seedFallback();
+// Wait for the real vyon mark before painting dots; never draw an old placeholder.
 function loadIconParticles(){
  const img=new Image();
  img.onload=()=>{
