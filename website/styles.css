@@ -94,3 +94,8 @@ body{background:var(--bg);background-image:radial-gradient(ellipse 56% 28% at 91
 @media(max-width:850px){.site-header{height:75px}.hero{height:775px;min-height:700px}.hero-orb{right:-36%;width:118%}.hero h1{font-size:clamp(62px,10.1vw,98px)}.player-aside{min-height:400px}.feature-card{padding:24px}}
 @media(max-width:590px){.hero{height:775px}.hero-orb{right:-75%;width:170%}.hero h1{font-size:clamp(51px,11.2vw,73px)}.hero-description{font-size:14px}.hero-footnote{margin-top:45px}.hero-buttons .btn{min-height:50px;padding:0 16px;font-size:11px;gap:10px}.feature-card{padding:24px}.download-content{padding:27px 22px}.release-status{margin-top:105px}.header-github{display:none}.player-shell{border-radius:10px}.player-aside{border-radius:10px}}
 @media(prefers-reduced-motion:reduce){.ambient-pointer{display:none}.reveal{transition:none}}
+
+/* vyon waveform mark in the shared header. */
+.brand .brand-symbol{display:block;width:42px;height:28px;object-fit:contain;flex:none;transition:transform .25s ease}
+.brand:hover .brand-symbol{transform:scale(1.04)}
+@media(prefers-reduced-motion:reduce){.brand .brand-symbol{transition:none}}

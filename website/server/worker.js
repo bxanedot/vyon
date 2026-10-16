@@ -39,7 +39,15 @@ export default {
    return stub.fetch(new Request("https://room.internal"+(match[2]?"/ws":"/state"),request));
   }
   if(path.startsWith("/api/"))return json({error:"Unknown endpoint"},404);
-  return env.ASSETS.fetch(request);
+  const response=await env.ASSETS.fetch(request);
+  if(request.method==="GET" && response.ok && response.headers.get("content-type")?.includes("text/html") && ["/","/index.html","/listen/","/listen/index.html"].includes(path)){
+   const page=path.startsWith("/listen")?"/listen/":"/";
+   return new HTMLRewriter()
+    .on('meta[property="og:image"], meta[name="twitter:image"]',{element(el){el.setAttribute("content",url.origin+"/vyon-social-preview.png");}})
+    .on('meta[property="og:url"]',{element(el){el.setAttribute("content",url.origin+page);}})
+    .transform(response);
+  }
+  return response;
  }
 };
 export class ListenRoom {

@@ -146,7 +146,9 @@ function loadIconParticles(){
   const sctx=sample.getContext("2d",{willReadFrequently:true});
   if(!sctx)return;
   sctx.clearRect(0,0,size,size);
-  sctx.drawImage(im,0,0,size,size);
+  const scale=Math.min(size/im.naturalWidth,size/im.naturalHeight);
+  const iw=im.naturalWidth*scale,ih=im.naturalHeight*scale;
+  sctx.drawImage(im,(size-iw)/2,(size-ih)/2,iw,ih);
   const pixels=sctx.getImageData(0,0,size,size).data;
   const next=[];
   for(let y=2;y<size-2;y+=3){
@@ -163,7 +165,7 @@ function loadIconParticles(){
   if(next.length>250){particles.splice(0,particles.length,...next);spriteAccent="";renderOrb();}
  };
  im.onerror=()=>renderOrb();
- im.src="/icons/originals/vyon-violet.svg";
+ im.src="/icons/vyon-mark.svg";
 }
 function resizeOrb(){
  if(!ctx)return;
