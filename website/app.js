@@ -75,7 +75,7 @@ if("IntersectionObserver" in window&&!reduce){
  $$(".reveal").forEach(x=>obs.observe(x));
 }else $$(".reveal").forEach(x=>x.classList.add("is-visible"));
 // FAQ answers slide into view without animating layout or hiding content.
-$(".faq-item").forEach(detail=>detail.addEventListener("toggle",()=>{
+$$(".faq-item").forEach(detail=>detail.addEventListener("toggle",()=>{
  if(reduce||!detail.open)return;
  const answer=detail.querySelector(".faq-answer");
  if(answer?.animate)answer.animate([
