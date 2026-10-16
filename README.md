@@ -42,12 +42,12 @@ The platform apps share music data and playback-related code, but their interfac
 
 | Platform | Project | Notes |
 | --- | --- | --- |
-| Android phones & tablets | \`android/app\` | Native Android app; Android 8.0+ (API 26) |
-| Android TV | \`tv\` | Dedicated TV interface; Android 8.0+ (API 26) |
-| Windows | \`desktop/app\` + \`desktop/ui\` | Compose Desktop app |
-| macOS | \`desktop/app\` + \`desktop/ui\` | Compose Desktop app |
-| Linux | \`desktop/app\` + \`desktop/ui\` | Compose Desktop app |
-| Wear OS | \`android/wearos\` | Companion to the Android phone app; Wear OS 3+ (API 30) |
+| Android phones & tablets | `android/app` | Native Android app; Android 8.0+ (API 26) |
+| Android TV | `tv` | Dedicated TV interface; Android 8.0+ (API 26) |
+| Windows | `desktop/app` + `desktop/ui` | Compose Desktop app |
+| macOS | `desktop/app` + `desktop/ui` | Compose Desktop app |
+| Linux | `desktop/app` + `desktop/ui` | Compose Desktop app |
+| Wear OS | `android/wearos` | Companion to the Android phone app; Wear OS 3+ (API 30) |
 
 **iOS and iPadOS are not supported.** Platform source code does not necessarily mean a prebuilt installer is available for that platform.
 
@@ -70,43 +70,43 @@ The project uses Kotlin, Jetpack Compose, Compose Multiplatform, Android Media3,
 
 ### 1. Clone
 
-\`\`\`bash
+```bash
 git clone https://github.com/bxanedot/vyon.git
 cd vyon
-\`\`\`
+```
 
 ### 2. Desktop (Windows, macOS, Linux)
 
 Run the app from the repository root:
 
-\`\`\`bash
+```bash
 ./gradlew :desktopApp:run
-\`\`\`
+```
 
-On Windows, use \`gradlew.bat :desktopApp:run\`.
+On Windows, use `gradlew.bat :desktopApp:run`.
 
-The desktop app uses a Java 21 toolchain. Platform-specific native audio and packaging tools may require additional dependencies; see \`desktop/app/build.gradle.kts\` and the corresponding \`desktop/<platform>/\` folder. Native installer generation is OS-specific.
+The desktop app uses a Java 21 toolchain. Platform-specific native audio and packaging tools may require additional dependencies; see `desktop/app/build.gradle.kts` and the corresponding `desktop/<platform>/` folder. Native installer generation is OS-specific.
 
 ### 3. Android
 
-Configure an Android SDK in Android Studio, or set \`ANDROID_HOME\` / \`ANDROID_SDK_ROOT\`. A valid \`sdk.dir\` entry in the ignored root \`local.properties\` also works.
+Configure an Android SDK in Android Studio, or set `ANDROID_HOME` / `ANDROID_SDK_ROOT`. A valid `sdk.dir` entry in the ignored root `local.properties` also works.
 
 Build the phone development APK:
 
-\`\`\`bash
+```bash
 ./gradlew :app:assembleDevDebug
-\`\`\`
+```
 
 Build the TV or watch development APK:
 
-\`\`\`bash
+```bash
 ./gradlew :tv:assembleDevDebug
 ./gradlew :wearos:assembleDevDebug
-\`\`\`
+```
 
-The \`dev\` Android variants use separate application IDs so that development and production installations can coexist. Without a detected Android SDK, \`settings.gradle.kts\` only includes the desktop application targets.
+The `dev` Android variants use separate application IDs so that development and production installations can coexist. Without a detected Android SDK, `settings.gradle.kts` only includes the desktop application targets.
 
-> Release APK signing requires private keystore configuration. Never commit \`keystore.properties\`, keystores, credentials, or \`local.properties\`.
+> Release APK signing requires private keystore configuration. Never commit `keystore.properties`, keystores, credentials, or `local.properties`.
 
 ### 4. Optional configuration
 
@@ -114,16 +114,16 @@ Some integrations need configuration before they can work. The Android and deskt
 
 | Setting | Purpose |
 | --- | --- |
-| \`LASTFM_API_KEY\` | Last.fm integration |
-| \`LASTFM_SECRET\` | Last.fm request signing |
-| \`LISTEN_TOGETHER_SERVER\` | Default address for a listening-room server |
-| \`MODULE_INDEX_URL\` | Optional desktop source-module index |
+| `LASTFM_API_KEY` | Last.fm integration |
+| `LASTFM_SECRET` | Last.fm request signing |
+| `LISTEN_TOGETHER_SERVER` | Default address for a listening-room server |
+| `MODULE_INDEX_URL` | Optional desktop source-module index |
 
 These settings are optional for a basic local build. Consult the source for integration-specific setup; do not publish secrets.
 
 ## Project structure
 
-\`\`\`text
+```text
 vyon/
 ├── android/
 │   ├── app/                  # Android phone and tablet app
@@ -143,23 +143,23 @@ vyon/
 ├── listen-together-server/   # Cloudflare Worker and Go server sources
 ├── assets/                   # Artwork and branding
 └── README.md
-\`\`\`
+```
 
 ### Website
 
 The website is a static HTML/CSS/JavaScript project, built with Node.js tooling and deployed separately to Vercel.
 
-\`\`\`bash
+```bash
 cd website
 npm install
 npm run build
-\`\`\`
+```
 
-Serve \`website/dist/\` with a local static server to preview the production build. For hosting, analytics, visitor counters, and the interactive particle effects, see **[website/README.md](website/README.md)**.
+Serve `website/dist/` with a local static server to preview the production build. For hosting, analytics, visitor counters, and the interactive particle effects, see **[website/README.md](website/README.md)**.
 
 ### Listen Together
 
-\`listen-together-server/\` contains listening-room synchronization services, including a Cloudflare Worker/Durable Objects implementation and a separate Go server. These services exchange playback metadata and state; **they do not stream music or redistribute audio**.
+`listen-together-server/` contains listening-room synchronization services, including a Cloudflare Worker/Durable Objects implementation and a separate Go server. These services exchange playback metadata and state; **they do not stream music or redistribute audio**.
 
 See **[listen-together-server/README.md](listen-together-server/README.md)** for the Worker setup, API, and security limitations. Server deployment and app integration are separate from installing the player.
 
