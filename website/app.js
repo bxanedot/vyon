@@ -88,10 +88,9 @@ function theme(color){
 }
 $$("[data-color]").forEach(b=>b.addEventListener("click",()=>theme(b.dataset.color)));
 try{theme(localStorage.getItem("vyon-accent")||"blood");}catch{theme("blood");}
-// A single particle sculpture generated from the actual vyon icon silhouette.
-// The original SVG is used only as an alpha mask: no image is laid over the dots.
+// Actual Vyon icon silhouette, drawn as static dots. Only clicked clusters fall.
 const region=$("#orb-region"),canvas=$("#orb-canvas"),ctx=canvas.getContext("2d",{alpha:true});
-const particles=[];
+const particles=[],falling=[];
 const tones={
  violet:["255,151,165","194,154,239","123,205,255"],
  acid:["47,190,128","22,162,143","46,221,190"],
@@ -99,219 +98,241 @@ const tones={
  ice:["75,205,242","91,155,250","133,239,249"],
  blood:["255,117,129","228,61,79","150,19,44"]
 };
-let w=0,h=0,orbVisible=true,orbAngle=-.13,orbLast=0;
-let orbVelocity=18,boostStarted=-100000;
-const interaction={x:-999,y:-999,tx:-999,ty:-999,strength:0,desired:0,pulseAt:-100000,pulseX:0,pulseY:0};
-const pointerRadius=reduce?68:92;
-function positionPointer(event){
- const rect=region.getBoundingClientRect();
- interaction.tx=event.clientX-rect.left;
- interaction.ty=event.clientY-rect.top;
- interaction.desired=1;
- if(reduce){interaction.x=interaction.tx;interaction.y=interaction.ty;interaction.strength=1;renderOrb();}
-}
-region.addEventListener("pointerenter",e=>{if(e.pointerType==="mouse"||e.pointerType==="pen")positionPointer(e);},{passive:true});
-region.addEventListener("pointermove",e=>{if(e.pointerType!=="touch"||e.buttons)positionPointer(e);},{passive:true});
-region.addEventListener("pointerleave",()=>{interaction.desired=0;if(reduce){interaction.strength=0;renderOrb();}},{passive:true});
-region.addEventListener("pointerdown",e=>{
- positionPointer(e);
- interaction.pulseAt=performance.now();
- interaction.pulseX=interaction.tx;interaction.pulseY=interaction.ty;
-},{passive:true});
-region.addEventListener("pointerup",e=>{if(e.pointerType==="touch")interaction.desired=0;},{passive:true});
-region.addEventListener("pointercancel",()=>{interaction.desired=0;},{passive:true});
-
-const particleSprite=document.createElement("canvas");
-particleSprite.width=720;particleSprite.height=720;
-const spriteContext=particleSprite.getContext("2d",{alpha:true});
-let spriteAccent="";
+let w=0,h=0,orbScale=1,spriteDirty=true,active=false,lastTime=0;
+const sprite=document.createElement("canvas");
+sprite.width=720;sprite.height=720;
+const spr=sprite.getContext("2d",{alpha:true});
+const debris=document.createElement("canvas");
+debris.className="vyon-falling-dots";
+debris.setAttribute("aria-hidden","true");
+document.body.appendChild(debris);
+const debrisCtx=debris.getContext("2d",{alpha:true});
+let vw=0,vh=0,ratio=1,obstacleCells=new Map(),floor=0;
+const gridSize=96;
 const hash=(x,y)=>{const n=Math.sin(x*127.1+y*311.7)*43758.5453123;return n-Math.floor(n);};
-function fillFallback(){
- // A vyon-like six-lobed ring while the SVG mask is loading or unavailable.
+function dotColor(p){
+ const palette=tones[root.dataset.accent]||tones.blood;
+ return "rgba("+palette[Math.min(2,Math.max(0,Math.floor((p.x+p.y+2)/4*3)))]+","+(.58+.38*p.j).toFixed(3)+")";
+}
+function seedFallback(){
  particles.length=0;
- for(let i=0;i<425;i++){
-  const theta=i/425*Math.PI*2;
-  for(let band=0;band<4;band++){
-   const radius=.64+.075*Math.cos(theta*7-.35)+.028*Math.sin(theta*5+.6)+(band-1.5)*.024;
-   particles.push({x:Math.cos(theta)*radius,y:Math.sin(theta)*radius,j:hash(i,band)});
+ for(let i=0;i<500;i++){
+  const theta=i/500*Math.PI*2;
+  for(let band=0;band<3;band++){
+   const radius=.66+.06*Math.cos(theta*6)+(band-1)*.035;
+   particles.push({x:Math.cos(theta)*radius,y:Math.sin(theta)*radius,j:hash(i,band),fallen:false});
   }
  }
+ spriteDirty=true;
 }
-fillFallback();
+seedFallback();
 function loadIconParticles(){
- const im=new Image();
- im.onload=()=>{
+ const img=new Image();
+ img.onload=()=>{
   const size=336,sample=document.createElement("canvas");
   sample.width=size;sample.height=size;
-  const sctx=sample.getContext("2d",{willReadFrequently:true});
-  if(!sctx)return;
-  sctx.clearRect(0,0,size,size);
-  const scale=Math.min(size/im.naturalWidth,size/im.naturalHeight);
-  const iw=im.naturalWidth*scale,ih=im.naturalHeight*scale;
-  sctx.drawImage(im,(size-iw)/2,(size-ih)/2,iw,ih);
-  const pixels=sctx.getImageData(0,0,size,size).data;
-  const next=[];
-  for(let y=2;y<size-2;y+=3){
-   for(let x=2;x<size-2;x+=3){
-    const jitterX=(hash(x,y)-.5)*2.1,jitterY=(hash(y,x)-.5)*2.1;
-    const xi=Math.min(size-1,Math.max(0,Math.round(x+jitterX)));
-    const yi=Math.min(size-1,Math.max(0,Math.round(y+jitterY)));
-    const alpha=pixels[(yi*size+xi)*4+3];
-    if(alpha<90)continue;
-    // Map the original full icon square into centered Cartesian coordinates.
-    next.push({x:((xi+.5)/size-.5)*2,y:((yi+.5)/size-.5)*2,j:hash(x+13,y+37)});
-   }
+  const sc=sample.getContext("2d",{willReadFrequently:true});
+  if(!sc)return;
+  const scale=Math.min(size/img.naturalWidth,size/img.naturalHeight);
+  sc.drawImage(img,(size-img.naturalWidth*scale)/2,(size-img.naturalHeight*scale)/2,img.naturalWidth*scale,img.naturalHeight*scale);
+  const data=sc.getImageData(0,0,size,size).data,next=[];
+  for(let y=2;y<size-2;y+=3)for(let x=2;x<size-2;x+=3){
+   const xi=Math.max(0,Math.min(size-1,Math.round(x+(hash(x,y)-.5)*2.1)));
+   const yi=Math.max(0,Math.min(size-1,Math.round(y+(hash(y,x)-.5)*2.1)));
+   if(data[(yi*size+xi)*4+3]<90)continue;
+   next.push({x:((xi+.5)/size-.5)*2,y:((yi+.5)/size-.5)*2,j:hash(x+13,y+37),fallen:false});
   }
-  if(next.length>250){particles.splice(0,particles.length,...next);spriteAccent="";renderOrb();}
+  if(next.length>250){particles.splice(0,particles.length,...next);spriteDirty=true;renderOrb();}
  };
- im.onerror=()=>renderOrb();
- im.src="/icons/vyon-mark.svg";
+ img.src="/icons/vyon-mark.svg";
+}
+function resizeDebris(){
+ ratio=Math.min(window.devicePixelRatio||1,2);
+ vw=window.innerWidth;vh=window.innerHeight;
+ debris.width=Math.round(vw*ratio);debris.height=Math.round(vh*ratio);
+ if(debrisCtx)debrisCtx.setTransform(ratio,0,0,ratio,0,0);
+ paintDebris();
 }
 function resizeOrb(){
  if(!ctx)return;
- const bounds=region.getBoundingClientRect();
- const ratio=Math.min(window.devicePixelRatio||1,2);
- w=Math.max(1,bounds.width);h=Math.max(1,bounds.height);
- canvas.width=Math.max(1,Math.round(w*ratio));
- canvas.height=Math.max(1,Math.round(h*ratio));
- ctx.setTransform(ratio,0,0,ratio,0,0);
+ const b=region.getBoundingClientRect();
+ w=Math.max(1,b.width);h=Math.max(1,b.height);
+ const r=Math.min(window.devicePixelRatio||1,2);
+ canvas.width=Math.round(w*r);canvas.height=Math.round(h*r);
+ ctx.setTransform(r,0,0,r,0,0);
+ orbScale=Math.min(w*.43,h*.42,320)*.75;
  renderOrb();
 }
-// Build the original-dot silhouette only when the color or icon mask changes.
-// Each animation frame rotates this cached texture in one GPU-friendly canvas draw.
-function buildParticleSprite(){
- if(!spriteContext)return;
- spriteContext.clearRect(0,0,720,720);
- const palette=tones[root.dataset.accent]||tones.violet;
+function buildSprite(){
+ if(!spr)return;
+ spr.clearRect(0,0,720,720);
  for(const p of particles){
-  const index=Math.min(2,Math.max(0,Math.floor((p.x+p.y+2)/4*3)));
-  const opacity=.58+.38*p.j;
-  spriteContext.fillStyle="rgba("+palette[index]+","+opacity.toFixed(3)+")";
-  spriteContext.beginPath();
-  spriteContext.arc(360+p.x*358,360+p.y*358,1.7+p.j*.87,0,Math.PI*2);
-  spriteContext.fill();
+  if(p.fallen)continue;
+  spr.fillStyle=dotColor(p);
+  spr.beginPath();spr.arc(360+p.x*358,360+p.y*358,1.7+p.j*.87,0,Math.PI*2);spr.fill();
  }
- spriteAccent=root.dataset.accent||"violet";
+ spriteDirty=false;
 }
 function renderOrb(){
  if(!ctx||!w||!h)return;
- if(spriteAccent!==(root.dataset.accent||"violet"))buildParticleSprite();
+ if(spriteDirty)buildSprite();
  ctx.clearRect(0,0,w,h);
- // 25% smaller than the prior icon. Center remains unchanged.
- const radius=Math.min(w*.43,h*.42,320)*.75;
- ctx.save();
- ctx.translate(w*.5,h*.49);
- ctx.rotate(orbAngle*Math.PI/180);
- ctx.imageSmoothingEnabled=true;
- ctx.drawImage(particleSprite,-radius,-radius,radius*2,radius*2);
- ctx.restore();
- renderInteractiveDots(radius);
+ ctx.drawImage(sprite,w*.5-orbScale,h*.49-orbScale,orbScale*2,orbScale*2);
 }
-function renderInteractiveDots(radius){
- const mouse=interaction;
- const level=mouse.strength;
- const rippleAge=(performance.now()-mouse.pulseAt)/1000;
- const ripple=rippleAge>=0&&rippleAge<.95 ? Math.pow(1-rippleAge/.95,2) : 0;
- if(level<.015&&ripple<.015)return;
- const palette=tones[root.dataset.accent]||tones.violet;
- const cx=w*.5,cy=h*.49;
- const rad=pointerRadius*level;
- // Fade out the cached dots under the pointer before drawing displaced ones.
- if(level>.015){
-  ctx.save();
-  ctx.globalCompositeOperation="destination-out";
-  const fade=ctx.createRadialGradient(mouse.x,mouse.y,0,mouse.x,mouse.y,Math.max(1,rad));
-  fade.addColorStop(0,"rgba(0,0,0,1)");
-  fade.addColorStop(.72,"rgba(0,0,0,.98)");
-  fade.addColorStop(1,"rgba(0,0,0,0)");
-  ctx.fillStyle=fade;
-  ctx.beginPath();
-  ctx.arc(mouse.x,mouse.y,rad,0,Math.PI*2);
-  ctx.fill();
-  ctx.restore();
+function rebuildObstacles(){
+ obstacleCells=new Map();
+ floor=Math.max(document.body.scrollHeight,document.documentElement.scrollHeight)-5;
+ const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);
+ const range=document.createRange();
+ let node,words=0;
+ while((node=walker.nextNode())){
+  const parent=node.parentElement;
+  if(!parent||!parent.closest("main,header,footer")||
+   parent.closest("script,style,svg,[hidden],.hero-orb,.vyon-falling-dots,.command-overlay"))continue;
+  if(!node.nodeValue||!node.nodeValue.trim())continue;
+  if(getComputedStyle(parent).visibility==="hidden"||getComputedStyle(parent).display==="none")continue;
+  const re=/\S+/g;let match;
+  while((match=re.exec(node.nodeValue))&&words<4000){
+   range.setStart(node,match.index);range.setEnd(node,match.index+match[0].length);
+   for(const r of range.getClientRects()){
+    if(r.width<2||r.height<2)continue;
+    const box={l:r.left+scrollX-2,r:r.right+scrollX+2,t:r.top+scrollY-2,b:r.bottom+scrollY+2};
+    if(box.b<0||box.t>floor)continue;
+    const minX=Math.floor(box.l/gridSize),maxX=Math.floor(box.r/gridSize);
+    const minY=Math.floor(box.t/gridSize),maxY=Math.floor(box.b/gridSize);
+    for(let y=minY;y<=maxY;y++)for(let x=minX;x<=maxX;x++){
+     const key=x+","+y;let group=obstacleCells.get(key);
+     if(!group){group=[];obstacleCells.set(key,group);}
+     group.push(box);
+    }
+   }
+   words++;
+  }
  }
- const angle=orbAngle*Math.PI/180,ca=Math.cos(angle),sa=Math.sin(angle);
- const dotScale=radius*358/360;
+ range.detach?.();
+}
+function getNearby(x,y){
+ const cx=Math.floor(x/gridSize),cy=Math.floor(y/gridSize);
+ const out=[],seen=new Set();
+ for(let row=cy-1;row<=cy+1;row++)for(let col=cx-1;col<=cx+1;col++){
+  for(const box of obstacleCells.get(col+","+row)||[]){
+   if(!seen.has(box)){seen.add(box);out.push(box);}
+  }
+ }
+ return out;
+}
+function paintDebris(){
+ if(!debrisCtx)return;
+ debrisCtx.clearRect(0,0,vw,vh);
+ for(const p of falling){
+  const x=p.px-scrollX,y=p.py-scrollY;
+  if(y<-8||y>vh+8||x<-8||x>vw+8)continue;
+  debrisCtx.fillStyle=dotColor(p);
+  debrisCtx.beginPath();debrisCtx.arc(x,y,p.radius,0,Math.PI*2);debrisCtx.fill();
+ }
+}
+function advanceDebris(dt){
+ // Two substeps for stable contact with narrow lines of text.
+ const steps=2,step=dt/steps;
+ for(let n=0;n<steps;n++){
+  for(const p of falling){
+   if(p.resting)continue;
+   const prevX=p.px,prevY=p.py;
+   p.vy=Math.min(1950,p.vy+1800*step);
+   p.px+=p.vx*step;p.py+=p.vy*step;
+   if(p.px<p.radius){p.px=p.radius;p.vx=Math.abs(p.vx)*.55+9;}
+   if(p.px>document.documentElement.clientWidth-p.radius){p.px=document.documentElement.clientWidth-p.radius;p.vx=-Math.abs(p.vx)*.55-9;}
+   // Words provide genuine DOM-derived hitboxes, rather than an arbitrary ground plane.
+   for(const b of getNearby(p.px,p.py)){
+    if(p.px+p.radius<b.l||p.px-p.radius>b.r||p.py+p.radius<b.t||p.py-p.radius>b.b)continue;
+    if(prevY+p.radius<=b.t+4&&p.vy>=0){
+     p.py=b.t-p.radius;
+     p.vy=-Math.abs(p.vy)*.19;
+     // Slide off words, then continue descending toward the footer.
+     p.vx+=((p.j>.5)?1:-1)*52;
+     p.vx=Math.max(-240,Math.min(240,p.vx));
+     break;
+    }
+    if(prevX+p.radius<=b.l&&p.vx>0){p.px=b.l-p.radius;p.vx=-Math.abs(p.vx)*.6;break;}
+    if(prevX-p.radius>=b.r&&p.vx<0){p.px=b.r+p.radius;p.vx=Math.abs(p.vx)*.6;break;}
+   }
+   if(p.py>=floor-p.radius){
+    p.py=floor-p.radius;p.vy=-Math.abs(p.vy)*.22;p.vx*=.74;
+    if(Math.abs(p.vy)<36){p.vy=0;p.vx=0;p.resting=true;}
+   }
+   p.vx*=Math.pow(.997,step*60);
+  }
+ }
+}
+function tick(now){
+ if(!active)return;
+ const dt=lastTime?Math.min(.034,(now-lastTime)/1000):.016;
+ lastTime=now;
+ if(!document.hidden)advanceDebris(dt);
+ paintDebris();
+ if(falling.some(p=>!p.resting)&&!document.hidden)requestAnimationFrame(tick);
+ else {active=false;lastTime=0;}
+}
+function animateFalls(){
+ if(active)return;
+ active=true;lastTime=0;
+ requestAnimationFrame(tick);
+}
+function dropCluster(localX,localY){
+ if(!w||!h)return false;
+ const cx=w*.5,cy=h*.49,scale=orbScale*358/360;
+ let closest=Infinity;
  for(const p of particles){
-  const x=cx+(p.x*ca-p.y*sa)*dotScale;
-  const y=cy+(p.x*sa+p.y*ca)*dotScale;
-  const dx=x-mouse.x,dy=y-mouse.y;
-  const d2=dx*dx+dy*dy;
-  const nearPointer=level>.015&&d2<(rad+3)*(rad+3);
-  const waveDx=x-mouse.pulseX,waveDy=y-mouse.pulseY;
-  const waveDist=Math.hypot(waveDx,waveDy);
-  const waveFront=rippleAge*265;
-  const inWave=ripple>.015&&Math.abs(waveDist-waveFront)<43;
-  if(!nearPointer&&!inWave)continue;
-  let move=0,ax=dx,ay=dy,length=Math.sqrt(d2);
-  if(nearPointer&&length>1){
-   // A gentle 45px repulsion that springs back when the pointer leaves.
-   const t=Math.max(0,1-length/rad);
-   move+=t*t*46*level;
-  }
-  if(inWave){
-   const phase=Math.max(0,1-Math.abs(waveDist-waveFront)/43);
-   move+=phase*ripple*29;
-   if(!nearPointer){ax=waveDx;ay=waveDy;length=waveDist;}
-  }
-  const shift=length>1?move/length:0;
-  const colorIndex=Math.min(2,Math.max(0,Math.floor((p.x+p.y+2)/4*3)));
-  let alpha=(.58+.38*p.j);
-  // Edges of the cached image remain visible, so avoid a harsh interaction seam.
-  if(nearPointer){
-   const t=Math.min(1,Math.sqrt(d2)/Math.max(rad,1));
-   alpha*=.75+.25*t;
-  }
-  ctx.fillStyle="rgba("+palette[colorIndex]+","+alpha.toFixed(3)+")";
-  ctx.beginPath();
-  ctx.arc(x+ax*shift,y+ay*shift,(.9+p.j*.5)+(inWave?.35:0),0,Math.PI*2);
-  ctx.fill();
+  if(p.fallen)continue;
+  closest=Math.min(closest,Math.hypot(cx+p.x*scale-localX,cy+p.y*scale-localY));
  }
-}
-function accelerateIcon(){
- boostStarted=performance.now();
- if(interaction.pulseAt<boostStarted-125){
-  interaction.pulseAt=boostStarted;
-  interaction.pulseX=interaction.strength>.05?interaction.x:w*.5;
-  interaction.pulseY=interaction.strength>.05?interaction.y:h*.49;
+ if(closest>20)return false;
+ const rect=region.getBoundingClientRect(),worldX=rect.left+scrollX,worldY=rect.top+scrollY;
+ const cluster=63;
+ rebuildObstacles();
+ let count=0;
+ for(const p of particles){
+  if(p.fallen)continue;
+  const x=cx+p.x*scale,y=cy+p.y*scale;
+  const dist=Math.hypot(x-localX,y-localY);
+  if(dist>cluster)continue;
+  p.fallen=true;count++;
+  const angle=Math.atan2(y-localY,x-localX);
+  const kick=Math.max(0,1-dist/cluster);
+  falling.push({
+   x:p.x,y:p.y,j:p.j,radius:1.1+p.j*.9,
+   px:worldX+x,py:worldY+y,
+   vx:Math.cos(angle)*kick*125+(p.j-.5)*35,
+   vy:-kick*(55+70*p.j),resting:false
+  });
  }
- if(reduce){orbAngle=(orbAngle+15)%360;renderOrb();}
+ if(!count)return false;
+ spriteDirty=true;renderOrb();
+ if(reduce){
+  for(const p of falling){p.py=floor-p.radius;p.vy=0;p.vx=0;p.resting=true;}
+  paintDebris();
+ }else animateFalls();
+ return true;
 }
-region.addEventListener("click",accelerateIcon);
-region.addEventListener("keydown",e=>{
- if(e.key==="Enter"||e.key===" "){e.preventDefault();accelerateIcon();}
+region.addEventListener("click",event=>{
+ const r=region.getBoundingClientRect();
+ dropCluster(event.clientX-r.left,event.clientY-r.top);
 });
-if("IntersectionObserver" in window){
- new IntersectionObserver(entries=>{orbVisible=entries[0].isIntersecting;orbLast=0;},{threshold:.01}).observe(region);
-}
-function smoothstep(t){const x=Math.min(1,Math.max(0,t));return x*x*(3-2*x);}
-function animateOrb(now){
- requestAnimationFrame(animateOrb);
- if(reduce||document.hidden||!orbVisible){orbLast=0;return;}
- if(orbLast){
-  const dt=Math.min(.05,(now-orbLast)/1000);
-  const elapsed=(now-boostStarted)/1000;
-  // Ease up over 0.45s, briefly sustain peak speed, then ease down over 3.4s.
-  const envelope=smoothstep(elapsed/.45)*(1-smoothstep((elapsed-.8)/3.4));
-  const target=18+30*envelope; // 30% idle / 80% peak of 60 deg/s
-  orbVelocity+=(target-orbVelocity)*(1-Math.exp(-dt*13));
-  orbAngle=(orbAngle+orbVelocity*dt)%360;
-  // Smooth pointer motion and fade out to the exact original dotted silhouette.
-  if(interaction.x<0&&interaction.desired>0){interaction.x=interaction.tx;interaction.y=interaction.ty;}
-  const ease=1-Math.exp(-dt*13);
-  if(interaction.desired>0){
-   interaction.x+=(interaction.tx-interaction.x)*ease;
-   interaction.y+=(interaction.ty-interaction.y)*ease;
-  }
-  interaction.strength+=(interaction.desired-interaction.strength)*(1-Math.exp(-dt*9));
-  renderOrb();
- }
- orbLast=now;
-}
-window.addEventListener("resize",resizeOrb,{passive:true});
-resizeOrb();
-loadIconParticles();
-if(!reduce)requestAnimationFrame(animateOrb);
+region.addEventListener("keydown",event=>{
+ if(event.key!=="Enter"&&event.key!==" ")return;
+ event.preventDefault();
+ const remaining=particles.filter(p=>!p.fallen);
+ if(!remaining.length)return;
+ const chosen=remaining[Math.floor(remaining.length*.5)];
+ const scale=orbScale*358/360;
+ dropCluster(w*.5+chosen.x*scale,h*.49+chosen.y*scale);
+});
+window.addEventListener("resize",()=>{
+ resizeOrb();resizeDebris();if(falling.length)rebuildObstacles();
+},{passive:true});
+window.addEventListener("scroll",paintDebris,{passive:true});
+document.addEventListener("visibilitychange",()=>{if(!document.hidden&&falling.some(p=>!p.resting))animateFalls();});
+resizeOrb();resizeDebris();loadIconParticles();
 // The interactive EQ controls live in /equalizer.js; no fake animated-bar visualizer.
 // Cursor-reactive surface light, with no dependency on animation libraries.
 if(window.matchMedia("(hover: hover) and (pointer: fine)").matches){
@@ -390,23 +411,34 @@ shotImg.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preven
 closeLightbox.addEventListener("click",dismissShot);
 lightbox.addEventListener("click",e=>{if(e.target===lightbox)dismissShot();});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!lightbox.hidden)dismissShot();});
-// Single primary APK action. It links directly to the GitHub release asset when verified.
-// Do not invent a filename, publish a dead download link, or show an obsolete status panel.
-const apkLink=$("#hero-apk-link"),apkFeedback=$("#hero-download-status");
+// Official stable release assets: verify format and URL before direct linking.
 const repo="bxanedot/vyon";
-let apkUrl=null,releaseCheckPending=true,releaseError=null,apkClickRequested=false;
-const missingApkMessage=()=>{
- if(releaseCheckPending)return "Checking GitHub for an official stable APK…";
- if(releaseError)return "The APK couldn't be verified. GitHub releases may be private or unavailable.";
- return "No stable APK has been published yet.";
+const releaseCards=$$("[data-platform]");
+const formats={
+ android:name=>/\.apk$/i.test(name),
+ windows:name=>/\.(exe|msi|msix|msixbundle)$/i.test(name)||(/\.(zip|7z)$/i.test(name)&&/(windows?|win32|win64)/i.test(name)),
+ macos:name=>/\.(dmg|pkg)$/i.test(name)||(/\.zip$/i.test(name)&&/(macos|mac[-_. ]?os|darwin|osx)/i.test(name)),
+ linux:name=>/\.(appimage|deb|rpm)$/i.test(name)||(/\.(tar\.gz|tar\.xz|tar\.zst)$/i.test(name)&&/linux/i.test(name))
 };
-apkLink.addEventListener("click",event=>{
- if(apkUrl)return; // Native anchor navigation to GitHub's direct downloadable APK asset.
- event.preventDefault();
- apkClickRequested=true;
- apkFeedback.textContent=missingApkMessage();
-});
+function setReleaseCard(card,asset,error){
+ const link=card.querySelector(".platform-download");
+ const label=card.querySelector(".platform-download-label");
+ const status=card.querySelector(".platform-status");
+ const os=card.querySelector("h3").textContent;
+ if(asset){
+  link.href=asset.browser_download_url;
+  link.setAttribute("aria-label","Download verified vyon installer for "+os);
+  label.textContent="Download for "+os;
+  status.textContent="Stable release: "+asset.name;
+ }else{
+  link.href="https://github.com/"+repo+"/releases";
+  link.setAttribute("aria-label","Browse official vyon releases for "+os);
+  label.textContent="View releases";
+  status.textContent=error?"Unable to verify release files. Check GitHub Releases.":"No matching stable installer published yet.";
+ }
+}
 (async()=>{
+ let stable=[];
  try{
   const controller=new AbortController();
   const timer=setTimeout(()=>controller.abort(),8000);
@@ -419,26 +451,18 @@ apkLink.addEventListener("click",event=>{
   if(!response.ok)throw Error("GitHub HTTP "+response.status);
   const data=await response.json();
   if(!Array.isArray(data))throw Error("Unexpected release response");
-  // API returns newest first. Drafts, prereleases and experimental channels are excluded.
-  const stable=data.filter(r=>!r.draft&&!r.prerelease&&
+  stable=data.filter(r=>!r.draft&&!r.prerelease&&
    !/nightly|canary|dev.build/i.test(String(r.name||"")+" "+String(r.tag_name||"")));
-  const release=stable.find(r=>Array.isArray(r.assets)&&
-   r.assets.some(a=>/\.apk$/i.test(a.name||"")&&/^https:\/\//.test(a.browser_download_url||"")));
-  const apk=release?.assets.find(a=>/\.apk$/i.test(a.name||"")&&
-   /^https:\/\//.test(a.browser_download_url||""));
-  if(apk){
-   apkUrl=apk.browser_download_url;
-   apkLink.href=apkUrl;
-   apkLink.setAttribute("aria-label","Download the official stable vyon Android APK directly from GitHub");
-   apkLink.title="Direct APK download from GitHub Releases";
-   if(apkClickRequested)apkFeedback.textContent="APK ready. Click Download APK to start downloading.";
-  }
  }catch(err){
-  releaseError=err;
-  console.info("vyon APK check:",err.message);
- }finally{
-  releaseCheckPending=false;
-  if(!apkUrl&&apkClickRequested)apkFeedback.textContent=missingApkMessage();
+  console.info("vyon release check:",err.message);
+  releaseCards.forEach(card=>setReleaseCard(card,null,true));return;
  }
+ releaseCards.forEach(card=>{
+  const accepts=formats[card.dataset.platform];
+  const asset=stable.flatMap(r=>Array.isArray(r.assets)?r.assets:[]).find(a=>a&&accepts&&
+   accepts(String(a.name||""))&&/^https:\/\//i.test(String(a.browser_download_url||"")));
+  setReleaseCard(card,asset||null,false);
+ });
 })();
+
 })();

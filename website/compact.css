@@ -431,3 +431,31 @@ html{scroll-behavior:smooth}
 /* GitHub mark sits alongside the source-code label and shares the download button height. */
 .hero-buttons-primary .hero-source-btn{gap:10px}
 .hero-source-btn .hero-github-icon{display:block;flex:none;width:20px;height:20px;color:currentColor}
+
+/* Cross-platform downloads + static, physics-enabled logo */
+.vyon-falling-dots{position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:70}
+.hero-orb{cursor:crosshair}
+.platforms-section{padding-block:88px 101px;background:linear-gradient(180deg,var(--base),var(--surface));border-block:1px solid var(--edge);scroll-margin-top:78px}
+.platforms-heading{margin-bottom:36px}
+.platforms-heading .heading-row h2{font-size:clamp(42px,5.4vw,82px)}
+.platforms-heading .heading-row p{max-width:450px}
+.platform-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.platform-card{min-width:0;min-height:328px;display:flex;flex-direction:column;padding:24px 22px;border:1px solid var(--edge);border-radius:15px;background:linear-gradient(145deg,rgba(255,255,255,.035),transparent 65%),var(--panel2);transition:transform .2s,border-color .2s}
+.platform-card:hover{border-color:rgba(var(--accent-rgb),.65);transform:translateY(-3px)}
+.platform-card-top{display:flex;justify-content:space-between;gap:10px;font:9px var(--mono);letter-spacing:.05em;color:#a4a1ac}
+.platform-supported{font-size:8px;color:var(--accent);white-space:nowrap}
+.platform-supported span{margin-right:5px;font-size:7px}
+.platform-card h3{font:700 clamp(28px,3vw,40px)/1.1 var(--display);letter-spacing:-.055em;margin:36px 0 11px}
+.platform-summary{color:#b5b1bf;line-height:1.6;font-size:13px;margin:0 0 24px}
+.platform-card-bottom{margin-top:auto}
+.platform-formats{display:flex;flex-direction:column;gap:4px;color:#888594;font:9px var(--mono);line-height:1.6;letter-spacing:.04em;margin-bottom:18px}
+.platform-formats span{color:#d3cfda;font-size:11px}
+.platform-download{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:13px 14px;border:1px solid var(--accent);border-radius:9px;background:rgba(var(--accent-rgb),.1);color:var(--ink);text-decoration:none;font-size:12px;font-weight:700;transition:background .2s}
+.platform-download:hover{background:rgba(var(--accent-rgb),.23)}
+.platform-download span:last-child{color:var(--accent);font-size:17px}
+.platform-status{min-height:30px;overflow-wrap:anywhere;color:#a6a2b0;font-size:10px;line-height:1.45;margin:12px 0 0}
+.platform-footnote{display:flex;align-items:flex-start;gap:11px;margin:25px 0 0;color:#aaa5b3;font-size:12px;line-height:1.7}
+.platform-footnote-dot{flex:none;width:7px;height:7px;margin-top:7px;border-radius:50%;background:var(--accent)}
+@media(max-width:1050px){.platform-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.platform-card{min-height:295px}.platform-card h3{margin-top:22px}}
+@media(max-width:590px){.platforms-section{padding-block:59px 66px}.platforms-heading{margin-bottom:23px}.platforms-heading .heading-row h2{font-size:clamp(40px,10vw,58px)}.platform-grid{grid-template-columns:1fr;gap:10px}.platform-card{min-height:0;padding:22px}.platform-card h3{margin:21px 0 8px;font-size:33px}.platform-summary{margin-bottom:17px}.platform-status{min-height:0}.platform-footnote{font-size:11px}}
+@media(prefers-reduced-motion:reduce){.platform-card,.platform-download{transition:none}.platform-card:hover{transform:none}}

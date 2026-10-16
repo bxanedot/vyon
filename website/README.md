@@ -1,16 +1,22 @@
 # vyon website
 
-vyon is an Android music player that uses YouTube Music as its backend. This directory contains its standalone compact website, official screenshot gallery, creator icons, direct stable-APK hero button, a compact FAQ, and browser-based Listen Together. Android project files are unchanged.
+Vyon is a YouTube Music-powered music player for Windows, macOS, Linux, and Android (not iOS). This directory contains the standalone website, genuine Android screenshots, Vyon branding, platform-specific release cards, FAQ, and browser-based Listen Together. App files are unchanged.
 
 ## Directory
 
-- index.html, styles.css, compact.css, app.js — responsive marketing website
+- index.html, styles.css, compact.css, app.js — responsive marketing website with cross-platform download cards and falling-dot logo interaction
 - icons/*.svg — bundled social SVGs and custom Guns.lol monogram
-- screenshots/ — real Android screenshots (not fabricated)
+- screenshots/ — real Android screenshots (not fabricated; desktop screenshots are not implied)
 - listen/index.html, listen/listen.css, listen/listen.js — browser listening room
 - server/worker.js — Cloudflare Durable Object WebSocket room server
 - wrangler.jsonc — one-worker static assets and room binding
 - .assetsignore — excludes private server files from public static assets
+
+## Platforms, official downloads and hero interaction
+
+Vyon supports Windows, macOS, Linux, and Android. iOS/iPadOS are excluded. The website scans official stable GitHub Releases for Windows EXE/MSI/MSIX, macOS DMG/PKG, Linux AppImage/DEB/RPM, and Android APK installers, and links to an appropriate published asset. If a release cannot be verified, it links to GitHub Releases instead; it never invents a downloadable file.
+
+The hero logo is stationary until clicked or activated by keyboard. Clicked dot clusters detach from the original icon and drop under gravity, using DOM-derived text hitboxes and the document floor for collisions. The falling layer does not intercept site interactions. Reduced-motion preferences skip the animated fall.
 
 ## Auto deployment to Cloudflare
 
