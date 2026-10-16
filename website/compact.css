@@ -934,3 +934,14 @@ body{transition:background-color .5s var(--vyon-ease)}
   -webkit-backdrop-filter:none!important;
  }
 }
+
+/* A regrouping dot phrase has a stable screen position while individual
+   particles spring into the letter silhouette; no whole-message slide jump. */
+.vyon-thank-you.is-regrouping{
+ opacity:1!important;visibility:visible!important;
+ transform:none!important;
+ transition:opacity .24s ease!important;
+}
+@media(prefers-reduced-motion:reduce){
+ .vyon-thank-you.is-regrouping{transition:none!important}
+}
