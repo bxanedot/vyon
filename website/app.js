@@ -99,7 +99,7 @@ if("IntersectionObserver" in window){
   if(!e.isIntersecting)return;
   navLinks.forEach(a=>a.getAttribute("href")==="#"+e.target.id?a.setAttribute("aria-current","location"):a.removeAttribute("aria-current"));
  }),{rootMargin:"-36% 0px -58% 0px",threshold:0});
- ["experience","equalizer","details","faq","community","support"].forEach(id=>{const section=document.getElementById(id);if(section)sectionObserver.observe(section);});
+ ["experience","equalizer","details","community","support","faq"].forEach(id=>{const section=document.getElementById(id);if(section)sectionObserver.observe(section);});
 }
 // Accent palette
 function theme(color){

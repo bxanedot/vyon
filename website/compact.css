@@ -513,3 +513,72 @@ body{transition:background-color .5s var(--vyon-ease)}
 @media(prefers-reduced-motion:reduce){
  .scroll-cue-arrow{animation:none!important;transform:none;will-change:auto}
 }
+
+/* Smooth transform-only arrow motion for clickable links and buttons.
+   Decorative arrows next to headings remain still. */
+:root{--vyon-arrow-ease:cubic-bezier(.16,1,.3,1)}
+:where(.platform-download > span:last-child,
+ .social-card .social-chevron,
+ .screenshot-tab .tab-arrow,
+ .command-results a > span:last-child,
+ .hero-download-btn .btn-download-icon,
+ .header-github svg,
+ .mobile-menu a .mobile-link-arrow){
+ display:inline-block;
+ translate:0 0;
+ transition:translate .55s var(--vyon-arrow-ease);
+}
+@keyframes vyon-link-arrow{
+ 0%,100%{transform:translate3d(0,0,0)}
+ 50%{transform:translate3d(2px,-2px,0)}
+}
+@keyframes vyon-download-arrow{
+ 0%,100%{transform:translate3d(0,0,0)}
+ 50%{transform:translate3d(0,3px,0)}
+}
+@media(prefers-reduced-motion:no-preference){
+ :where(.platform-download > span:last-child,
+  .social-card .social-chevron,
+  .screenshot-tab .tab-arrow,
+  .command-results a > span:last-child,
+  .header-github svg,
+  .mobile-menu a .mobile-link-arrow){
+  animation:vyon-link-arrow 3.8s ease-in-out infinite;
+ }
+ .hero-download-btn .btn-download-icon{
+  animation:vyon-download-arrow 3.2s ease-in-out infinite;
+ }
+ .platform-card:nth-child(2) .platform-download > span:last-child,
+ .social-card:nth-child(2) .social-chevron,
+ .screenshot-tab:nth-child(2) .tab-arrow{animation-delay:-.95s}
+ .platform-card:nth-child(3) .platform-download > span:last-child,
+ .social-card:nth-child(3) .social-chevron,
+ .screenshot-tab:nth-child(3) .tab-arrow{animation-delay:-1.9s}
+ .platform-card:nth-child(4) .platform-download > span:last-child,
+ .social-card:nth-child(4) .social-chevron{animation-delay:-2.85s}
+}
+.platform-download:is(:hover,:focus-visible) > span:last-child,
+.platform-card:hover .platform-download > span:last-child,
+.social-card:is(:hover,:focus-visible) .social-chevron,
+.screenshot-tab:is(:hover,:focus-visible,.is-selected) .tab-arrow,
+.command-results a:is(:hover,:focus-visible,.is-selected) > span:last-child,
+.mobile-menu a:is(:hover,:focus-visible) .mobile-link-arrow{
+ translate:5px -5px;
+}
+.header-github:is(:hover,:focus-visible) svg{translate:5px 0}
+.hero-download-btn:is(:hover,:focus-visible) .btn-download-icon{translate:0 5px}
+.scroll-cue:is(:hover,:focus-visible) .scroll-cue-arrow{translate:0 4px;transition:translate .55s var(--vyon-arrow-ease)}
+@media(prefers-reduced-motion:reduce){
+ :where(.platform-download > span:last-child,
+ .social-card .social-chevron,
+ .screenshot-tab .tab-arrow,
+ .command-results a > span:last-child,
+ .hero-download-btn .btn-download-icon,
+ .header-github svg,
+ .mobile-menu a .mobile-link-arrow){
+  animation:none!important;
+  transition:none!important;
+  translate:0 0!important;
+ }
+ .scroll-cue:is(:hover,:focus-visible) .scroll-cue-arrow{translate:0 0;transition:none}
+}
