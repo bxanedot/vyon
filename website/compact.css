@@ -425,3 +425,7 @@ html{scroll-behavior:smooth}
 @media(max-width:350px){
  .hero-buttons-primary .btn{flex:1 1 100%}
 }
+
+/* GitHub mark sits alongside the source-code label and shares the download button height. */
+.hero-buttons-primary .hero-source-btn{gap:10px}
+.hero-source-btn .hero-github-icon{display:block;flex:none;width:20px;height:20px;color:currentColor}
