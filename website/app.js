@@ -514,9 +514,9 @@ function activateLogo(localX,localY){
  if(spot){
   if(spot.heartAt===null)makeHeart(spot);
   else dropHeart(spot,localX,localY);
-  return;
+  return true;
  }
- dropCluster(localX,localY);
+ return dropCluster(localX,localY);
 }
 // Press and drag over the silhouette to dislodge only the dots the pointer touches.
 let pointerTrail=null,ignoreNextClick=false;
@@ -586,9 +586,48 @@ function endDotDrag(e){
 region.addEventListener("pointerup",endDotDrag);
 region.addEventListener("pointercancel",endDotDrag);
 region.addEventListener("click",event=>{
- if(ignoreNextClick){ignoreNextClick=false;return;}
+ if(ignoreNextClick){ignoreNextClick=false;event.vyonParticleHandled=true;return;}
  const r=region.getBoundingClientRect();
- activateLogo(event.clientX-r.left,event.clientY-r.top);
+ if(activateLogo(event.clientX-r.left,event.clientY-r.top))event.vyonParticleHandled=true;
+});
+// Click truly empty page space to form a short-lived dot cloud that collapses
+// immediately into independent particles. Keep native controls and text untouched.
+function burstFromEmptySpace(clientX,clientY){
+ const count=38,worldX=clientX+scrollX,worldY=clientY+scrollY;
+ const time=performance.now(),start=falling.length;
+ rebuildObstacles();
+ for(let i=0;i<count;i++){
+  const j=hash(time*.00001+i*14.13,i*17.7);
+  const angle=(i+j*.6)*Math.PI*2/count;
+  const radius=Math.sqrt((i+.4)/count)*(18+10*j);
+  const x=Math.cos(angle)*radius,y=Math.sin(angle)*radius;
+  const p={x:x/30,y:y/30,j};
+  releaseDot(p,worldX,worldY,x,y,0,0,1.1+j*.8,true);
+  const dot=falling[falling.length-1];
+  // No intact/static dot artwork: every spawned point is already in motion.
+  dot.vx+=Math.cos(angle)*(25+65*j);
+  dot.vy=Math.max(25,dot.vy+130+85*j);
+ }
+ if(reduce){
+  for(let i=start;i<falling.length;i++){
+   const p=falling[i];p.py=floor-p.radius;p.vx=0;p.vy=0;p.resting=true;
+  }
+ }
+ paintDebris();
+ if(!reduce)animateFalls();
+}
+document.addEventListener("click",event=>{
+ if(event.vyonParticleHandled||event.defaultPrevented||event.button!==0||event.detail===0)return;
+ const target=event.target;
+ if(!(target instanceof Element))return;
+ // Page backgrounds and blank layout regions are interactive; buttons,
+ // links, prose, form controls, media and dialogs keep their normal behavior.
+ if(target.closest('a,button,input,select,textarea,label,summary,[contenteditable],[role="link"],[role="menuitem"],[role="dialog"],[aria-modal="true"],.command-overlay,.shot-lightbox'))return;
+ if(target.closest('[role="button"]')&&!target.closest("#orb-region"))return;
+ if(!target.closest("#orb-region")&&target.closest('h1,h2,h3,h4,h5,h6,p,li,strong,small,em,span,blockquote,kbd,svg,img,canvas'))return;
+ if(window.getSelection()?.toString().trim())return;
+ if(event.clientX<0||event.clientY<0||event.clientX>innerWidth||event.clientY>innerHeight)return;
+ burstFromEmptySpace(event.clientX,event.clientY);
 });
 region.addEventListener("keydown",event=>{
  if(event.key!=="Enter"&&event.key!==" ")return;

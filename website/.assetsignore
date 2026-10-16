@@ -1,8 +1,0 @@
-server/
-wrangler.jsonc
-README.md
-.assetsignore
-_headers
-.dev.vars*
-*.map
-screenshots/*.md

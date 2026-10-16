@@ -1,146 +1,36 @@
 # vyon website
 
-Vyon is a YouTube Music-powered music player for Windows, macOS, Linux, and Android (not iOS). This directory contains the standalone website, genuine Android screenshots, Vyon branding, platform-specific release cards, FAQ, and browser-based Listen Together. App files are unchanged.
+The website for **vyon**, a music player powered by YouTube Music for Windows, macOS, Linux and Android. iOS/iPadOS are not supported.
 
-## Directory
+## Hosting: Vercel only
 
-- index.html, styles.css, compact.css, app.js — responsive marketing website with cross-platform download cards, draggable individual dots, bouncy text, and destructible dotted buttons
-- icons/*.svg — bundled social SVGs and custom Guns.lol monogram
-- screenshots/ — real Android screenshots (not fabricated; desktop screenshots are not implied)
-- listen/index.html, listen/listen.css, listen/listen.js — browser listening room
-- server/worker.js — Cloudflare Durable Object WebSocket room server
-- wrangler.jsonc — one-worker static assets and room binding
-- .assetsignore — excludes private server files from public static assets
+The live site uses **https://vyon.live**, hosted on Vercel with HTTPS and automatic deployment from the `main` branch of `bxanedot/vyon`. `www.vyon.live` redirects permanently to the main address.
 
-## Platforms, official downloads and hero interaction
+Import the repository into Vercel with **Root Directory: `website`**, framework **Other**. The repository's `website/vercel.json` runs `npm run build`, which bundles the public static assets and Vercel Analytics in `website/dist/`. No server runtime or secret credentials are needed for the marketing site. The built `dist/` directory is generated at deploy time and ignored by Git.
 
-Vyon supports Windows, macOS, Linux, and Android. iOS/iPadOS are excluded. The website scans official stable GitHub Releases for Windows EXE/MSI/MSIX, macOS DMG/PKG, Linux AppImage/DEB/RPM, and Android APK installers, and links to an appropriate published asset. If a release cannot be verified, it links to GitHub Releases instead; it never invents a downloadable file.
+To test the site locally, run `npm install` and `npm run build` inside `website/`, then serve the generated `dist/` directory using a local static web server.
 
-The hero logo stays stationary. Clicking or activating part of the dotted icon with the keyboard detaches a cluster that falls under gravity. Each individual dot has its own circular collision body (mass, bounce and friction): dots collide, bounce and push each other, spread into unique piles, and react to DOM-derived text hitboxes and the document floor. Click the vacated spot again to draw a small dotted heart; click the heart a third time to crumble it: all heart dots become the same independent falling physics bodies as the logo, with extra varied impulses so the heart visibly breaks apart instead of falling as a solid shape. Further clicks can repeat the heart creation and drop cycle. Enter or Space supports the sequence from the keyboard. Dragging through the logo or a heart releases only the touched dots. Text bounces visually on particle impact, while repeated collisions are released to prevent particles from getting stuck above the footer. Button surfaces use a dotted treatment: the first activation keeps its standard function, and the second lets their decorative dots collapse. The falling layer never intercepts site clicks. Reduced-motion preferences skip the animated fall and heart reveal.
+## Web Analytics
 
-## Vercel Web Analytics
+`@vercel/analytics` is bundled from `analytics-entry.js` and injected into the generated HTML by `build-vercel.mjs`. This is a plain HTML/JavaScript site, so no Next.js or React component is used. Enable Analytics in the project's Vercel dashboard to start collecting page views.
 
-The site uses the framework-neutral `@vercel/analytics` package, **not**
-`@vercel/analytics/next` (this is not a Next.js app). The Vercel build bundles
-`analytics-entry.js` into `dist/analytics.js` with esbuild and injects its
-module script into the built `index.html` only, leaving Cloudflare assets
-unchanged. It calls `inject({mode: "production"})` once to track page views.
+## Interactive particles
 
-On the Vercel dashboard, select the **vyon** project, open **Analytics**, and
-choose **Enable** if it is not yet active. Publish a Vercel deployment after
-enabling; visit the site (without an ad/content blocker) and then review
-Analytics for traffic. Vercel Authentication may limit public visitor access.
+- The dot-built logo stays still until clicked or dragged. Clicking breaks off a cluster; dragging removes only the individual dots touched.
+- Click an emptied logo area to create a dotted heart, then click the heart to collapse its dots with the same gravity physics. The interaction can repeat.
+- **Click blank space anywhere on the page:** a compact cloud of dots appears at the pointer and immediately breaks into independently falling bodies. Links, controls, images and text do not trigger this effect.
+- Each falling dot has its own collision radius, mass, bounce and friction. Dots collide with one another, bounce off text, and settle near the bottom of the page. Text has a brief spring reaction on impact.
+- Decorative dots are applied to the website's buttons. Normal controls work on their first activation; a second activation releases the button decoration into falling particles.
+- The physics overlay does not intercept page interactions. The `prefers-reduced-motion` setting skips falling and transition animation.
 
-## Deploy to Vercel
+## Downloads
 
-The marketing site supports Vercel. Import `bxanedot/vyon` with **Root Directory = website** (framework: Other). The `vercel.json` and `npm run build` command build a safe `dist/` with only public frontend assets. Any future push redeploys through the Git integration. Social card URLs are made absolute for the Vercel deployment.
+Official stable GitHub Releases are inspected for Windows (EXE/MSI/MSIX), macOS (DMG/PKG), Linux (AppImage/DEB/RPM), and Android (APK). The site only links directly to verified published installers, otherwise showing the official Releases page. No downloads are fabricated.
 
-**Important:** Listen Together's room server uses Cloudflare Durable Objects and WebSockets and is **not supported by this static Vercel build**. The hidden `/listen/` room page and the server source are intentionally excluded from the Vercel output. Use Cloudflare Workers for the real-time rooms.
+## Screenshots and branding
 
-## Auto deployment to Cloudflare
+- The header uses the transparent white `icons/vyon-logo.png`. Browser favicon uses `favicon.svg`.
+- Genuine Android screenshots belong at `screenshots/home.webp`, `screenshots/now-playing.webp`, and `screenshots/library.webp`. If missing, the website displays honest placeholders, not generated screenshots.
+- The original theme accents, equalizer demo, links to creator/community profiles, FAQ, and social preview are preserved.
 
-Cloudflare **Workers with Static Assets** is required for the live WebSocket rooms. Static-only Cloudflare Pages hosting cannot run this Worker.
-
-One-time account setup:
-
-1. Create a scoped Cloudflare API token with permissions to deploy Workers and use Durable Objects.
-2. In GitHub repository bxanedot/vyon > Settings > Secrets and variables > Actions, add CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN.
-3. Use Actions > Deploy vyon website and Listen Together > Run workflow once. All later main-branch changes inside website/ automatically redeploy both the site and the room server.
-4. Configure a custom domain for the vyon-web Worker in Cloudflare if desired. Use its workers.dev URL initially if enabled.
-5. If the domain is already linked to Cloudflare Pages, migrate that domain to the Worker. Do not attach it to both simultaneously.
-
-GitHub Actions skips deployment until the credentials have been set. No Cloudflare account access or secrets are available to this chat, so the workflow is configured but not yet active on a Cloudflare account.
-
-Manual alternative: from inside website/, run npx wrangler@latest deploy after logging in. For local full-stack development, run npx wrangler@latest dev. A basic Python static HTTP server can preview only the marketing site, not the listening rooms.
-
-## Listen Together
-
-At /listen/ a host creates a room and shares an invite link. The host can select a direct public HTTPS audio URL (mp3, m4a, ogg, oga, wav or aac), then play, pause and seek in synchronization. Guest browsers fetch audio from the original source and use WebSockets for synchronization. Users must enable audio manually when their browser blocks autoplay.
-
-Room state is stored in Cloudflare Durable Objects and expires after seven days of inactivity. Room capacity is 24 connections. Host authorization uses a randomly generated secret stored in the creator's sessionStorage, separate from the shared invite link. Anybody with an invite can listen. The server does NOT store or proxy copyrighted music or share private/local media files. Use media that you have permission to share. It does not yet sync Android APK playback.
-
-## Screenshot setup
-
-Add real vyon APK captures at these exact paths:
-
-- website/screenshots/home.webp
-- website/screenshots/now-playing.webp
-- website/screenshots/library.webp
-
-The website shows labeled empty placeholders until the images exist and expands real images on click. Never use made-up app screenshots.
-
-## Music source and affiliation
-
-vyon uses **YouTube Music as its music backend**; the website must not describe vyon as an independent music service or imply it hosts its own music catalogue. The separate website-based Listen Together prototype uses public direct HTTPS audio URLs and is **not** yet integrated with YouTube Music or the Android player.
-
-## Releases
-
-The hero Get vyon button opens the cross-platform downloads section for Windows, macOS, Linux, and Android. Platform cards link directly to a verified stable release asset, if available. Private GitHub releases may be inaccessible through the public GitHub API. iOS is not supported.
-
-## Theme, socials, inspiration
-
-Your color, your mood switches violet, lime, coral, ice, and blood red across the site accents, navigation, cards, artwork, and interactive previews; preferences persist in localStorage (including on the hidden Listen Together page). Blood red is the default on first visit; a previously saved user choice takes precedence. The current design deliberately keeps matte-black backgrounds in every theme. The layout is deliberately shorter than the original, inspired by public visual patterns at xan.lat without copying source.
-
-Icon links: https://guns.lol/bxane · https://ko-fi.com/bxane · https://patreon.com/bxane · https://discord.gg/h4Wsu824Uf · https://t.me/+T9avk7iJ7_YyN2Rk
-
-The root LICENSE still applies. Maintained by bxane (https://github.com/bxanedot).
-
-## Hidden listening-room page
-
-The existing browser-based Listen Together implementation remains available only when someone knows the direct `/listen/` URL. The public website no longer links to or advertises it (including header, mobile navigation, hero, feature cards and command menu). The room page has a `noindex,nofollow` robots instruction, but it is **not access-controlled**. Anyone who knows or guesses the URL may still open it.
-
-## Sound dot and matte finish
-
-Sphere, Halo and Wave now have a fourth **Sound** mode: a pulsing particle-based radial waveform visualization. It is decorative; it does not ask for microphone access or access YouTube Music playback. The grain overlay and tinted background gradients are removed in favor of a matte-black page while theme accents stay functional.
-
-## guns.lol icon
-
-The guns.lol profile card now uses the official guns.lol apple-touch icon from `https://assets.guns.lol/favicon/apple-touch-icon.png`, not the previous hand-drawn glyph. It is served by guns.lol's asset host.
-
-## Brand casing
-
-The displayed project name is consistently written as **vyon** in lowercase. Other proper names (for example YouTube Music and Patreon) retain their original capitalization.
-
-## Simplified public layout (October 2026)
-
-The marketing website retains a **fixed matte-black header** that stays in view while scrolling. The footer has been removed. The public header and command navigation no longer feature a Connect link; creator support and social cards remain lower on the page. Browser Listen Together stays unadvertised and accessible only by its direct URL.
-
-The hero uses a **single static vyon particle silhouette** derived from the original waveform icon artwork; alternate particle mode selectors and the continuous rotation were removed. Clicking a cluster releases dots under gravity. Clicking the cleared spot a second time makes a dotted heart, and clicking that heart drops its dots with their own colliding bodies. Enter and Space support the same click sequence.
-
-## Direct stable APK downloads and icon polish
-
-- The hero **Download APK** button points directly to the actual `browser_download_url` for the newest stable Android `.apk` found in the GitHub Releases API. Clicking an available APK link downloads the GitHub-hosted file without first opening a release detail page. No Nightly or prerelease APKs are selected.
-- Until a stable APK is published and publicly discoverable, clicking the hero CTA gives a brief inline unavailable message rather than presenting a fake download. The connected GitHub API listed no published releases on October 15, 2026; visitors may also be unable to retrieve private-repo assets.
-- The website header uses a transparent, optimized PNG prepared from the supplied white Vyon logo image. The browser favicon remains the transparent SVG mark; the PNG artwork is available for touch icons.
-- The dot-based vyon waveform stays still until a cluster is clicked. Falling dots are simulated as individual bodies and use a spatial grid for efficient particle-to-particle collisions.
-- Scroll reveals, button transitions and cards use more consistent easing and reduced-motion support.
-
-## Interactive vyon particles
-
-The hero icon stays below the sticky header (72 px desktop, 56 px tablet, 48 px mobile). It does not spin or repel on hover. Tap or click a cluster to release it into gravity-driven dot physics, then tap the same cleared patch to draw a heart, and tap the heart to drop its particles. A spatial hash efficiently handles circle-circle collisions between dots, while text boxes and the document floor remain solid. Enter and Space provide keyboard access, and reduced-motion users see dots settle immediately.
-
-## Compact FAQ replacing the old download panel
-
-The entire **GET vyon / Take your music further** release-status card has been removed. Desktop/mobile header links and the command menu now navigate to **FAQ** instead of the deleted `#downloads` anchor. The FAQ is a native `<details>` accordion inspired by the clarity of metrolist.cc's questions section, with original vyon-specific copy. Answers cover the YouTube Music backend, direct stable APKs, normal Android installation, future APK updates, Android-only distribution, and unofficial YouTube Music affiliation. We do not claim unverified sign-in, offline playback, updater or subscription features.
-
-## Community / Support header navigation
-
-The sticky desktop header presents **Community** and **Support** as two independent navigation links (without a slash). The mobile menu and command palette expose both shortcuts too. The Community anchor jumps to the Guns.lol, X, Discord and Telegram cards at the bottom; Support jumps to the separate Ko-fi and Patreon cards directly below. Jump navigation honors the fixed header using `scroll-margin-top`. No external redirect happens until a user clicks one of the actual social cards.
-
-## October 2026 visibility fix
-
-A runtime error caused by calling `.forEach()` on a single DOM element interrupted the page JavaScript before the scroll reveal observer could initialize. The navigation and reveal handlers now correctly query element lists with `querySelectorAll`. Content uses **visible-by-default** styling and scroll animation is optional, so a future JavaScript failure cannot leave entire sections invisible. Community and Support remain separate bottom-section anchors. The site still requires successful deployment from GitHub to its actual hosting provider before visitors see these repository changes.
-
-## Interactive equalizer website preview
-
-A new full-width **vyon Equalizer** section is located at `/#equalizer`. Its dark two-column layout mirrors the visible structure of [xan.lat's equalizer](https://xan.lat/#equalizer): a heading, preset chips, two explanation cards, a rounded dark panel, Basic/Advanced switch, and circular three-axis tuner (Mids, Treble, Bass).
-
-This is **an original implementation**, not copied XAN source code. The Basic mode supports dragging handles on the circular chart and using accessible −10 to +10 dB sliders. Advanced mode shows a responsive ten-band frequency-response curve and inputs for 31, 62, 125, 250, and 500 Hz plus 1, 2, 4, 8, and 16 kHz. Five presets—Flat, vyon Signature, Bass Boost, Treble Boost and Warm—work in either mode. Customized values are retained in browser localStorage under `vyon-eq-preview-v2` along with the selected mode. Older five-band custom settings are migrated where possible.
-
-The separate old animated frequency bars and their timer were removed. The EQ control is an **interactive website preview only** and intentionally does **not** alter the Android APK's audio, YouTube Music streaming, system audio, or any other listener's audio. Do not advertise it as a verified shipped APK equalizer until the Android project is actually integrated. The EQ visually follows the website's chosen accent color and respects reduced-motion settings.
-
-## X social link and hero actions
-
-An X social card was added to Community and points to the verified `https://x.com/bxanedot` account. Its icon is a local monochrome-white SVG under `website/icons/x.svg`, consistent with the other social icons. The hero now has two horizontally aligned actions: a vivid accent-colored **Download APK** primary button and a subdued **Source code** button linking to `https://github.com/bxanedot/vyon`. The former *only* downloads an APK when the site's GitHub Releases lookup finds a published stable APK; otherwise it reports unavailability. The former **See the app** button has been removed. The Experience copy no longer ends with “powered by YouTube Music.” Other factual backend references are intentionally retained.
-
-The Advanced EQ now contains ten bands rather than five; on very narrow screens its ten sliders form two rows of five to stay tappable. Basic and Advanced continue to share the same settings, and a previously saved custom five-band curve is interpolated into the new ten-band representation. EQ remains a browser-only demonstration.
+The app uses YouTube Music as its backend and is not affiliated with YouTube. The root repository `LICENSE` applies.

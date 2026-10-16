@@ -7,8 +7,8 @@ await mkdir(output,{recursive:true});
 const publicFiles=["index.html","app.js","styles.css","compact.css","equalizer.css","equalizer.js","premium.css","favicon.svg","vyon-social-preview.png"];
 for(const file of publicFiles)await cp(join(process.cwd(),file),join(output,file));
 for(const dir of ["icons","screenshots"])await cp(join(process.cwd(),dir),join(output,dir),{recursive:true});
-// Keep the tracking dependency out of the Cloudflare static site: only the
-// Vercel dist/ output loads the analytics bundle.
+// Include tracking only in the compiled Vercel dist/ output, rather than
+// relying on a framework-specific Analytics component.
 await bundle({
  entryPoints:[join(process.cwd(),"analytics-entry.js")],
  outfile:join(output,"analytics.js"),
