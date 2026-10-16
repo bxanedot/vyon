@@ -45,7 +45,7 @@
 
   <main id="main">
     <section class="hero section-pad" id="top">
-      <div class="hero-orb" id="orb-region" role="img" aria-label="Dotted Vyon logo. Drag a finger or mouse across the dots to scatter them and create a heart; drag across the heart to scatter it." title="Drag across dots to scatter them">
+      <div class="hero-orb" id="orb-region" role="button" tabindex="0" aria-label="Dotted Vyon logo. Tap or click to release the dots and follow the fastest one down the page, or drag to scatter them." title="Tap to follow the falling dots, or drag to scatter">
         <canvas id="orb-canvas" aria-hidden="true"></canvas>
       </div>
       <div class="hero-copy">
@@ -312,6 +312,15 @@
     </section>
 
   </main>
+  <footer class="vyon-footer section-pad" id="site-footer" aria-label="Site credits">
+    <div class="vyon-footer-inner">
+      <a class="vyon-footer-brand" href="#top" aria-label="Return to top"><span>vyon<span class="vyon-footer-period">.</span></span><span class="vyon-footer-up" aria-hidden="true">↑</span></a>
+      <div class="vyon-footer-credits">
+        <span>© bxane · 2026</span>
+        <span>Made with <span class="vyon-footer-heart" aria-label="love">♥</span> by <a href="https://guns.lol/bxane" rel="noopener noreferrer" target="_blank">bxane <span aria-hidden="true">↗</span></a></span>
+      </div>
+    </div>
+  </footer>
   <div class="command-overlay" id="command-overlay" hidden><div class="command-backdrop" data-close-command></div><div class="command-dialog" role="dialog" aria-modal="true" aria-label="Quick navigation"><div class="command-input-wrap"><span aria-hidden="true">⌕</span><input id="command-input" autocomplete="off" spellcheck="false" placeholder="Where to?" aria-label="Search sections"><kbd>ESC</kbd></div><div class="command-results" id="command-results"><a href="#top" data-command-item> Introduction <span class="vyon-arrow-shell" aria-hidden="true"><span class="vyon-arrow-glyph">↗</span></span></a><a href="#downloads" data-command-item> Downloads for your device <span class="vyon-arrow-shell" aria-hidden="true"><span class="vyon-arrow-glyph">↗</span></span></a><a href="#experience" data-command-item> App screenshots <span class="vyon-arrow-shell" aria-hidden="true"><span class="vyon-arrow-glyph">↗</span></span></a><a href="#equalizer" data-command-item> Interactive equalizer <span class="vyon-arrow-shell" aria-hidden="true"><span class="vyon-arrow-glyph">↗</span></span></a><a href="#details" data-command-item> Visual details <span class="vyon-arrow-shell" aria-hidden="true"><span class="vyon-arrow-glyph">↗</span></span></a><a href="#community" data-command-item> Community <span class="vyon-arrow-shell" aria-hidden="true"><span class="vyon-arrow-glyph">↗</span></span></a><a href="#support" data-command-item> Support vyon <span class="vyon-arrow-shell" aria-hidden="true"><span class="vyon-arrow-glyph">↗</span></span></a><a href="#faq" data-command-item> Questions &amp; answers <span class="vyon-arrow-shell" aria-hidden="true"><span class="vyon-arrow-glyph">↗</span></span></a><a href="https://github.com/bxanedot/vyon" target="_blank" rel="noopener noreferrer" data-command-item> GitHub repository <span class="vyon-arrow-shell" aria-hidden="true"><span class="vyon-arrow-glyph">↗</span></span></a></div><div class="command-footer"><span>↑↓ SELECT</span><span>↵ OPEN</span><span>ESC CLOSE</span></div></div></div>
   <script src="/visit-counters.js" defer></script>
   <script src="/app.js" defer></script>
