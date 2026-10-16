@@ -148,33 +148,47 @@ function makeHeart(spot){
  renderOrb();
  if(!reduce&&!heartAnimating){heartAnimating=true;requestAnimationFrame(animateHearts);}
 }
-// A third click releases each heart pixel as its own body into the same gravity simulation.
-function dropHeart(spot){
+// Both the logo and hearts release the very same independent circle bodies.
+// The heart adds an irregular crumble impulse so it breaks apart rather than
+// translating downward with all dots maintaining the heart silhouette.
+function releaseDot(p,worldX,worldY,x,y,hitX,hitY,radius=1.1+p.j*.9,crumble=false){
+ const dx=x-hitX,dy=y-hitY,dist=Math.hypot(dx,dy);
+ const angle=Math.atan2(dy,dx);
+ const kick=Math.max(0,1-dist/63);
+ const jitter=hash(x*.7+p.j*100,y*.9+p.j*50)-.5;
+ const vx=Math.cos(angle)*kick*125+(p.j-.5)*60+Math.sin(p.j*91)*22+
+  (crumble?jitter*175:0);
+ const vy=-kick*(55+70*p.j)+
+  (crumble?-dy*2.3+(hash(y*3+p.j*50,x*2)-.5)*120:0);
+ falling.push({
+  x:p.x,y:p.y,j:p.j,radius,
+  px:worldX+x,py:worldY+y,vx,vy,resting:false,
+  mass:radius*radius,bounce:.15+.14*p.j,
+  surfaceFriction:.68+.21*p.j,supported:false,sleepFor:0
+ });
+}
+function dropHeart(spot,hitX,hitY){
  if(spot.heartAt===null)return;
  const rect=region.getBoundingClientRect(),anchor=locateSpot(spot);
  const elapsed=performance.now()-spot.heartAt;
  const progress=reduce?1:1-Math.pow(1-Math.min(1,elapsed/490),3);
  const scale=.72+.28*progress;
- // Remove the fixed heart immediately, then let its independent dots continue.
+ const worldX=rect.left+scrollX,worldY=rect.top+scrollY;
+ const start=falling.length;
+ // Stop drawing the intact heart and turn every visible heart dot into physics.
  spot.heartAt=null;
  renderOrb();
  rebuildObstacles();
  for(const point of heartPoints){
+  const x=anchor.x+point.x*scale,y=anchor.y+point.y*scale;
   const r=1.6+point.j*.7;
-  const x=point.x*scale,y=point.y*scale;
-  const seed=hash(point.x+performance.now()*.001,point.y);
-  falling.push({
-   x:point.x/28,y:point.y/28,j:point.j,radius:r,
-   px:rect.left+scrollX+anchor.x+x,
-   py:rect.top+scrollY+anchor.y+y,
-   vx:x*1.2+(point.j-.5)*95+(seed-.5)*35,
-   vy:-25-point.j*85-Math.abs(x)*.5,
-   mass:r*r,bounce:.15+.14*point.j,
-   surfaceFriction:.68+.21*point.j,supported:false,sleepFor:0,resting:false
-  });
+  releaseDot({x:point.x/28,y:point.y/28,j:point.j},worldX,worldY,x,y,
+   hitX??anchor.x,hitY??anchor.y,r,true);
  }
  if(reduce){
-  for(const p of falling){p.py=floor-p.radius;p.vx=0;p.vy=0;p.resting=true;}
+  for(let i=start;i<falling.length;i++){
+   const p=falling[i];p.py=floor-p.radius;p.vx=0;p.vy=0;p.resting=true;
+  }
   paintDebris();
  }else animateFalls();
 }
@@ -437,16 +451,7 @@ function dropCluster(localX,localY){
   const dist=Math.hypot(x-localX,y-localY);
   if(dist>cluster)continue;
   p.fallen=true;count++;
-  const angle=Math.atan2(y-localY,x-localX);
-  const kick=Math.max(0,1-dist/cluster);
-  falling.push({
-   x:p.x,y:p.y,j:p.j,radius:1.1+p.j*.9,
-   px:worldX+x,py:worldY+y,
-   vx:Math.cos(angle)*kick*125+(p.j-.5)*60+Math.sin(p.j*91)*22,
-   vy:-kick*(55+70*p.j),resting:false,
-   mass:Math.pow(1.1+p.j*.9,2),bounce:.15+.14*p.j,
-   surfaceFriction:.68+.21*p.j,supported:false,sleepFor:0
-  });
+  releaseDot(p,worldX,worldY,x,y,localX,localY);
  }
  if(!count)return false;
  clearedSpots.push({relX:(localX-cx)/scale,relY:(localY-cy)/scale,heartAt:null});
@@ -465,7 +470,7 @@ function activateLogo(localX,localY){
  });
  if(spot){
   if(spot.heartAt===null)makeHeart(spot);
-  else dropHeart(spot);
+  else dropHeart(spot,localX,localY);
   return;
  }
  dropCluster(localX,localY);
@@ -478,7 +483,7 @@ region.addEventListener("keydown",event=>{
  if(event.key!=="Enter"&&event.key!==" ")return;
  event.preventDefault();
  const shown=clearedSpots.find(s=>s.heartAt!==null);
- if(shown){dropHeart(shown);return;}
+ if(shown){const at=locateSpot(shown);dropHeart(shown,at.x,at.y);return;}
  const waiting=clearedSpots.find(s=>s.heartAt===null);
  if(waiting){makeHeart(waiting);return;}
  const remaining=particles.filter(p=>!p.fallen);

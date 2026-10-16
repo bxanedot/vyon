@@ -16,7 +16,7 @@ Vyon is a YouTube Music-powered music player for Windows, macOS, Linux, and Andr
 
 Vyon supports Windows, macOS, Linux, and Android. iOS/iPadOS are excluded. The website scans official stable GitHub Releases for Windows EXE/MSI/MSIX, macOS DMG/PKG, Linux AppImage/DEB/RPM, and Android APK installers, and links to an appropriate published asset. If a release cannot be verified, it links to GitHub Releases instead; it never invents a downloadable file.
 
-The hero logo stays stationary. Clicking or activating part of the dotted icon with the keyboard detaches a cluster that falls under gravity. Each individual dot has its own circular collision body (mass, bounce and friction): dots collide, bounce and push each other, spread into unique piles, and react to DOM-derived text hitboxes and the document floor. Click the vacated spot again to draw a small dotted heart; click the heart a third time to release its individual dots into the same gravity and dot-to-dot collision simulation. Further clicks can repeat the heart creation and drop cycle. Enter or Space supports the sequence from the keyboard. The falling layer never intercepts site clicks. Reduced-motion preferences skip the animated fall and heart reveal.
+The hero logo stays stationary. Clicking or activating part of the dotted icon with the keyboard detaches a cluster that falls under gravity. Each individual dot has its own circular collision body (mass, bounce and friction): dots collide, bounce and push each other, spread into unique piles, and react to DOM-derived text hitboxes and the document floor. Click the vacated spot again to draw a small dotted heart; click the heart a third time to crumble it: all heart dots become the same independent falling physics bodies as the logo, with extra varied impulses so the heart visibly breaks apart instead of falling as a solid shape. Further clicks can repeat the heart creation and drop cycle. Enter or Space supports the sequence from the keyboard. The falling layer never intercepts site clicks. Reduced-motion preferences skip the animated fall and heart reveal.
 
 ## Auto deployment to Cloudflare
 
@@ -92,7 +92,7 @@ The hero uses a **single static vyon particle silhouette** derived from the orig
 
 - The hero **Download APK** button points directly to the actual `browser_download_url` for the newest stable Android `.apk` found in the GitHub Releases API. Clicking an available APK link downloads the GitHub-hosted file without first opening a release detail page. No Nightly or prerelease APKs are selected.
 - Until a stable APK is published and publicly discoverable, clicking the hero CTA gives a brief inline unavailable message rather than presenting a fake download. The connected GitHub API listed no published releases on October 15, 2026; visitors may also be unable to retrieve private-repo assets.
-- The favicon is a small optimized **white PNG sourced from the original uploaded icon artwork** at `website/icons/vyon-white-favicon.png`; it replaces the violet favicon.
+- The website header and browser favicon use the original background-free white SVG logo. The extra PNG favicon link was removed to avoid browsers choosing an alternate version. The PNG artwork remains available for touch icons.
 - The dot-based vyon waveform stays still until a cluster is clicked. Falling dots are simulated as individual bodies and use a spatial grid for efficient particle-to-particle collisions.
 - Scroll reveals, button transitions and cards use more consistent easing and reduced-motion support.
 

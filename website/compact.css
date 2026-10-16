@@ -459,3 +459,6 @@ html{scroll-behavior:smooth}
 @media(max-width:1050px){.platform-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.platform-card{min-height:295px}.platform-card h3{margin-top:22px}}
 @media(max-width:590px){.platforms-section{padding-block:59px 66px}.platforms-heading{margin-bottom:23px}.platforms-heading .heading-row h2{font-size:clamp(40px,10vw,58px)}.platform-grid{grid-template-columns:1fr;gap:10px}.platform-card{min-height:0;padding:22px}.platform-card h3{margin:21px 0 8px;font-size:33px}.platform-summary{margin-bottom:17px}.platform-status{min-height:0}.platform-footnote{font-size:11px}}
 @media(prefers-reduced-motion:reduce){.platform-card,.platform-download{transition:none}.platform-card:hover{transform:none}}
+
+/* The header uses the original transparent white logo, without a tile or matte. */
+.brand .brand-symbol{background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;filter:none!important;mix-blend-mode:normal;object-fit:contain}
