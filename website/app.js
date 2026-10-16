@@ -601,7 +601,7 @@ function buildThankDots(message){
  }
  paintThankDots();
 }
-function brushThankDots(clientX,clientY,prevX=clientX,prevY=clientY,radius=compactMotion?23:18){
+function brushThankDots(clientX,clientY,prevX=clientX,prevY=clientY,radius=compactMotion?14:12){
  if(!thankYou.classList.contains("is-visible")||!thankDots.some(p=>!p.fallen))return false;
  const bounds=thankCanvas.getBoundingClientRect();
  const fromX=prevX-bounds.left,fromY=prevY-bounds.top;
@@ -887,10 +887,11 @@ region.addEventListener("click",e=>{
  if(performance.now()<suppressLogoClickUntil)return;
  if(e.detail!==0&&e.button!==0)return;
  if(thankYou.classList.contains("is-visible")){
-  // A tap breaks a local patch; if every letter has been broken, the next
+  // A tap removes only the ink dots directly beneath a fingertip, not a chunk;
+  // if every letter has been broken, the next
   // tap draws a fresh randomized dotted thank-you.
   if(!thankDots.some(p=>!p.fallen))showThanks();
-  else brushThankDots(e.clientX,e.clientY,e.clientX,e.clientY,compactMotion?42:36);
+  else brushThankDots(e.clientX,e.clientY,e.clientX,e.clientY,compactMotion?13:11);
   e.vyonParticleHandled=true;
   return;
  }
