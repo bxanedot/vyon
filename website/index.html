@@ -1,7 +1,8 @@
 <!doctype html>
-<html lang="en" data-accent="blood">
+<html lang="en" data-accent="blood" data-glass="on">
 <head>
   <meta charset="UTF-8">
+  <script>try{document.documentElement.dataset.glass=localStorage.getItem("vyon-liquid-glass")==="off"?"off":"on"}catch{}</script>
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#080808">
   <meta name="description" content="vyon is a music player for Windows, macOS, Linux, and Android, powered by YouTube Music. Find official downloads for your device.">
@@ -38,13 +39,13 @@
   <header class="site-header" id="site-header">
     <a class="brand" href="#top" aria-label="vyon home"><img class="brand-symbol" src="/icons/vyon-logo.png" alt="" width="42" height="28"><span>vyon<span class="brand-period">.</span></span></a>
     <nav class="nav-desktop" aria-label="Primary"><a href="#downloads">Downloads</a><a href="#experience">Experience</a><a href="#equalizer">EQ</a><a href="#details">Details</a><a href="#community">Community</a><a href="#support">Support</a><a href="#faq">FAQ</a></nav>
-    <div class="header-actions"><button class="command-trigger" id="command-trigger" type="button" aria-label="Open quick navigation"><span class="command-key">⌘</span> K <span class="command-txt">Explore</span></button><a class="header-github" href="https://github.com/bxanedot/vyon" target="_blank" rel="noopener noreferrer">GitHub <span class="vyon-arrow-shell" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a><button class="mobile-menu-btn" id="mobile-menu-btn" type="button" aria-expanded="false" aria-controls="mobile-menu" aria-label="Toggle menu"><span></span><span></span></button></div>
+    <div class="header-actions"><button class="command-trigger" id="command-trigger" type="button" aria-label="Open quick navigation"><span class="command-key">⌘</span> K <span class="command-txt">Explore</span></button><button class="glass-toggle" id="glass-toggle" type="button" aria-pressed="true" aria-label="Turn Liquid Glass off" title="Toggle Liquid Glass"><span class="glass-toggle-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="16" height="16" rx="6"/><path d="M7.5 13c.5-3 2-4.7 5.3-5.4" stroke-linecap="round"/><circle cx="15.7" cy="15.5" r="2" fill="currentColor" stroke="none" opacity=".6"/></svg></span><span class="glass-toggle-label">Glass</span><span class="glass-toggle-track" aria-hidden="true"><span class="glass-toggle-thumb"></span></span></button><a class="header-github" href="https://github.com/bxanedot/vyon" target="_blank" rel="noopener noreferrer">GitHub <span class="vyon-arrow-shell" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a><button class="mobile-menu-btn" id="mobile-menu-btn" type="button" aria-expanded="false" aria-controls="mobile-menu" aria-label="Toggle menu"><span></span><span></span></button></div>
   </header>
   <nav class="mobile-menu" id="mobile-menu" aria-label="Mobile" hidden><a href="#downloads">Downloads</a><a href="#experience">Experience</a><a href="#equalizer">EQ</a><a href="#details">Details</a><a href="#community">Community</a><a href="#support">Support</a><a href="#faq">FAQ</a><a href="https://github.com/bxanedot/vyon" target="_blank" rel="noopener noreferrer">GitHub <span class="mobile-link-arrow vyon-arrow-shell" aria-hidden="true"><span class="vyon-arrow-glyph">↗</span></span></a></nav>
 
   <main id="main">
     <section class="hero section-pad" id="top">
-      <div class="hero-orb" id="orb-region" role="button" tabindex="0" aria-label="Interactive vyon particle logo. Drag across individual dots to release them, or click a cluster. Click a cleared area to create a heart, then click again to make it collapse." title="Drag across dots to release them · click again to form and collapse hearts">
+      <div class="hero-orb" id="orb-region" role="img" aria-label="Dotted Vyon logo. Drag a finger or mouse across the dots to scatter them and create a heart; drag across the heart to scatter it." title="Drag across dots to scatter them">
         <canvas id="orb-canvas" aria-hidden="true"></canvas>
       </div>
       <div class="hero-copy">

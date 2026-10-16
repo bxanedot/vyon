@@ -4,6 +4,17 @@
 const $=(s,scope=document)=>scope.querySelector(s), $$=(s,scope=document)=>[...scope.querySelectorAll(s)];
 const root=document.documentElement;
 const reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+// Toggle Liquid Glass without reloading; the head preloads the stored preference.
+const glassToggle=$("#glass-toggle");
+function applyGlass(enabled,save=false){
+ root.dataset.glass=enabled?"on":"off";
+ glassToggle?.setAttribute("aria-pressed",String(enabled));
+ glassToggle?.setAttribute("aria-label",enabled?"Turn Liquid Glass off":"Turn Liquid Glass on");
+ glassToggle?.setAttribute("title",enabled?"Disable Liquid Glass":"Enable Liquid Glass");
+ if(save)try{localStorage.setItem("vyon-liquid-glass",enabled?"on":"off")}catch{}
+}
+applyGlass(root.dataset.glass!=="off");
+glassToggle?.addEventListener("click",()=>applyGlass(root.dataset.glass==="off",true));
 // Navigation
 const overlay=$("#command-overlay"),input=$("#command-input"),items=$$("[data-command-item]"),mob=$("#mobile-menu"),mobBtn=$("#mobile-menu-btn");
 let focusBefore=null,selected=0;
@@ -44,21 +55,7 @@ mobBtn.addEventListener("click",()=>{
 });
 $$("a",mob).forEach(x=>x.addEventListener("click",()=>{mob.hidden=true;mobBtn.setAttribute("aria-expanded","false");}));
 
-// Header, mobile, and quick-navigation links jump straight to the bottom sections.
-$$('a[href="#community"],a[href="#support"]').forEach(link=>{
- link.addEventListener("click",event=>{
-  const hash=link.getAttribute("href");
-  const target=document.querySelector(hash);
-  if(!target)return;
-  event.preventDefault();
-  const prior=root.style.scrollBehavior;
-  root.style.scrollBehavior="auto";
-  target.scrollIntoView({behavior:"auto",block:"start"});
-  root.style.scrollBehavior=prior;
-  if(location.hash!==hash)history.pushState(null,"",hash);
- });
-});
-
+// All anchors now use native CSS smooth scrolling, honoring reduced motion.
 // Content stays visible by default; animation is an optional enhancement.
 // JavaScript errors must never hide the main page.
 if("IntersectionObserver" in window&&!reduce){
@@ -114,7 +111,7 @@ function theme(color){
 }
 $$("[data-color]").forEach(b=>b.addEventListener("click",()=>theme(b.dataset.color)));
 try{theme(localStorage.getItem("vyon-accent")||"blood");}catch{theme("blood");}
-// Actual Vyon icon silhouette, drawn as static dots. Only clicked clusters fall.
+// Drag-only Vyon particle silhouette: taps never scatter dots.
 const region=$("#orb-region"),canvas=$("#orb-canvas"),ctx=canvas.getContext("2d",{alpha:true});
 const particles=[],falling=[],clearedSpots=[];
 let heartAnimating=false;
@@ -546,51 +543,13 @@ function animateFalls(){
  active=true;lastTime=0;physicsCarry=0;
  requestAnimationFrame(tick);
 }
-function dropCluster(localX,localY){
- if(!w||!h)return false;
- const cx=w*.5,cy=h*.49,scale=orbScale*358/360;
- let closest=Infinity;
- for(const p of particles){
-  if(p.fallen)continue;
-  closest=Math.min(closest,Math.hypot(cx+p.x*scale-localX,cy+p.y*scale-localY));
- }
- if(closest>20)return false;
- const rect=region.getBoundingClientRect(),worldX=rect.left+scrollX,worldY=rect.top+scrollY;
- const cluster=63;
- rebuildObstacles();
- let count=0;
- for(const p of particles){
-  if(p.fallen)continue;
-  const x=cx+p.x*scale,y=cy+p.y*scale;
-  const dist=Math.hypot(x-localX,y-localY);
-  if(dist>cluster)continue;
-  p.fallen=true;count++;
-  releaseDot(p,worldX,worldY,x,y,localX,localY);
- }
- if(!count)return false;
- clearedSpots.push({relX:(localX-cx)/scale,relY:(localY-cy)/scale,heartAt:null});
- spriteDirty=true;renderOrb();
- if(reduce){
-  for(const p of falling){p.py=floor-p.radius;p.vy=0;p.vx=0;p.resting=true;}
-  paintDebris();
- }else animateFalls();
- return true;
-}
-function activateLogo(localX,localY){
- // Click cycle: dots fall -> a heart appears in the gap -> the heart falls too.
- const spot=clearedSpots.find(s=>{
-  const at=locateSpot(s);
-  return Math.hypot(at.x-localX,at.y-localY)<43;
- });
- if(spot){
-  if(spot.heartAt===null)makeHeart(spot);
-  else dropHeart(spot,localX,localY);
-  return true;
- }
- return dropCluster(localX,localY);
-}
 // Press and drag over the silhouette to dislodge only the dots the pointer touches.
-let pointerTrail=null,ignoreNextClick=false;
+let pointerTrail=null,orbRenderQueued=false;
+function queueOrbRender(){
+ if(orbRenderQueued)return;
+ orbRenderQueued=true;
+ requestAnimationFrame(()=>{orbRenderQueued=false;renderOrb()});
+}
 function dragDotBrush(localX,localY){
  const cx=w*.5,cy=h*.49,scale=orbScale*358/360;
  const r=16;
@@ -625,125 +584,94 @@ function dragDotBrush(localX,localY){
   // Keep one heart target per drag stroke, not one giant cluster per pointer sample.
   const distance=clearedSpots.length?Math.hypot(locateSpot(clearedSpots[clearedSpots.length-1]).x-localX,locateSpot(clearedSpots[clearedSpots.length-1]).y-localY):Infinity;
   if(distance>55)clearedSpots.push({relX:(localX-cx)/scale,relY:(localY-cy)/scale,heartAt:null});
-  spriteDirty=true;renderOrb();
+  spriteDirty=true;queueOrbRender();
   if(reduce){const count=falling.length;for(let i=0;i<count;i++){if(!falling[i].resting){falling[i].py=floor-falling[i].radius;falling[i].vx=falling[i].vy=0;falling[i].resting=true;}}paintDebris();}
   else animateFalls();
  }
+ return first;
 }
 region.addEventListener("pointerdown",e=>{
  if(e.button!==0&&e.pointerType==="mouse")return;
- const b=region.getBoundingClientRect();
- pointerTrail={id:e.pointerId,x:e.clientX-b.left,y:e.clientY-b.top,dragged:false};
- if(region.setPointerCapture)region.setPointerCapture(e.pointerId);
-},{passive:true});
+ const r=region.getBoundingClientRect();
+ pointerTrail={id:e.pointerId,x:e.clientX-r.left,y:e.clientY-r.top,
+  startX:e.clientX-r.left,startY:e.clientY-r.top,dragged:false,
+  released:false,spotsStart:clearedSpots.length};
+ region.setPointerCapture?.(e.pointerId);
+});
 region.addEventListener("pointermove",e=>{
- if(!pointerTrail||e.pointerId!==pointerTrail.id)return;
- const b=region.getBoundingClientRect(),x=e.clientX-b.left,y=e.clientY-b.top;
+ if(!pointerTrail||pointerTrail.id!==e.pointerId)return;
+ const r=region.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;
  const dx=x-pointerTrail.x,dy=y-pointerTrail.y,dist=Math.hypot(dx,dy);
- if(dist>4){
-  if(!pointerTrail.dragged){pointerTrail.dragged=true;rebuildObstacles();}
-  const steps=Math.max(1,Math.ceil(dist/9));
-  for(let n=1;n<=steps;n++)dragDotBrush(pointerTrail.x+dx*n/steps,pointerTrail.y+dy*n/steps);
-  e.preventDefault();
+ if(!pointerTrail.dragged&&Math.hypot(x-pointerTrail.startX,y-pointerTrail.startY)<8)return;
+ if(!pointerTrail.dragged){pointerTrail.dragged=true;rebuildObstacles();}
+ if(dist>0){
+  const steps=Math.max(1,Math.min(32,Math.ceil(dist/7)));
+  for(let i=1;i<=steps;i++){
+   if(dragDotBrush(pointerTrail.x+dx*i/steps,pointerTrail.y+dy*i/steps))pointerTrail.released=true;
+  }
  }
  pointerTrail.x=x;pointerTrail.y=y;
+ if(e.cancelable)e.preventDefault();
 },{passive:false});
 function endDotDrag(e){
  if(!pointerTrail||e.pointerId!==pointerTrail.id)return;
- if(pointerTrail.dragged)ignoreNextClick=true;
- pointerTrail=null;
+ const stroke=pointerTrail;pointerTrail=null;
  if(region.hasPointerCapture?.(e.pointerId))region.releasePointerCapture(e.pointerId);
+ if(e.type!=="pointercancel"&&stroke.dragged&&stroke.released){
+  const spots=clearedSpots.slice(stroke.spotsStart).filter(s=>s.heartAt===null);
+  if(spots.length)makeHeart(spots[spots.length-1]);
+ }
 }
 region.addEventListener("pointerup",endDotDrag);
 region.addEventListener("pointercancel",endDotDrag);
-region.addEventListener("click",event=>{
- if(ignoreNextClick){ignoreNextClick=false;event.vyonParticleHandled=true;return;}
- const r=region.getBoundingClientRect();
- if(activateLogo(event.clientX-r.left,event.clientY-r.top))event.vyonParticleHandled=true;
-});
-// Click truly empty page space to form a short-lived dot cloud that collapses
-// immediately into independent particles. Keep native controls and text untouched.
-function burstFromEmptySpace(clientX,clientY){
- const count=38,worldX=clientX+scrollX,worldY=clientY+scrollY;
- const time=performance.now(),start=falling.length;
- rebuildObstacles();
- for(let i=0;i<count;i++){
-  const j=hash(time*.00001+i*14.13,i*17.7);
-  const angle=(i+j*.6)*Math.PI*2/count;
-  const radius=Math.sqrt((i+.4)/count)*(18+10*j);
-  const x=Math.cos(angle)*radius,y=Math.sin(angle)*radius;
-  const p={x:x/30,y:y/30,j};
-  releaseDot(p,worldX,worldY,x,y,0,0,1.1+j*.8,true);
-  const dot=falling[falling.length-1];
-  // No intact/static dot artwork: every spawned point is already in motion.
-  dot.vx+=Math.cos(angle)*(25+65*j);
-  dot.vy=Math.max(25,dot.vy+130+85*j);
- }
- if(reduce){
-  for(let i=start;i<falling.length;i++){
-   const p=falling[i];p.py=floor-p.radius;p.vx=0;p.vy=0;p.resting=true;
-  }
- }
- paintDebris();
- if(!reduce)animateFalls();
-}
-document.addEventListener("click",event=>{
- if(event.vyonParticleHandled||event.defaultPrevented||event.button!==0||event.detail===0)return;
- const target=event.target;
- if(!(target instanceof Element))return;
- // Page backgrounds and blank layout regions are interactive; buttons,
- // links, prose, form controls, media and dialogs keep their normal behavior.
- if(target.closest('a,button,input,select,textarea,label,summary,[contenteditable],[role="link"],[role="menuitem"],[role="dialog"],[aria-modal="true"],.command-overlay,.shot-lightbox'))return;
- if(target.closest('[role="button"]')&&!target.closest("#orb-region"))return;
- if(!target.closest("#orb-region")&&target.closest('h1,h2,h3,h4,h5,h6,p,li,strong,small,em,span,blockquote,kbd,svg,img,canvas'))return;
- if(window.getSelection()?.toString().trim())return;
- if(event.clientX<0||event.clientY<0||event.clientX>innerWidth||event.clientY>innerHeight)return;
- burstFromEmptySpace(event.clientX,event.clientY);
-});
-region.addEventListener("keydown",event=>{
- if(event.key!=="Enter"&&event.key!==" ")return;
- event.preventDefault();
- const shown=clearedSpots.find(s=>s.heartAt!==null);
- if(shown){const at=locateSpot(shown);dropHeart(shown,at.x,at.y);return;}
- const waiting=clearedSpots.find(s=>s.heartAt===null);
- if(waiting){makeHeart(waiting);return;}
- const remaining=particles.filter(p=>!p.fallen);
- if(!remaining.length)return;
- const chosen=remaining[Math.floor(remaining.length*.5)];
- const scale=orbScale*358/360;
- activateLogo(w*.5+chosen.x*scale,h*.49+chosen.y*scale);
-});
 window.addEventListener("resize",()=>{
  resizeOrb();resizeDebris();if(falling.length)rebuildObstacles();
 },{passive:true});
 window.addEventListener("scroll",()=>paintDebris(),{passive:true});
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&falling.some(p=>!p.resting))animateFalls();});
 resizeOrb();resizeDebris();loadIconParticles();
-// Dotted button surfaces preserve the first click's normal link/button action.
-// A second activation drops only their decorative particles into the shared physics.
-document.querySelectorAll(".btn,.platform-download,.social-card,.header-github,.theme-chip,.screenshot-tab,.eq-toggle,.command-trigger,.mobile-menu-btn").forEach(control=>{
+// Taps and ordinary clicks always activate controls normally.
+// Only intentional dragging removes their decorative dotted layer.
+$$(".btn,.platform-download,.social-card,.header-github,.theme-chip,.screenshot-tab,.eq-toggle,.command-trigger,.mobile-menu-btn").forEach(control=>{
  control.classList.add("vyon-dot-button");
- let activations=0;
- control.addEventListener("click",event=>{
-  activations++;
-  if(activations!==2)return;
-  if(control.matches("a[href]"))event.preventDefault();
+ let stroke=null,suppressClick=false;
+ control.addEventListener("pointerdown",e=>{
+  if(e.pointerType==="mouse"&&e.button!==0)return;
+  stroke={id:e.pointerId,x:e.clientX,y:e.clientY,released:false};
+ });
+ control.addEventListener("pointermove",e=>{
+  if(!stroke||stroke.id!==e.pointerId||stroke.released||control.classList.contains("vyon-dots-collapsed"))return;
+  const dx=e.clientX-stroke.x,dy=e.clientY-stroke.y;
+  if(Math.hypot(dx,dy)<14)return;
+  // Vertical touch gestures should continue to scroll normally.
+  if(e.pointerType==="touch"&&Math.abs(dy)>Math.abs(dx)*1.1)return;
+  stroke.released=true;suppressClick=true;
+  if(e.cancelable&&e.pointerType==="mouse")e.preventDefault();
   const b=control.getBoundingClientRect();
   if(b.width<10||b.height<8)return;
   rebuildObstacles();
+  const start=falling.length;
   for(let y=7;y<b.height-4;y+=9)for(let x=7;x<b.width-4;x+=9){
    const seed=hash(x+b.left,y+b.top);
    if(seed<.24)continue;
-   const p={x:(x/b.width)*2-1,y:(y/b.height)*2-1,j:seed};
-   releaseDot(p,b.left+scrollX,b.top+scrollY,x,y,b.width*.5,b.height*.5,
-    1.1+seed*.6,true);
+   releaseDot({x:x/b.width*2-1,y:y/b.height*2-1,j:seed},
+    b.left+scrollX,b.top+scrollY,x,y,e.clientX-b.left,e.clientY-b.top,1.1+seed*.6,true);
   }
   control.classList.add("vyon-dots-collapsed");
   if(reduce){
-   for(const p of falling)if(!p.resting){p.py=floor-p.radius;p.vx=p.vy=0;p.resting=true;}
+   for(let i=start;i<falling.length;i++){
+    const p=falling[i];p.py=floor-p.radius;p.vx=p.vy=0;p.resting=true;
+   }
    paintDebris();
   }else animateFalls();
- },{capture:true});
+ },{passive:false});
+ control.addEventListener("pointerup",e=>{if(stroke?.id===e.pointerId)stroke=null});
+ control.addEventListener("pointercancel",()=>{stroke=null;suppressClick=false});
+ control.addEventListener("click",e=>{
+  if(!suppressClick)return;
+  suppressClick=false;e.preventDefault();e.stopImmediatePropagation();
+ },true);
+ control.addEventListener("dragstart",e=>e.preventDefault());
 });
 // The interactive EQ controls live in /equalizer.js; no fake animated-bar visualizer.
 // Cursor-reactive surface light, with no dependency on animation libraries.

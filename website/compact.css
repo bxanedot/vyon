@@ -652,3 +652,92 @@ body{transition:background-color .5s var(--vyon-ease)}
 @media(prefers-reduced-motion:reduce){
  .hero .hero-orb{transition:none!important}
 }
+
+/* Liquid Glass — opt-in persisted by #glass-toggle. Inspired by light,
+   layered translucent interfaces, with fast reduced-transparency fallbacks. */
+.glass-toggle{
+ display:inline-flex;align-items:center;justify-content:center;gap:7px;
+ height:36px;padding:0 10px;border-radius:99px;
+ border:1px solid rgba(255,255,255,.19);
+ color:#f4eef4;background:rgba(255,255,255,.07);
+ font:600 10px var(--mono);letter-spacing:.015em;cursor:pointer;flex:none;
+ transition:transform .52s cubic-bezier(.18,.8,.18,1),background-color .52s,border-color .52s,box-shadow .52s;
+}
+.glass-toggle:hover{border-color:rgba(var(--accent-rgb),.64);background:rgba(var(--accent-rgb),.10)}
+.glass-toggle:active{transform:scale(.96)}
+.glass-toggle:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.glass-toggle-icon{display:grid;place-items:center;color:var(--accent)}
+.glass-toggle-track{display:block;position:relative;width:30px;height:17px;flex:none;border-radius:99px;background:#4b4650;transition:background-color .52s}
+.glass-toggle-thumb{position:absolute;top:2px;left:2px;width:13px;height:13px;border-radius:50%;background:#eeedf0;box-shadow:0 1px 4px rgba(0,0,0,.35);transform:translate3d(0,0,0);transition:transform .55s cubic-bezier(.2,1.1,.3,1)}
+:root[data-glass="on"] .glass-toggle-track{background:var(--accent)}
+:root[data-glass="on"] .glass-toggle-thumb{transform:translate3d(13px,0,0);background:#fff}
+:root[data-glass="on"] .glass-toggle{
+ background:linear-gradient(145deg,rgba(255,255,255,.19),rgba(255,255,255,.035));
+ border-color:rgba(255,255,255,.34);
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 3px 15px rgba(var(--accent-rgb),.10);
+}
+:root[data-glass="on"] body{
+ background-image:radial-gradient(ellipse 45% 35% at 92% 5%,rgba(var(--accent-rgb),.12),transparent 78%),
+ radial-gradient(ellipse 45% 20% at 6% 65%,rgba(var(--accent-rgb),.06),transparent 80%);
+}
+:root[data-glass="on"] .site-header,
+:root[data-glass="on"] .site-header.is-scrolled{
+ background:linear-gradient(145deg,rgba(38,35,44,.77),rgba(14,14,19,.53))!important;
+ border:1px solid rgba(255,255,255,.22)!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 14px 50px rgba(0,0,0,.34),0 0 35px rgba(var(--accent-rgb),.05);
+ backdrop-filter:blur(21px) saturate(165%)!important;
+ -webkit-backdrop-filter:blur(21px) saturate(165%)!important;
+}
+:root[data-glass="on"] :is(.mobile-menu,.command-dialog,.shot-lightbox){
+ background:linear-gradient(145deg,rgba(43,39,49,.89),rgba(14,13,19,.79))!important;
+ border-color:rgba(255,255,255,.20)!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.20),0 20px 60px rgba(0,0,0,.43);
+ backdrop-filter:blur(20px) saturate(145%);
+ -webkit-backdrop-filter:blur(20px) saturate(145%);
+}
+:root[data-glass="on"] :is(.platform-card,.social-card,.screenshot-browser,.screenshot-aside,.feature-card,.faq-list){
+ background:linear-gradient(140deg,rgba(255,255,255,.115),rgba(255,255,255,.025) 42%,rgba(12,9,17,.35) 100%),rgba(27,24,34,.68)!important;
+ border-color:rgba(255,255,255,.18)!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 14px 35px rgba(0,0,0,.18);
+}
+:root[data-glass="on"] :is(.platform-download,.hero-source-btn,.theme-chip,.command-trigger,.screenshot-tab){
+ backdrop-filter:blur(8px) saturate(145%);
+ -webkit-backdrop-filter:blur(8px) saturate(145%);
+}
+:root[data-glass="on"] :is(.platform-card,.social-card,.feature-card):hover{
+ border-color:rgba(var(--accent-rgb),.55)!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 18px 42px rgba(var(--accent-rgb),.12);
+}
+:root[data-glass="on"] :is(.site-header,.mobile-menu,.command-dialog,.platform-card,.social-card,.screenshot-browser,.screenshot-aside,.feature-card,.faq-list){
+ transition:background-color .55s ease,border-color .55s ease,box-shadow .55s cubic-bezier(.2,.75,.25,1),transform .55s cubic-bezier(.18,.8,.18,1);
+}
+@media(max-width:1150px){
+ .glass-toggle-label{display:none}
+ .glass-toggle{gap:5px;padding:0 8px;height:35px}
+}
+@media(max-width:850px){
+ .site-header .header-actions{gap:9px}
+ .glass-toggle{height:36px;min-width:61px}
+ :root[data-glass="on"] :is(.platform-card,.social-card,.feature-card,.screenshot-browser,.screenshot-aside,.faq-list){
+  backdrop-filter:none;-webkit-backdrop-filter:none;
+ }
+}
+@media(max-width:370px){
+ .glass-toggle{min-width:53px;padding-inline:5px}
+ .site-header .header-actions{gap:5px}
+}
+@media(prefers-reduced-transparency:reduce){
+ :root[data-glass="on"] :is(.site-header,.site-header.is-scrolled,.mobile-menu,.command-dialog,.platform-card,.social-card,.screenshot-browser,.screenshot-aside,.feature-card,.faq-list){
+  background:#201b25!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ .glass-toggle,.glass-toggle-track,.glass-toggle-thumb{transition:none!important}
+}
+/* Keep the attractive dots but only dislodge via a deliberate pointer brush.
+   Mobile controls allow natural vertical scrolling and normal taps. */
+.vyon-dot-button{touch-action:pan-y}
+.hero-orb{touch-action:none}
+@media(prefers-reduced-motion:no-preference){
+ :is(.btn,.platform-download,.social-card,.screenshot-tab,.theme-chip,.glass-toggle){transition-timing-function:cubic-bezier(.18,.8,.18,1)!important}
+}
