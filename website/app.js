@@ -124,7 +124,10 @@ const tones={
  blood:["255,117,129","228,61,79","150,19,44"]
 };
 let w=0,h=0,orbScale=1,spriteDirty=true,active=false,lastTime=0,physicsCarry=0;
-const physicsStep=1/120;
+const compactMotion=window.matchMedia("(max-width:650px)").matches;
+const physicsStep=1/(compactMotion?60:90);
+const maxFalling=compactMotion?210:340;
+let lastDebrisPrune=0;
 const sprite=document.createElement("canvas");
 sprite.width=720;sprite.height=720;
 const spr=sprite.getContext("2d",{alpha:true});
@@ -133,7 +136,7 @@ debris.className="vyon-falling-dots";
 debris.setAttribute("aria-hidden","true");
 document.body.appendChild(debris);
 const debrisCtx=debris.getContext("2d",{alpha:true});
-let vw=0,vh=0,ratio=1,obstacleCells=new Map(),floor=0;
+let vw=0,vh=0,ratio=1,obstacleCells=new Map(),floor=0,obstacleLastBuilt=0,obstacleLastHeight=0,obstacleDirty=true;
 const gridSize=96,particleCell=8;
 const textImpacts=new WeakMap();
 const inkMeasure=document.createElement("canvas").getContext("2d");
@@ -189,8 +192,9 @@ function releaseDot(p,worldX,worldY,x,y,hitX,hitY,radius=1.1+p.j*.9,crumble=fals
   (crumble?jitter*175:0);
  const vy=-kick*(55+70*p.j)+
   (crumble?-dy*2.3+(hash(y*3+p.j*50,x*2)-.5)*120:0);
+ if(falling.length>=maxFalling)falling.splice(0,Math.min(28,falling.length-maxFalling+28));
  falling.push({
-  x:p.x,y:p.y,j:p.j,radius,
+  x:p.x,y:p.y,j:p.j,radius,bornAt:performance.now(),
   px:worldX+x,py:worldY+y,prevPX:worldX+x,prevPY:worldY+y,vx,vy,resting:false,
   mass:radius*radius,bounce:.15+.14*p.j,
   surfaceFriction:.68+.21*p.j,supported:false,sleepFor:0
@@ -249,7 +253,7 @@ function loadIconParticles(){
  img.src="/icons/vyon-mark.svg";
 }
 function resizeDebris(){
- ratio=Math.min(window.devicePixelRatio||1,2);
+ ratio=Math.min(window.devicePixelRatio||1,compactMotion?1.5:2);
  vw=window.innerWidth;vh=window.innerHeight;
  debris.width=Math.round(vw*ratio);debris.height=Math.round(vh*ratio);
  if(debrisCtx)debrisCtx.setTransform(ratio,0,0,ratio,0,0);
@@ -283,8 +287,12 @@ function renderOrb(){
  paintHearts();
 }
 function rebuildObstacles(){
+ const height=Math.max(document.body.scrollHeight,document.documentElement.scrollHeight);
+ const now=performance.now();
+ if(!obstacleDirty&&height===obstacleLastHeight&&now-obstacleLastBuilt<8000)return;
+ obstacleDirty=false;obstacleLastBuilt=now;obstacleLastHeight=height;
  obstacleCells=new Map();
- floor=Math.max(document.body.scrollHeight,document.documentElement.scrollHeight)-5;
+ floor=height-5;
  const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);
  const range=document.createRange();
  let node,words=0,glyphs=0;
@@ -448,6 +456,8 @@ function resolveDotContacts(){
  }
 }
 function advanceDebris(dt){
+ const now=performance.now();
+ // Visible glyph collision only, allowing long particle tours at low cost.
  // Individual dots use independent circular rigid-body contacts, plus DOM text boxes.
  const steps=1,step=dt;
  for(let n=0;n<steps;n++){
@@ -461,13 +471,13 @@ function advanceDebris(dt){
    if(p.px>document.documentElement.clientWidth-p.radius){p.px=document.documentElement.clientWidth-p.radius;p.vx=-Math.abs(p.vx)*.55-9;}
    // Words are springy obstacles, not permanent shelves for the particles.
    // After repeated hits a trapped dot passes through rather than hanging mid-page.
-   if((p.passTextUntil||0)<performance.now()){
+   if((p.passTextUntil||0)<now&&p.py>scrollY-120&&p.py<scrollY+innerHeight+120){
     for(const box of getNearby(p.px,p.py)){
      if(p.px+p.radius<box.l||p.px-p.radius>box.r||p.py+p.radius<box.t||p.py-p.radius>box.b)continue;
      bounceText(box,Math.abs(p.vy));
      p.textHits=(p.textHits||0)+1;
      if(p.textHits>5){
-      p.passTextUntil=performance.now()+1100;
+      p.passTextUntil=now+1100;
       p.textHits=0;p.vy=Math.max(80,p.vy);
       p.vx+=(p.j>.5?1:-1)*95;
       break;
@@ -520,6 +530,95 @@ function advanceDebris(dt){
   }
  }
 }
+
+let followActive=false,followStart=0,followPeakY=0,followReturnBehavior="";
+const thankYou=document.createElement("span");
+thankYou.className="vyon-thank-you";
+thankYou.setAttribute("role","status");
+thankYou.setAttribute("aria-live","polite");
+thankYou.setAttribute("aria-atomic","true");
+region.appendChild(thankYou);
+let thanksIndex=-1,thanksTimer=0;
+const thanksOptions=[
+ {message:"Thank you.",sub:"For being part of vyon."},
+ {message:"Much love.",sub:"Thanks for listening."},
+ {message:"You're amazing.",sub:"Thanks for being here."},
+ {message:"Thank you ♥",sub:"Keep the music playing."},
+ {message:"Stay in tune.",sub:"Thanks for making vyon yours."}
+];
+function hideThanks(){
+ if(thanksTimer){clearTimeout(thanksTimer);thanksTimer=0}
+ thankYou.classList.remove("is-visible");
+}
+function restoreLogo(){
+ if(!particles.length||particles.some(p=>!p.fallen))return;
+ for(const p of particles)p.fallen=false;
+ clearedSpots.length=0;spriteDirty=true;queueOrbRender();
+}
+function showThanks(){
+ hideThanks();
+ let i=Math.floor(Math.random()*thanksOptions.length);
+ if(i===thanksIndex)i=(i+1+Math.floor(Math.random()*(thanksOptions.length-1)))%thanksOptions.length;
+ thanksIndex=i;
+ const v=thanksOptions[i];
+ thankYou.replaceChildren();
+ const big=document.createElement("strong"),small=document.createElement("small");
+ big.textContent=v.message;small.textContent=v.sub;
+ thankYou.append(big,small);
+ thankYou.dataset.variant=String(Math.floor(Math.random()*3));
+ thankYou.classList.add("is-visible");
+ thanksTimer=setTimeout(()=>{
+  thanksTimer=0;
+  thankYou.classList.remove("is-visible");
+  restoreLogo();
+ },2400);
+}
+function stopDotFollow(){
+ if(!followActive)return;
+ followActive=false;
+ root.style.scrollBehavior=followReturnBehavior;
+ hideThanks();restoreLogo();
+}
+function beginDotFollow(){
+ if(reduce)return;
+ followReturnBehavior=root.style.scrollBehavior;
+ root.style.scrollBehavior="auto";
+ followActive=true;followStart=performance.now();
+ followPeakY=scrollY+innerHeight*.5;
+}
+function followFastestDot(now,dt){
+ if(!followActive)return;
+ if(document.hidden||now-followStart>18000){stopDotFollow();return;}
+ let fastest=null,anyMoving=false;
+ for(const p of falling){
+  if(!p.tourDot||p.resting)continue;
+  anyMoving=true;
+  if(p.vy>0&&(!fastest||p.vy>fastest.vy))fastest=p;
+ }
+ if(fastest)followPeakY=Math.max(followPeakY,fastest.py);
+ const limit=Math.max(0,document.documentElement.scrollHeight-innerHeight);
+ const target=anyMoving?Math.max(scrollY,Math.min(limit,followPeakY-innerHeight*.43)):limit;
+ const alpha=1-Math.exp(-Math.max(.001,dt)*5.2);
+ const next=scrollY+(target-scrollY)*alpha;
+ if(Math.abs(next-scrollY)>.15)window.scrollTo(0,next);
+ if(!anyMoving&&Math.abs(target-next)<2)stopDotFollow();
+}
+window.addEventListener("wheel",stopDotFollow,{passive:true});
+window.addEventListener("touchmove",stopDotFollow,{passive:true});
+document.addEventListener("pointerdown",stopDotFollow,{capture:true,passive:true});
+document.addEventListener("keydown",e=>{
+ if(["Escape","PageDown","PageUp","ArrowUp","ArrowDown","Home","End"," "].includes(e.key))stopDotFollow();
+});
+function pruneFalling(now){
+ if(now-lastDebrisPrune<450)return;
+ lastDebrisPrune=now;
+ for(let i=falling.length-1;i>=0;i--){
+  const p=falling[i];
+  if(now-(p.bornAt||now)>14500||(p.resting&&now-(p.bornAt||now)>3000))
+   falling.splice(i,1);
+ }
+}
+
 function tick(now){
  if(!active)return;
  const elapsed=lastTime?Math.max(0,Math.min(.05,(now-lastTime)/1000)):physicsStep;
@@ -534,23 +633,76 @@ function tick(now){
   physicsCarry-=physicsStep;
   passes++;
  }
+ pruneFalling(now);
+ if(followActive)followFastestDot(now,elapsed);
  paintDebris(Math.min(1,physicsCarry/physicsStep));
- if(falling.some(p=>!p.resting)&&!document.hidden)requestAnimationFrame(tick);
- else {active=false;lastTime=0;physicsCarry=0;paintDebris();}
+ if((falling.some(p=>!p.resting)||followActive)&&!document.hidden)requestAnimationFrame(tick);
+ else {active=false;lastTime=0;physicsCarry=0;stopDotFollow();paintDebris();}
 }
 function animateFalls(){
  if(active)return;
  active=true;lastTime=0;physicsCarry=0;
  requestAnimationFrame(tick);
 }
-// Press and drag over the silhouette to dislodge only the dots the pointer touches.
-let pointerTrail=null,orbRenderQueued=false;
+
+function collapseDottedLogo(){
+ if(!w||!h||!particles.length)return false;
+ stopDotFollow();
+ if(particles.every(p=>p.fallen))restoreLogo();
+ const available=particles.filter(p=>!p.fallen);
+ if(!available.length)return false;
+ rebuildObstacles();
+ const rect=region.getBoundingClientRect();
+ const worldX=rect.left+scrollX,worldY=rect.top+scrollY;
+ const cx=w*.5,cy=h*.49,scale=orbScale*358/360;
+ const sampleEvery=Math.max(1,Math.ceil(available.length/(compactMotion?180:280)));
+ const first=falling.length;
+ for(const p of falling)p.tourDot=false;
+ for(let i=0;i<available.length;i++){
+  const p=available[i];p.fallen=true;
+  if(i%sampleEvery!==0)continue;
+  const x=cx+p.x*scale,y=cy+p.y*scale;
+  releaseDot(p,worldX,worldY,x,y,cx,cy,1.1+p.j*.9,true);
+  const dot=falling[falling.length-1];
+  dot.tourDot=true;dot.vy-=20+p.j*65;dot.vx+=(p.j-.5)*90;
+ }
+ clearedSpots.length=0;spriteDirty=true;queueOrbRender();
+ showThanks();
+ if(reduce){
+  for(let i=first;i<falling.length;i++){
+   const p=falling[i];p.py=floor-p.radius;p.vx=p.vy=0;p.resting=true;
+  }
+  paintDebris();
+ }else{
+  beginDotFollow();animateFalls();
+ }
+ return true;
+}
+function tapTouchesDots(clientX,clientY){
+ const rect=region.getBoundingClientRect(),x=clientX-rect.left,y=clientY-rect.top;
+ const cx=w*.5,cy=h*.49,scale=orbScale*358/360;
+ const limit=compactMotion?29:22,limitSq=limit*limit;
+ for(const p of particles){
+  const dx=cx+p.x*scale-x,dy=cy+p.y*scale-y;
+  if(dx*dx+dy*dy<=limitSq)return true;
+ }
+ return false;
+}
+function pointInBrush(x,y,fromX,fromY,toX,toY,r){
+ const dx=toX-fromX,dy=toY-fromY,length=dx*dx+dy*dy;
+ const t=length>0?Math.max(0,Math.min(1,((x-fromX)*dx+(y-fromY)*dy)/length)):0;
+ const px=fromX+dx*t-x,py=fromY+dy*t-y;
+ return px*px+py*py<=r*r;
+}
+
+// Sweep only once per pointer event instead of 32 repeated full-logo scans.
+let pointerTrail=null,orbRenderQueued=false,suppressLogoClickUntil=0;
 function queueOrbRender(){
  if(orbRenderQueued)return;
  orbRenderQueued=true;
  requestAnimationFrame(()=>{orbRenderQueued=false;renderOrb()});
 }
-function dragDotBrush(localX,localY){
+function dragDotBrush(localX,localY,fromX=localX,fromY=localY){
  const cx=w*.5,cy=h*.49,scale=orbScale*358/360;
  const r=16;
  const rect=region.getBoundingClientRect();
@@ -559,7 +711,7 @@ function dragDotBrush(localX,localY){
  for(const p of particles){
   if(p.fallen)continue;
   const x=cx+p.x*scale,y=cy+p.y*scale;
-  if(Math.hypot(x-localX,y-localY)>r)continue;
+  if(!pointInBrush(x,y,fromX,fromY,localX,localY,r))continue;
   p.fallen=true;first=true;
   releaseDot(p,worldX,worldY,x,y,localX,localY);
  }
@@ -573,7 +725,7 @@ function dragDotBrush(localX,localY){
   for(let i=0;i<heartPoints.length;i++){
    if(removed.has(i))continue;
    const point=heartPoints[i],x=anchor.x+point.x*size,y=anchor.y+point.y*size;
-   if(Math.hypot(x-localX,y-localY)>r)continue;
+   if(!pointInBrush(x,y,fromX,fromY,localX,localY,r))continue;
    removed.add(i);first=true;
    const radius=1.6+point.j*.7;
    releaseDot({x:point.x/28,y:point.y/28,j:point.j},worldX,worldY,x,y,localX,localY,radius,true);
@@ -605,10 +757,7 @@ region.addEventListener("pointermove",e=>{
  if(!pointerTrail.dragged&&Math.hypot(x-pointerTrail.startX,y-pointerTrail.startY)<8)return;
  if(!pointerTrail.dragged){pointerTrail.dragged=true;rebuildObstacles();}
  if(dist>0){
-  const steps=Math.max(1,Math.min(32,Math.ceil(dist/7)));
-  for(let i=1;i<=steps;i++){
-   if(dragDotBrush(pointerTrail.x+dx*i/steps,pointerTrail.y+dy*i/steps))pointerTrail.released=true;
-  }
+  if(dragDotBrush(x,y,pointerTrail.x,pointerTrail.y))pointerTrail.released=true;
  }
  pointerTrail.x=x;pointerTrail.y=y;
  if(e.cancelable)e.preventDefault();
@@ -616,6 +765,7 @@ region.addEventListener("pointermove",e=>{
 function endDotDrag(e){
  if(!pointerTrail||e.pointerId!==pointerTrail.id)return;
  const stroke=pointerTrail;pointerTrail=null;
+ if(stroke.dragged)suppressLogoClickUntil=performance.now()+600;
  if(region.hasPointerCapture?.(e.pointerId))region.releasePointerCapture(e.pointerId);
  if(e.type!=="pointercancel"&&stroke.dragged&&stroke.released){
   const spots=clearedSpots.slice(stroke.spotsStart).filter(s=>s.heartAt===null);
@@ -624,11 +774,23 @@ function endDotDrag(e){
 }
 region.addEventListener("pointerup",endDotDrag);
 region.addEventListener("pointercancel",endDotDrag);
+region.addEventListener("click",e=>{
+ if(performance.now()<suppressLogoClickUntil)return;
+ if((e.detail===0||e.button===0)&&(thankYou.classList.contains("is-visible")||tapTouchesDots(e.clientX,e.clientY))){
+  collapseDottedLogo();
+  e.vyonParticleHandled=true;
+ }
+});
+region.addEventListener("keydown",e=>{
+ if(e.key==="Enter"||e.key===" "){e.preventDefault();collapseDottedLogo();}
+});
 window.addEventListener("resize",()=>{
- resizeOrb();resizeDebris();if(falling.length)rebuildObstacles();
+ obstacleDirty=true;resizeOrb();resizeDebris();if(falling.length)rebuildObstacles();
 },{passive:true});
-window.addEventListener("scroll",()=>paintDebris(),{passive:true});
-document.addEventListener("visibilitychange",()=>{if(!document.hidden&&falling.some(p=>!p.resting))animateFalls();});
+window.addEventListener("scroll",()=>{if(!active)paintDebris()},{passive:true});
+document.addEventListener("visibilitychange",()=>{if(document.hidden)stopDotFollow();else if(falling.some(p=>!p.resting))animateFalls();});
+document.fonts?.ready?.then(()=>{obstacleDirty=true});
+$(".faq-item").forEach(el=>el.addEventListener("toggle",()=>{obstacleDirty=true}));
 resizeOrb();resizeDebris();loadIconParticles();
 // Taps and ordinary clicks always activate controls normally.
 // Only intentional dragging removes their decorative dotted layer.
