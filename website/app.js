@@ -148,6 +148,36 @@ function makeHeart(spot){
  renderOrb();
  if(!reduce&&!heartAnimating){heartAnimating=true;requestAnimationFrame(animateHearts);}
 }
+// A third click releases each heart pixel as its own body into the same gravity simulation.
+function dropHeart(spot){
+ if(spot.heartAt===null)return;
+ const rect=region.getBoundingClientRect(),anchor=locateSpot(spot);
+ const elapsed=performance.now()-spot.heartAt;
+ const progress=reduce?1:1-Math.pow(1-Math.min(1,elapsed/490),3);
+ const scale=.72+.28*progress;
+ // Remove the fixed heart immediately, then let its independent dots continue.
+ spot.heartAt=null;
+ renderOrb();
+ rebuildObstacles();
+ for(const point of heartPoints){
+  const r=1.6+point.j*.7;
+  const x=point.x*scale,y=point.y*scale;
+  const seed=hash(point.x+performance.now()*.001,point.y);
+  falling.push({
+   x:point.x/28,y:point.y/28,j:point.j,radius:r,
+   px:rect.left+scrollX+anchor.x+x,
+   py:rect.top+scrollY+anchor.y+y,
+   vx:x*1.2+(point.j-.5)*95+(seed-.5)*35,
+   vy:-25-point.j*85-Math.abs(x)*.5,
+   mass:r*r,bounce:.15+.14*point.j,
+   surfaceFriction:.68+.21*point.j,supported:false,sleepFor:0,resting:false
+  });
+ }
+ if(reduce){
+  for(const p of falling){p.py=floor-p.radius;p.vx=0;p.vy=0;p.resting=true;}
+  paintDebris();
+ }else animateFalls();
+}
 function dotColor(p){
  const palette=tones[root.dataset.accent]||tones.blood;
  return "rgba("+palette[Math.min(2,Math.max(0,Math.floor((p.x+p.y+2)/4*3)))]+","+(.58+.38*p.j).toFixed(3)+")";
@@ -428,12 +458,16 @@ function dropCluster(localX,localY){
  return true;
 }
 function activateLogo(localX,localY){
- // Second click in a previously cleared hitbox draws a heart instead of dislodging more dots.
+ // Click cycle: dots fall -> a heart appears in the gap -> the heart falls too.
  const spot=clearedSpots.find(s=>{
   const at=locateSpot(s);
   return Math.hypot(at.x-localX,at.y-localY)<43;
  });
- if(spot){makeHeart(spot);return;}
+ if(spot){
+  if(spot.heartAt===null)makeHeart(spot);
+  else dropHeart(spot);
+  return;
+ }
  dropCluster(localX,localY);
 }
 region.addEventListener("click",event=>{
@@ -443,13 +477,12 @@ region.addEventListener("click",event=>{
 region.addEventListener("keydown",event=>{
  if(event.key!=="Enter"&&event.key!==" ")return;
  event.preventDefault();
+ const shown=clearedSpots.find(s=>s.heartAt!==null);
+ if(shown){dropHeart(shown);return;}
  const waiting=clearedSpots.find(s=>s.heartAt===null);
  if(waiting){makeHeart(waiting);return;}
  const remaining=particles.filter(p=>!p.fallen);
- if(!remaining.length){
-  if(clearedSpots.length)makeHeart(clearedSpots[clearedSpots.length-1]);
-  return;
- }
+ if(!remaining.length)return;
  const chosen=remaining[Math.floor(remaining.length*.5)];
  const scale=orbScale*358/360;
  activateLogo(w*.5+chosen.x*scale,h*.49+chosen.y*scale);

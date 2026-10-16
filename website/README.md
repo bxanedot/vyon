@@ -16,7 +16,7 @@ Vyon is a YouTube Music-powered music player for Windows, macOS, Linux, and Andr
 
 Vyon supports Windows, macOS, Linux, and Android. iOS/iPadOS are excluded. The website scans official stable GitHub Releases for Windows EXE/MSI/MSIX, macOS DMG/PKG, Linux AppImage/DEB/RPM, and Android APK installers, and links to an appropriate published asset. If a release cannot be verified, it links to GitHub Releases instead; it never invents a downloadable file.
 
-The hero logo stays stationary. Clicking or activating part of the dotted icon with the keyboard detaches a cluster that falls under gravity. Each individual dot has its own circular collision body (mass, bounce and friction): dots collide, bounce and push each other, spread into unique piles, and react to DOM-derived text hitboxes and the document floor. Click the vacated spot again to draw a small dotted heart in the hole; the heart remains visible. Enter or Space creates a heart for the last opened hole. The falling layer never intercepts site clicks. Reduced-motion preferences skip the animated fall and heart reveal.
+The hero logo stays stationary. Clicking or activating part of the dotted icon with the keyboard detaches a cluster that falls under gravity. Each individual dot has its own circular collision body (mass, bounce and friction): dots collide, bounce and push each other, spread into unique piles, and react to DOM-derived text hitboxes and the document floor. Click the vacated spot again to draw a small dotted heart; click the heart a third time to release its individual dots into the same gravity and dot-to-dot collision simulation. Further clicks can repeat the heart creation and drop cycle. Enter or Space supports the sequence from the keyboard. The falling layer never intercepts site clicks. Reduced-motion preferences skip the animated fall and heart reveal.
 
 ## Auto deployment to Cloudflare
 
@@ -86,7 +86,7 @@ The displayed project name is consistently written as **vyon** in lowercase. Oth
 
 The marketing website retains a **fixed matte-black header** that stays in view while scrolling. The footer has been removed. The public header and command navigation no longer feature a Connect link; creator support and social cards remain lower on the page. Browser Listen Together stays unadvertised and accessible only by its direct URL.
 
-The hero uses a **single static vyon particle silhouette** derived from the original waveform icon artwork; alternate particle mode selectors and the continuous rotation were removed. Clicking a cluster releases dots under gravity. Clicking the cleared spot a second time makes a dotted heart. Enter and Space offer the same two-step interaction.
+The hero uses a **single static vyon particle silhouette** derived from the original waveform icon artwork; alternate particle mode selectors and the continuous rotation were removed. Clicking a cluster releases dots under gravity. Clicking the cleared spot a second time makes a dotted heart, and clicking that heart drops its dots with their own colliding bodies. Enter and Space support the same click sequence.
 
 ## Direct stable APK downloads and icon polish
 
@@ -98,7 +98,7 @@ The hero uses a **single static vyon particle silhouette** derived from the orig
 
 ## Interactive vyon particles
 
-The hero icon stays below the sticky header (72 px desktop, 56 px tablet, 48 px mobile). It does not spin or repel on hover. Tap or click a cluster to release it into gravity-driven dot physics, then tap the same cleared patch to draw a heart. A spatial hash efficiently handles circle-circle collisions between dots, while text boxes and the document floor remain solid. Enter and Space provide keyboard access, and reduced-motion users see dots settle immediately.
+The hero icon stays below the sticky header (72 px desktop, 56 px tablet, 48 px mobile). It does not spin or repel on hover. Tap or click a cluster to release it into gravity-driven dot physics, then tap the same cleared patch to draw a heart, and tap the heart to drop its particles. A spatial hash efficiently handles circle-circle collisions between dots, while text boxes and the document floor remain solid. Enter and Space provide keyboard access, and reduced-motion users see dots settle immediately.
 
 ## Compact FAQ replacing the old download panel
 
