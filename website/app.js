@@ -550,7 +550,7 @@ thankCanvas.className="vyon-thank-dots";
 thankCanvas.setAttribute("aria-hidden","true");
 const thankCtx=thankCanvas.getContext("2d");
 const thankDots=[];
-let thanksPainting=false,regroup=[],regroupStart=0,regrouping=false,regroupPending=false,regroupSeq=0;
+let thanksPainting=false,regroup=[],regroupOrigins=[],regroupStart=0,regrouping=false,regroupPending=false,regroupSeq=0;
 const regroupTime=reduce?0:1330;
 function scheduleRegroup(wait=600){
  if(regroupPending||regrouping)return;
@@ -582,8 +582,15 @@ function startRegroup(){
    sources.push({px:oldRect.left+scrollX+p.tx,py:oldRect.top+scrollY+p.ty,j:p.j});
  }
  showThanks();
+ thankYou.classList.add("is-regrouping");
  const b=thankCanvas.getBoundingClientRect(),targetX=b.left+scrollX,targetY=b.top+scrollY;
- const targets=thankDots.slice(),count=Math.min(sources.length,targets.length,maxFalling);
+ const targets=thankDots.slice();
+ // Dots tapped away earlier might already have settled or expired. Retain
+ // their last visible coordinates for the next phrase, with a hard cap.
+ if(sources.length<24&&regroupOrigins.length)
+  sources.push(...regroupOrigins.slice(-Math.min(190,maxFalling-sources.length)));
+ regroupOrigins.length=0;
+ const count=Math.min(sources.length,targets.length,maxFalling);
  for(const p of targets)p.fallen=true;
  // Shuffle the destination ordering so each new message forms in a unique way.
  const arranged=targets.map((p,i)=>({p,r:hash(i*13+thanksIndex, i*7+3)})).sort((a,b)=>a.r-b.r);
@@ -602,7 +609,7 @@ function startRegroup(){
  regrouping=!reduce&&regroup.length>0;
  if(!regrouping){
   for(const p of targets){p.fallen=false;p.gatherExtra=false;}
-  regroup=[];queueThankPaint();
+  regroup=[];thankYou.classList.remove("is-regrouping");queueThankPaint();
  }else{queueThankPaint();animateFalls();}
 }
 function advanceRegroup(now){
@@ -618,6 +625,7 @@ function advanceRegroup(now){
  }
  if(!regroup.length||elapsed>regroupTime+350){
   regroup=[];regrouping=false;
+  thankYou.classList.remove("is-regrouping");
   for(const p of thankDots){p.fallen=false;p.gatherExtra=false;}
  }
  queueThankPaint();
@@ -692,6 +700,8 @@ function brushThankDots(clientX,clientY,prevX=clientX,prevY=clientY,radius=compa
  for(const p of thankDots){
   if(p.fallen||!pointInBrush(p.tx,p.ty,fromX,fromY,toX,toY,radius))continue;
   p.fallen=true;
+  regroupOrigins.push({px:worldX+p.tx,py:worldY+p.ty,j:p.j});
+  if(regroupOrigins.length>200)regroupOrigins.splice(0,regroupOrigins.length-200);
   // Limit moving dots even if someone repeatedly scratches every word.
   if(hits++%2===0){
    releaseDot(p,worldX,worldY,p.tx,p.ty,toX,toY,p.radius,true);
@@ -738,7 +748,7 @@ const thanksOptions=[
  {message:"Stay in tune.",sub:"Thanks for making vyon yours."}
 ];
 function hideThanks(){
- thankYou.classList.remove("is-visible");
+ thankYou.classList.remove("is-visible","is-regrouping");
  thankDots.length=0;queueThankPaint();
 }
 function restoreLogo(){
@@ -1011,6 +1021,7 @@ window.addEventListener("resize",()=>{
   const phrase=thanksOptions[thanksIndex]?.message;
   if(phrase)buildThankDots(phrase);
   regroup=[];regrouping=false;
+  thankYou.classList.remove("is-regrouping");
  }
 },{passive:true});
 window.addEventListener("scroll",()=>{if(!active)paintDebris()},{passive:true});
