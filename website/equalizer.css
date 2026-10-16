@@ -296,3 +296,12 @@
  .vqe-advanced{padding:7px 0 8px}
  .vqe-advanced-graph{max-height:112px}
 }
+
+/* Refresh-rate-independent EQ transitions share the site's soft motion curve. */
+.vqe-preset,.vqe-mode-switch button{
+ transition-timing-function:var(--vyon-spring-ease,cubic-bezier(.16,1,.3,1));
+ transition-duration:.34s;
+}
+@media(prefers-reduced-motion:reduce){
+ .vqe-preset,.vqe-mode-switch button{transition:none!important}
+}
