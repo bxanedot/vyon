@@ -8,222 +8,203 @@
 
 ### Music, on your terms.
 
-**A different kind of listening.**  
-An open-source music player powered by YouTube Music, designed for your desktop, phone, TV, and watch.
+**Discover more. Download more. Listen your way.**
+
+A music player powered by YouTube Music, built for Android, desktop, TV, and beyond.
 
 <br>
 
-[![GitHub stars](https://img.shields.io/github/stars/bxanedot/vyon?style=for-the-badge&logo=github&logoColor=white&label=Stars&labelColor=161616&color=c44759)](https://github.com/bxanedot/vyon/stargazers)
-[![GitHub downloads](https://img.shields.io/github/downloads/bxanedot/vyon/total?style=for-the-badge&logo=github&logoColor=white&label=Downloads&labelColor=161616&color=c44759)](https://github.com/bxanedot/vyon/releases)
-[![GitHub forks](https://img.shields.io/github/forks/bxanedot/vyon?style=for-the-badge&logo=github&logoColor=white&label=Forks&labelColor=161616&color=464646)](https://github.com/bxanedot/vyon/forks)
+[![Stars](https://img.shields.io/github/stars/bxanedot/vyon?style=for-the-badge&logo=github&logoColor=white&label=Stars&labelColor=171717&color=c44759)](https://github.com/bxanedot/vyon/stargazers)
+[![Release downloads](https://img.shields.io/github/downloads/bxanedot/vyon/total?style=for-the-badge&logo=github&logoColor=white&label=Release%20downloads&labelColor=171717&color=c44759)](https://github.com/bxanedot/vyon/releases)
+[![Forks](https://img.shields.io/github/forks/bxanedot/vyon?style=for-the-badge&logo=github&logoColor=white&label=Forks&labelColor=171717&color=555555)](https://github.com/bxanedot/vyon/network/members)
 
-[![License](https://img.shields.io/github/license/bxanedot/vyon?style=flat-square&labelColor=161616&color=646464)](LICENSE)
-[![Last commit](https://img.shields.io/github/last-commit/bxanedot/vyon?style=flat-square&labelColor=161616&color=646464)](https://github.com/bxanedot/vyon/commits/main/)
-[![Issues](https://img.shields.io/github/issues/bxanedot/vyon?style=flat-square&labelColor=161616&color=646464)](https://github.com/bxanedot/vyon/issues)
+[![License](https://img.shields.io/github/license/bxanedot/vyon?style=flat-square&labelColor=171717&color=555555)](LICENSE)
+[![Last commit](https://img.shields.io/github/last-commit/bxanedot/vyon?style=flat-square&labelColor=171717&color=555555)](https://github.com/bxanedot/vyon/commits/main)
+[![Open issues](https://img.shields.io/github/issues/bxanedot/vyon?style=flat-square&labelColor=171717&color=555555)](https://github.com/bxanedot/vyon/issues)
 
 <br>
 
-[**🌐 Website**](https://vyon.live) &nbsp;·&nbsp;
+[**🌐 Explore vyon.live**](https://vyon.live) &nbsp;·&nbsp;
 [**⬇️ Get vyon**](https://github.com/bxanedot/vyon/releases) &nbsp;·&nbsp;
-[**✨ Features**](#-highlights) &nbsp;·&nbsp;
-[**🛠️ Build**](#-building-from-source) &nbsp;·&nbsp;
-[**💬 Report an issue**](https://github.com/bxanedot/vyon/issues)
+[**🎵 Features**](#download-your-music) &nbsp;·&nbsp;
+[**💬 Feedback**](https://github.com/bxanedot/vyon/issues)
 
 <br>
 
-[![Windows](https://img.shields.io/badge/Windows-181818?style=flat-square&logo=windows11&logoColor=white)](desktop/windows/)
-[![macOS](https://img.shields.io/badge/macOS-181818?style=flat-square&logo=apple&logoColor=white)](desktop/macos/)
-[![Linux](https://img.shields.io/badge/Linux-181818?style=flat-square&logo=linux&logoColor=white)](desktop/linux/)
-[![Android](https://img.shields.io/badge/Android-181818?style=flat-square&logo=android&logoColor=white)](android/app/)
-[![Android TV](https://img.shields.io/badge/Android_TV-181818?style=flat-square&logo=androidtv&logoColor=white)](tv/)
-[![Wear OS](https://img.shields.io/badge/Wear_OS-181818?style=flat-square&logo=wearos&logoColor=white)](android/wearos/)
+[![Windows](https://img.shields.io/badge/Windows-181818?style=flat-square&logo=windows11&logoColor=white)](https://vyon.live/#downloads)
+[![macOS](https://img.shields.io/badge/macOS-181818?style=flat-square&logo=apple&logoColor=white)](https://vyon.live/#downloads)
+[![Linux](https://img.shields.io/badge/Linux-181818?style=flat-square&logo=linux&logoColor=white)](https://vyon.live/#downloads)
+[![Android](https://img.shields.io/badge/Android-181818?style=flat-square&logo=android&logoColor=white)](https://vyon.live/#downloads)
+[![Android TV](https://img.shields.io/badge/Android_TV-181818?style=flat-square&logo=android&logoColor=white)](tv/)
+[![Wear OS](https://img.shields.io/badge/Wear_OS-181818?style=flat-square&logo=google&logoColor=white)](android/wearos/)
 
 </div>
 
 ---
 
-## 🎧 About
+## Download your music
 
-**vyon** is a music player built around a custom listening experience: a YouTube Music-powered catalog, expressive interfaces, and deep playback controls. The project includes native Android and Android TV apps, a Compose Multiplatform desktop app for Windows, macOS, and Linux, a Wear OS companion, a marketing website, and optional listening-room infrastructure.
+**One song or an entire collection — vyon gives you the choice.**
 
-The platform apps share music data and playback-related code, but their interfaces and supported integrations can differ.
+| | What you can download | How it works |
+| :---: | --- | --- |
+| 🎤 | **Artist catalog** | Download the songs available in an artist's current track listing together, instead of saving each one individually. |
+| 💿 | **Complete albums** | Download an album's tracks in one action and keep the release together in your Downloads library. |
+| 📚 | **Entire playlists** | Queue a full playlist for download at once, in playlist order. |
+| 🎵 | **Individual tracks** | Pick the exact song you want and download only that track. |
 
-### One player. Different screens.
+From an artist, album, or playlist, open its **more actions (⋯)** menu and select **Download all**. For one song, open the **track actions (⋯)** menu and choose **Download**. The download features are implemented in the Android and desktop apps; controls and available sources may differ by platform.
 
-<p align="center">
-  <a href="desktop/"><img src="assets/branding/vyon-desktop-banner.png" width="49%" alt="vyon desktop experience"></a>
-  <a href="tv/"><img src="assets/branding/vyon-tv-banner.png" width="49%" alt="vyon TV experience"></a>
-</p>
+> **About artist downloads:** Bulk download uses the tracks currently provided by the artist page. It should not be confused with automatically collecting every release in an artist's lifetime discography. Downloadable formats and tracks depend on the chosen source.
 
-<p align="center"><sub>Native interfaces built for desktop and TV · Branding artwork from this repository</sub></p>
+### Downloads that you control
 
-## ✨ Highlights
-
-- **Your music, your way** — browse, search, play, queue, and organize music from the YouTube Music catalog, with a music/video playback switch.
-- **A player that feels alive** — album-art-driven visuals, polished transitions, and dynamic artwork treatments.
-- **Lyrics, in sync** — synchronized lyric display and support for multiple lyrics providers and formats.
-- **More control over sound** — equalizer, loudness processing, crossfade, and smart/Automix transition logic, with platform-dependent audio capabilities.
-- **More than one music source** — local media and additional source integrations, including SMB and WebDAV support in the Android codebase.
-- **Connected listening** — optional Listen Together rooms, Discord presence, and listening-history/scrobbling integrations.
-- **Made for different screens** — tailored desktop, touch, TV, and watch experiences instead of a single stretched layout.
-
-> **Note:** Individual features depend on the platform, music source, device capabilities, and configured services. This is not an official YouTube or YouTube Music application.
-
-## 📱 Platforms
-
-| Platform | Project | Notes |
-| --- | --- | --- |
-| Android phones & tablets | `android/app` | Native Android app; Android 8.0+ (API 26) |
-| Android TV | `tv` | Dedicated TV interface; Android 8.0+ (API 26) |
-| Windows | `desktop/app` + `desktop/ui` | Compose Desktop app |
-| macOS | `desktop/app` + `desktop/ui` | Compose Desktop app |
-| Linux | `desktop/app` + `desktop/ui` | Compose Desktop app |
-| Wear OS | `android/wearos` | Companion to the Android phone app; Wear OS 3+ (API 30) |
-
-**iOS and iPadOS are not supported.** Platform source code does not necessarily mean a prebuilt installer is available for that platform.
-
-## ⬇️ Download
-
-Get published builds from the **[GitHub Releases page](https://github.com/bxanedot/vyon/releases)**, or visit **[vyon.live](https://vyon.live)** to find available downloads for your device.
+- **Download manager** — see what's queued, follow transfer progress, and cancel or retry downloads.
+- **Quality options** — choose your preferred download quality, including lossless when a compatible source supplies it.
+- **Offline listening** — play songs already saved on your device without fetching them again.
+- **Organized collections** — Android remembers albums and playlists downloaded as a group, alongside individual songs.
+- **Artwork and metadata** — save track information and cover art where the source and file format support them.
+- **Network preferences** — Android offers Wi-Fi-only downloading and optional export of supported downloaded files.
 
 <p align="center">
-  <a href="https://github.com/bxanedot/vyon/releases"><img alt="View GitHub Releases" src="https://img.shields.io/badge/VIEW%20OFFICIAL%20RELEASES-%E2%86%92-c44759?style=for-the-badge&labelColor=161616"></a>
-  <a href="https://vyon.live"><img alt="Visit vyon.live" src="https://img.shields.io/badge/EXPLORE%20VYON.LIVE-%E2%86%97-303030?style=for-the-badge&labelColor=161616"></a>
+  <a href="https://vyon.live/#downloads"><img alt="Explore Vyon downloads" src="https://img.shields.io/badge/EXPLORE%20VYON%20DOWNLOADS-%E2%86%92-c44759?style=for-the-badge&labelColor=171717"></a>
 </p>
-
-Only download installers from sources you trust. The website links to a direct installer only when it can verify a matching published release asset.
-
-<sub>**About the counters:** Stars and forks reflect this GitHub repository. The downloads badge counts **GitHub Release asset downloads**, not website visits or installs. It may show zero or unavailable until release assets have been published.</sub>
-
-## 🛠️ Building from source
-
-### Prerequisites
-
-- **Git**
-- **JDK 21** for the desktop build (the Gradle wrapper supplies Gradle 9.3.1)
-- **Android Studio / Android SDK** for Android, TV, or Wear OS builds; install the SDK platforms and native CMake components requested by the Android project
-- An internet connection to resolve Gradle dependencies
-
-The project uses Kotlin, Jetpack Compose, Compose Multiplatform, Android Media3, and shared Kotlin Multiplatform modules.
-
-### 1. Clone
-
-```bash
-git clone https://github.com/bxanedot/vyon.git
-cd vyon
-```
-
-### 2. Desktop (Windows, macOS, Linux)
-
-Run the app from the repository root:
-
-```bash
-./gradlew :desktopApp:run
-```
-
-On Windows, use `gradlew.bat :desktopApp:run`.
-
-The desktop app uses a Java 21 toolchain. Platform-specific native audio and packaging tools may require additional dependencies; see `desktop/app/build.gradle.kts` and the corresponding `desktop/<platform>/` folder. Native installer generation is OS-specific.
-
-### 3. Android
-
-Configure an Android SDK in Android Studio, or set `ANDROID_HOME` / `ANDROID_SDK_ROOT`. A valid `sdk.dir` entry in the ignored root `local.properties` also works.
-
-Build the phone development APK:
-
-```bash
-./gradlew :app:assembleDevDebug
-```
-
-Build the TV or watch development APK:
-
-```bash
-./gradlew :tv:assembleDevDebug
-./gradlew :wearos:assembleDevDebug
-```
-
-The `dev` Android variants use separate application IDs so that development and production installations can coexist. Without a detected Android SDK, `settings.gradle.kts` only includes the desktop application targets.
-
-> Release APK signing requires private keystore configuration. Never commit `keystore.properties`, keystores, credentials, or `local.properties`.
-
-### 4. Optional configuration
-
-Some integrations need configuration before they can work. The Android and desktop builds read applicable values from local properties or environment variables, including:
-
-| Setting | Purpose |
-| --- | --- |
-| `LASTFM_API_KEY` | Last.fm integration |
-| `LASTFM_SECRET` | Last.fm request signing |
-| `LISTEN_TOGETHER_SERVER` | Default address for a listening-room server |
-| `MODULE_INDEX_URL` | Optional desktop source-module index |
-
-These settings are optional for a basic local build. Consult the source for integration-specific setup; do not publish secrets.
-
-## 🗂️ Project structure
-
-```text
-vyon/
-├── android/
-│   ├── app/                  # Android phone and tablet app
-│   └── wearos/               # Wear OS companion
-├── tv/                       # Android TV experience
-├── desktop/
-│   ├── app/                  # Desktop application and packaging
-│   ├── ui/                   # Desktop-specific Compose UI
-│   ├── windows/
-│   ├── macos/
-│   └── linux/
-├── core/
-│   ├── shared/               # Shared models, clients, playback logic
-│   ├── ui/                   # Shared Compose interface components
-│   └── native/               # Native audio-related sources/tools
-├── website/                  # vyon.live marketing website
-├── listen-together-server/   # Cloudflare Worker and Go server sources
-├── assets/                   # Artwork and branding
-└── README.md
-```
-
-### Website
-
-The website is a static HTML/CSS/JavaScript project, built with Node.js tooling and deployed separately to Vercel.
-
-```bash
-cd website
-npm install
-npm run build
-```
-
-Serve `website/dist/` with a local static server to preview the production build. For hosting, analytics, visitor counters, and the interactive particle effects, see **[website/README.md](website/README.md)**.
-
-### Listen Together
-
-`listen-together-server/` contains listening-room synchronization services, including a Cloudflare Worker/Durable Objects implementation and a separate Go server. These services exchange playback metadata and state; **they do not stream music or redistribute audio**.
-
-See **[listen-together-server/README.md](listen-together-server/README.md)** for the Worker setup, API, and security limitations. Server deployment and app integration are separate from installing the player.
-
-## 🤝 Contributing
-
-Issues, bug reports, and pull requests are welcome. Before submitting a change:
-
-1. Check the existing [issues](https://github.com/bxanedot/vyon/issues).
-2. Keep changes scoped to the relevant platform or shared module.
-3. Describe the behavior you changed and how you tested it.
-4. Avoid committing generated builds, local settings, signing material, or API secrets.
-
-## 📜 License & disclaimer
-
-This repository is distributed under the **[GNU General Public License v3.0](LICENSE)**. Some bundled components and dependencies have their own licenses and notices; keep those notices intact.
-
-vyon is an independent project and is **not affiliated with, endorsed by, or sponsored by Google or YouTube**. YouTube and YouTube Music are trademarks of their respective owners.
 
 ---
 
+## Discover, collect, play
+
+| Feature | Experience |
+| --- | --- |
+| 🔎 **Search & discovery** | Find tracks, artists, albums, and playlists through the music catalog. |
+| ❤️ **Your library** | Keep favorite tracks and music collections within reach. |
+| 📝 **Playlist controls** | Create and manage playlists, queue songs, and reorder your own playlists where supported. |
+| 🔀 **Queues & autoplay** | Play next, shuffle, reorder listening, and keep music going with autoplay. |
+| 📺 **Music & video** | Switch between music listening and available video playback experiences. |
+| 📁 **Local music** | Play music stored on your device; Android also includes SMB and WebDAV music-source integrations. |
+
+## Sound, your way
+
+**The player is as much about how music sounds as what you listen to.**
+
+- 🎚️ **Equalizer & presets** — tune playback to your preferences.
+- 🌊 **Crossfade** — ease the transition between tracks.
+- ✨ **Automix** — smart transition planning informed by track analysis.
+- 🔊 **Audio-quality controls** — select streaming quality, with separate Wi-Fi and mobile-data preferences on Android.
+- 💎 **High-quality sources** — support for compatible lossless formats and Dolby Atmos audio paths when the source, device, and decoder allow it.
+
+These audio capabilities vary by platform, format, and connected music source. Lossless or Atmos playback is not guaranteed for every song.
+
+## Lyrics, artwork & atmosphere
+
+- 🎤 **Synced lyrics** — follow lyrics while music plays, with line- and word-level timing when available.
+- 🌍 **Lyrics translation** — read translations in supported languages when available.
+- ⏱️ **Lyrics timing controls** — adjust synchronization offsets to match playback.
+- 🖼️ **Animated cover art** — motion artwork and Canvas-style visuals for supported releases.
+- 🎨 **Reactive player** — album-art-inspired colors, gradients, and immersive playback screens.
+- 🫧 **Distinct UI** — custom layouts and polished visual effects across desktop, phone, and TV.
+
+---
+
+## Better together
+
+**Listening doesn't have to be a solo experience.**
+
+| Integration | What it brings |
+| --- | --- |
+| 👥 **Listen Together** | Shared rooms with synchronized playback state, queue changes, and host/listener controls when connected to a compatible server. |
+| 🎮 **Discord presence** | Show what you're listening to with supported Discord Rich Presence integration. |
+| 📊 **Listening statistics** | Explore listening history and insights tracked by the app. |
+| 🎧 **Last.fm / ListenBrainz** | Scrobble listening activity through supported account integrations. |
+
+Listen Together coordinates playback; it does **not** host or redistribute audio. Each participant needs access to playable music through their own source.
+
+---
+
+## Made for every screen
+
+<p align="center">
+  <img src="assets/branding/vyon-desktop-banner.png" width="49%" alt="Vyon desktop branding">
+  <img src="assets/branding/vyon-tv-banner.png" width="49%" alt="Vyon TV branding">
+</p>
+
+<p align="center"><sub>Desktop & TV artwork from the vyon project</sub></p>
+
+| Platform | Experience |
+| --- | --- |
+| **Windows, macOS & Linux** | Desktop music player with its own interface, downloads, audio controls, and integrations. |
+| **Android phones & tablets** | Touch-first player with downloads, music library, customizable playback, and device integrations. |
+| **Android TV** | Living-room interface designed for a bigger screen and remote-control navigation. |
+| **Wear OS** | Companion experience paired with the Android app. |
+
+**iOS and iPadOS are not supported.** Some features and downloadable builds may be available on only certain platforms.
+
+---
+
+## Get vyon
+
+**Ready to listen?** Find official builds and available installers below.
+
 <div align="center">
 
-**If vyon is useful to you, consider giving the project a ⭐.**  
-It helps people discover the project.
+[![Official releases](https://img.shields.io/badge/GET%20VYON-GITHUB%20RELEASES-c44759?style=for-the-badge&logo=github&logoColor=white&labelColor=171717)](https://github.com/bxanedot/vyon/releases)
+[![Official website](https://img.shields.io/badge/VISIT-VYON.LIVE-383838?style=for-the-badge&labelColor=171717)](https://vyon.live)
 
-[![Star this project](https://img.shields.io/badge/STAR%20VYON-ON%20GITHUB-c44759?style=for-the-badge&logo=github&logoColor=white&labelColor=161616)](https://github.com/bxanedot/vyon)
+</div>
+
+Vyon's website only links directly to installers it can verify in published GitHub releases. If no build is published for your platform yet, check the [Releases page](https://github.com/bxanedot/vyon/releases) for updates.
+
+<sub>GitHub badges display live repository statistics. The download counter measures **GitHub Release asset downloads**, not active users, website visits, or installed copies. A repository without published release assets may show zero or an unavailable value.</sub>
+
+---
+
+## Questions?
+
+<details>
+<summary><strong>Can I download a whole album or playlist at once?</strong></summary>
+<br>
+Yes. Open the album or playlist's actions menu and choose <strong>Download all</strong>. The app queues its listed tracks without needing a separate tap for each song.
+</details>
+
+<details>
+<summary><strong>Can I download all of an artist's music?</strong></summary>
+<br>
+An artist page supports batch downloading its available song list. The selection follows the tracks provided by that page; it may not include every album, single, or historical release in a complete discography.
+</details>
+
+<details>
+<summary><strong>Can I listen without the internet?</strong></summary>
+<br>
+Previously downloaded, playable tracks can be accessed from your device. Discovering new music and using online integrations still requires a connection.
+</details>
+
+<details>
+<summary><strong>Can I download lossless music?</strong></summary>
+<br>
+Where a configured music source provides a supported lossless format, vyon can preserve higher-quality audio. YouTube Music alone does not guarantee lossless downloads.
+</details>
+
+<details>
+<summary><strong>Where do I report a bug or suggest a feature?</strong></summary>
+<br>
+Open a <a href="https://github.com/bxanedot/vyon/issues">GitHub issue</a> with a short description of the problem or idea.
+</details>
+
+---
+
+## License & credits
+
+Vyon is open source under the [GNU General Public License v3.0](LICENSE). Bundled third-party components retain their respective licenses.
+
+**Disclaimer:** Vyon is an independent music player and is not affiliated with, endorsed by, or sponsored by Google or YouTube. YouTube and YouTube Music are trademarks of their respective owners.
+
+<div align="center">
+
+<br>
+
+**Like vyon? A star helps more people discover it.**
+
+[![Star vyon on GitHub](https://img.shields.io/badge/STAR%20VYON-ON%20GITHUB-c44759?style=for-the-badge&logo=github&logoColor=white&labelColor=171717)](https://github.com/bxanedot/vyon)
 
 <sub>Made with ♥ by <a href="https://github.com/bxanedot">bxane</a> · <a href="https://vyon.live">vyon.live</a></sub>
 
