@@ -10,6 +10,19 @@ Import the repository into Vercel with **Root Directory: `website`**, framework 
 
 To test the site locally, run `npm install` and `npm run build` inside `website/`, then serve the generated `dist/` directory using a local static web server.
 
+## Social sharing previews
+
+Discord, Telegram, X and other Open Graph-compatible link previews use a
+single 1200 × 630 PNG at `https://vyon.live/vyon-social-preview.png`.
+The page defines absolute `og:url`, `og:image`, secure image URL, canonical
+link and X's `summary_large_image` card metadata. The Vercel build does not
+rewrite these to temporary preview-deployment hostnames. Instagram may choose
+not to show a link preview depending on the surface and app behavior; this
+cannot be forced with metadata.
+
+To inspect social metadata on a deployment, open its **Open Graph** tab in
+Vercel. Platform caches may require time before updating.
+
 ## Web Analytics
 
 `@vercel/analytics` is bundled from `analytics-entry.js` and injected into the generated HTML by `build-vercel.mjs`. This is a plain HTML/JavaScript site, so no Next.js or React component is used. Enable Analytics in the project's Vercel dashboard to start collecting page views.

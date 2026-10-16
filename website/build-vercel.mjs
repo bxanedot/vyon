@@ -28,13 +28,6 @@ if(!analyticsHtml.includes('src="/analytics.js"')){
  analyticsHtml=analyticsHtml.replace('</body>','  <script type="module" src="/analytics.js"></script>\n</body>');
  await writeFile(analyticsPage,analyticsHtml);
 }
-const hostname=process.env.VERCEL_URL;
-if(hostname&&/^[a-z0-9.-]+$/i.test(hostname)){
- const path=join(output,"index.html");
- let html=await readFile(path,"utf8");
- const origin="https://"+hostname;
- html=html.replace('property="og:url" content="/"','property="og:url" content="'+origin+'/"');
- html=html.replaceAll('content="/vyon-social-preview.png"','content="'+origin+'/vyon-social-preview.png"');
- await writeFile(path,html);
-}
+// All production and preview builds advertise the stable public domain.
+// Never point social crawlers at a temporary, potentially protected Vercel URL.
 console.log("Built Vyon static marketing website for Vercel.");
