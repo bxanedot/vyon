@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Listen Together — Cloudflare Demo</title>
+  <style>
+    :root{font-family:system-ui,-apple-system,Segoe UI,sans-serif;color-scheme:dark;background:#0e1119;color:#f5f6fb}
+    *{box-sizing:border-box}body{margin:0 auto;padding:40px 20px;max-width:780px}
+    h1{margin-bottom:4px}p,.muted{color:#abb3c4}section{padding:22px;border:1px solid #354054;border-radius:14px;margin:18px 0;background:#191e2b}
+    label{display:block;margin:12px 0 6px;font-size:14px}input,textarea,button{font:inherit;border-radius:8px;padding:10px}
+    input,textarea{width:100%;border:1px solid #46526a;background:#0f1521;color:#fff}textarea{resize:vertical;min-height:90px}
+    button{border:0;background:#6b86f5;color:#070b17;font-weight:700;cursor:pointer;margin-top:12px}
+    button:disabled{opacity:.45;cursor:not-allowed}a{color:#a9bbff;overflow-wrap:anywhere}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:550px){.grid{grid-template-columns:1fr}}
+    code{overflow-wrap:anywhere}pre{white-space:pre-wrap;word-break:break-word;background:#0e1119;padding:12px;border-radius:9px}
+  </style>
+</head>
+<body>
+  <h1>🎧 Listen Together</h1>
+  <p>A working room and playback-sync demo. This syncs metadata, not copyrighted music/audio.</p>
+
+  <section>
+    <h2>Create room</h2>
+    <label for="secret">Server creation key (the CREATE_KEY Worker secret)</label>
+    <input id="secret" type="password" autocomplete="off" placeholder="Enter the key configured on Cloudflare">
+    <button id="create">Create room</button>
+    <p class="muted">The key is used for this request only and is not saved.</p>
+  </section>
+
+  <section>
+    <h2>Join a room</h2>
+    <label for="room">Room ID or share link</label>
+    <input id="room" placeholder="Paste a room ID or URL">
+    <button id="join">Connect</button>
+    <p id="status" role="status" aria-live="polite">Not connected</p>
+    <p id="invite"></p>
+    <p class="muted">The room link grants listening access. Only someone with the private host key can control playback.</p>
+  </section>
+
+  <section>
+    <h2>Playback</h2>
+    <p id="role">Connect to a room to see shared playback.</p>
+    <div class="grid">
+      <div><label for="track">Track ID</label><input id="track" placeholder="Track/video ID"></div>
+      <div><label for="title">Track title</label><input id="title" placeholder="Track title"></div>
+      <div><label for="position">Position (seconds)</label><input id="position" type="number" min="0" max="86400" step="0.1" value="0"></div>
+      <div><label for="playing">Playing</label><input id="playing" type="checkbox" style="width:auto"></div>
+    </div>
+    <label for="queue">Queue (one line per track: id | title)</label>
+    <textarea id="queue" placeholder="track123 | First track"></textarea>
+    <button id="sync" disabled>Send playback state</button>
+    <p class="muted">This demo shows sync events; connect your actual audio player separately. Timestamped state supports drift correction.</p>
+    <h3>Latest event</h3>
+    <pre id="latest">No events yet.</pre>
+  </section>
+
+  <script>
+    "use strict";
+    const el = (id) => document.getElementById(id);
+    let socket = null;
+    let currentRoom = "";
+    let myRole = "listener";
+    const roomPattern = /^[0-9a-f]{24}$/;
+
+    function status(message) { el("status").textContent = message; }
+
+    function roomFromInput(input) {
+      let value = input.trim();
+      try { value = new URL(value).searchParams.get("room") || value; } catch {}
+      return roomPattern.test(value) ? value : null;
+    }
+
+    function connect(roomId, hostKey) {
+      if (socket) socket.close();
+      currentRoom = roomId;
+      myRole = "listener";
+      el("sync").disabled = true;
+      el("room").value = roomId;
+      const invitation = location.origin + "/?room=" + roomId;
+      const link = document.createElement("a");
+      link.href = invitation;
+      link.textContent = invitation;
+      el("invite").replaceChildren("Share with listeners: ", link);
+      history.replaceState(null, "", "/?room=" + roomId);
+
+      const wsProtocol = location.protocol === "https:" ? "wss:" : "ws:";
+      socket = new WebSocket(wsProtocol + "//" + location.host + "/room/" + roomId);
+      status("Connecting…");
+      socket.onopen = () => {
+        socket.send(JSON.stringify({ type: "join", hostKey: hostKey || undefined }));
+      };
+      socket.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        el("latest").textContent = JSON.stringify(data, null, 2);
+        if (data.type === "welcome") {
+          myRole = data.role;
+          el("sync").disabled = myRole !== "host";
+          el("role").textContent = "Connected as " + myRole +
+            ". Only hosts may send changes.";
+          status("Connected to room " + roomId);
+        }
+        if (data.type === "state") {
+          el("track").value = data.trackId;
+          el("title").value = data.title;
+          const corrected = data.positionMs +
+            (data.playing ? Math.max(0, Date.now() - data.updatedAt) : 0);
+          el("position").value = (corrected / 1000).toFixed(1);
+          el("playing").checked = data.playing;
+          el("queue").value = (data.queue || []).map((t) =>
+            t.id + " | " + t.title).join("\n");
+        }
+        if (data.type === "presence") {
+          status("Connected: " + data.connections + " participant(s)");
+        }
+      };
+      socket.onclose = (event) => {
+        if (socket !== event.target) return;
+        status("Disconnected (" + event.code + "). Reconnect to try again.");
+        el("sync").disabled = true;
+      };
+      socket.onerror = () => status("Connection error — check your server URL.");
+    }
+
+    el("create").onclick = async () => {
+      try {
+        status("Creating room…");
+        const result = await fetch("/api/rooms", {
+          method: "POST",
+          headers: { "x-create-key": el("secret").value },
+        });
+        const body = await result.json();
+        if (!result.ok) throw new Error(body.error || "Create failed");
+        sessionStorage.setItem("listen-host:" + body.roomId, body.hostKey);
+        el("secret").value = "";
+        connect(body.roomId, body.hostKey);
+      } catch (error) { status(String(error.message || error)); }
+    };
+
+    el("join").onclick = () => {
+      const id = roomFromInput(el("room").value);
+      if (!id) { status("Enter a valid room ID or share link."); return; }
+      const savedHostKey = sessionStorage.getItem("listen-host:" + id);
+      connect(id, savedHostKey);
+    };
+
+    el("sync").onclick = () => {
+      if (!socket || socket.readyState !== WebSocket.OPEN || myRole !== "host") return;
+      const queue = el("queue").value.split("\n").map((line) => {
+        const [id, ...title] = line.split("|");
+        return { id: id.trim(), title: title.join("|").trim() };
+      }).filter((item) => item.id);
+      socket.send(JSON.stringify({
+        type: "sync",
+        trackId: el("track").value,
+        title: el("title").value,
+        positionMs: Number(el("position").value) * 1000,
+        playing: el("playing").checked,
+        queue,
+      }));
+    };
+
+    const incoming = new URLSearchParams(location.search).get("room");
+    if (incoming && roomPattern.test(incoming)) {
+      el("room").value = incoming;
+      connect(incoming, sessionStorage.getItem("listen-host:" + incoming));
+    }
+  </script>
+</body>
+</html>
