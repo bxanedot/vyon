@@ -18,9 +18,9 @@ module.exports = {
     },
     assert: {
       assertions: {
-        // Track performance as an actionable warning until stable baseline
-        // measurements exist; keep layout shifts as a hard failure.
-        "categories:performance": ["warn", {minScore: 0.6, aggregationMethod: "median"}],
+        // Conservative hard floor; warnings surface higher-quality targets.
+        // Median aggregation reduces occasional mobile-CI noise.
+        "categories:performance": ["error", {minScore: 0.55, aggregationMethod: "median"}],
         "categories:accessibility": ["warn", {minScore: 0.85, aggregationMethod: "median"}],
         "categories:seo": ["error", {minScore: 0.85, aggregationMethod: "median"}],
         "cumulative-layout-shift": ["error", {maxNumericValue: 0.25, aggregationMethod: "median"}],
