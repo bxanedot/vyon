@@ -22,6 +22,7 @@ assert.match(homepage,/<link rel="stylesheet" href="\/dimension.css">/);
 assert.match(homepage,/id="sonic-canvas"/);
 assert.match(homepage,/id="particle-lab"/);
 assert.match(homepage,/data-rive-motion/);
+assert.match(homepage,/<script type="module" src="\/anime-motion.js"><\/script>/);
 assert.match(homepage,/href="https:\/\/fonts.googleapis.com\/css2\?/);
 assert.match(homepage,/href="\/download"/);
 assert.match(homepage,/<meta name="description"/);
@@ -47,7 +48,7 @@ for(const page of pages){
 }
 
 // The original interactive homepage code still needs to parse after optimization.
-for(const script of ["app.js","equalizer.js","visit-counters.js","sonic-scene.js","rive-studio.js"])
+for(const script of ["app.js","equalizer.js","visit-counters.js","sonic-scene.js","rive-studio.js","anime-motion.js"])
  execFileSync(process.execPath,["--check",join(output,script)],{stdio:"pipe"});
 
 const css=["styles.css","compact.css","equalizer.css","seo-pages.css","seo-foundation.css","studio.css","dimension.css"];
