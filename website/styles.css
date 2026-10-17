@@ -98,3 +98,29 @@ body{background:var(--bg);background-image:radial-gradient(ellipse 56% 28% at 91
 .brand .brand-symbol{display:block;width:42px;height:28px;object-fit:contain;flex:none;transition:transform .25s ease}
 .brand:hover .brand-symbol{transform:scale(1.04)}
 @media(prefers-reduced-motion:reduce){.brand .brand-symbol{transition:none}}
+
+
+/* Atmospheric shader-gradient inspired light, rendered by CSS rather than
+   another WebGL context. The original interactive particle canvas stays intact. */
+.hero-atmosphere{
+ position:absolute;top:6%;right:-12%;z-index:1;
+ width:min(73vw,820px);aspect-ratio:1;border-radius:50%;
+ pointer-events:none;
+ background:radial-gradient(circle at 50% 50%,
+  rgba(var(--accent-rgb),.105) 0%,rgba(var(--accent-rgb),.045) 33%,transparent 69%);
+ transform:translate3d(-4%,2%,0) scale(.96);
+ animation:vyon-ambient-drift 16s ease-in-out infinite alternate;
+}
+@keyframes vyon-ambient-drift{
+ to{transform:translate3d(4%,-3%,0) scale(1.08)}
+}
+@media(max-width:850px){
+ .hero-atmosphere{width:min(100vw,500px);right:-32%;top:12%;
+  animation:none;transform:none;opacity:.65}
+}
+@media(prefers-reduced-motion:reduce){
+ .hero-atmosphere{animation:none;transform:none}
+}
+@media(prefers-reduced-transparency:reduce){
+ .hero-atmosphere{display:none}
+}
