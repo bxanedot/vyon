@@ -167,3 +167,24 @@ test("new dimensional experience preserves all core homepage interactions", asyn
   await expect(page.locator(".screenshot-tab")).toHaveCount(3);
   await expect(page.locator('.hero-explore[href="#particle-lab"]')).toBeAttached();
 });
+
+
+test("Anime.js cinematic choreography is provided without blocking the page", async ({page}) => {
+  await page.goto("/", {waitUntil: "domcontentloaded"});
+  await expect(page.locator('script[type="module"][src="/anime-motion.js"]')).toHaveCount(1);
+  const response=await page.request.get("/anime-motion.js");
+  expect(response.status()).toBe(200);
+  const source=await response.text();
+  expect(source).toContain("animejs@4.5.0");
+  expect(source).toContain('matchMedia("(prefers-reduced-motion: reduce)")');
+  await expect(page.locator("#sonic-scene")).toBeAttached();
+  await expect(page.locator(".hero h1")).toBeVisible();
+});
+
+test("Anime.js is skipped for reduced-motion preference", async ({page}) => {
+  await page.emulateMedia({reducedMotion: "reduce"});
+  await page.goto("/", {waitUntil: "load"});
+  await expect(page.locator("html")).toHaveAttribute("data-anime-motion", "skipped");
+  await expect(page.locator(".hero h1")).toBeVisible();
+  await expect(page.locator("#particle-lab")).toBeAttached();
+});
