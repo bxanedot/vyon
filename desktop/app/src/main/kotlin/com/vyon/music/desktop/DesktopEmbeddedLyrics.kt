@@ -180,7 +180,7 @@ internal object DesktopEmbeddedLyrics {
             val value = entry.substringAfter('=', "")
             // This app's own field wins outright; the standard one is held in case it is the only
             // one there.
-            if (name == WORD_LYRICS_FIELD && value.isNotBlank()) return value
+            if (name == WORD_LYRICS_FIELD.uppercase() && value.isNotBlank()) return value
             if (name == "LYRICS" && plain == null && value.isNotBlank()) plain = value
         }
         return plain

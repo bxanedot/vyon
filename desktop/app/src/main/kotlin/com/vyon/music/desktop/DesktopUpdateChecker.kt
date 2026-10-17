@@ -36,6 +36,7 @@ internal object DesktopUpdateChecker {
         "https://api.github.com/repos/bxanedot/vyon/releases/latest"
 
     val currentVersion: String = System.getProperty("vyon.version") ?: "1.0.0"
+    val currentVersionCode: Int = Integer.getInteger("vyon.versionCode", 1)
 
     private val json = Json { ignoreUnknownKeys = true }
 

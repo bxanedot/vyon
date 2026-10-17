@@ -18,13 +18,13 @@ import (
 
 	"github.com/gorilla/websocket"
 
-	"github.com/bxandot/vyon/listen-together-server/go/clock"
-	"github.com/bxandot/vyon/listen-together-server/go/codes"
-	"github.com/bxandot/vyon/listen-together-server/go/config"
-	"github.com/bxandot/vyon/listen-together-server/go/hub"
-	"github.com/bxandot/vyon/listen-together-server/go/party"
-	"github.com/bxandot/vyon/listen-together-server/go/presence"
-	"github.com/bxandot/vyon/listen-together-server/go/protocol"
+	"github.com/bxanedot/vyon/listen-together-server/go/clock"
+	"github.com/bxanedot/vyon/listen-together-server/go/codes"
+	"github.com/bxanedot/vyon/listen-together-server/go/config"
+	"github.com/bxanedot/vyon/listen-together-server/go/hub"
+	"github.com/bxanedot/vyon/listen-together-server/go/party"
+	"github.com/bxanedot/vyon/listen-together-server/go/presence"
+	"github.com/bxanedot/vyon/listen-together-server/go/protocol"
 )
 
 var (
@@ -749,7 +749,7 @@ var inviteTemplate = template.Must(template.New("invite").Parse(`<!DOCTYPE html>
             <a id="joinBtn" href="{{.IntentURI}}" class="btn">Join Party in Vyon</a>
             <p class="footer-note">
                 Didn’t open automatically? Tap the button above.<br>
-                Don't have Vyon yet? <a href="https://github.com/bxandot/vyon/releases" target="_blank" rel="noopener">Download it here</a>.
+                Don't have Vyon yet? <a href="https://github.com/bxanedot/vyon/releases" target="_blank" rel="noopener">Download it here</a>.
             </p>
             <script>
                 var intentUri = {{.IntentURI}};

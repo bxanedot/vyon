@@ -1,5 +1,9 @@
 <resources>
     <string name="vyon_tagline">موسيقاك، بطريقتك</string>
+    <string name="vyon_stable">مستقر</string>
+    <string name="vyon_version_code">رمز الإصدار</string>
+    <string name="vyon_license">الترخيص</string>
+    <string name="vyon_open_source_licenses">تراخيص المصادر المفتوحة</string>
     <string name="vyon_lead_dev">المطور الرئيسي</string>
     <string name="vyon_inspector">مفتش</string>
     <string name="vyon_app_info">معلومات التطبيق</string>

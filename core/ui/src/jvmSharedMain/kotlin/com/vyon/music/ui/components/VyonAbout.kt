@@ -38,7 +38,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-fun VyonAbout(modifier: Modifier = Modifier, onLicenses: (() -> Unit)? = null) {
+fun VyonAbout(versionName: String, versionCode: Int, modifier: Modifier = Modifier, onLicenses: (() -> Unit)? = null) {
     val uri = LocalUriHandler.current
     var stars by remember { mutableIntStateOf(-1) }
     LaunchedEffect(Unit) {
@@ -57,7 +57,10 @@ fun VyonAbout(modifier: Modifier = Modifier, onLicenses: (() -> Unit)? = null) {
         Column(Modifier.fillMaxWidth().padding(bottom = 8.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
             VyonLogo(Modifier.size(88.dp))
         Text("vyon", color = MaterialTheme.colorScheme.onBackground, style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold)
-        Text("1.0.0 · " + stringResource(Res.string.vyon_tagline), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
+        Surface(shape = CircleShape, color = MaterialTheme.colorScheme.primaryContainer, contentColor = MaterialTheme.colorScheme.onPrimaryContainer) {
+            Text("v$versionName · " + stringResource(Res.string.vyon_stable), Modifier.padding(horizontal = 12.dp, vertical = 6.dp), style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.SemiBold)
+        }
+        Text(stringResource(Res.string.vyon_tagline), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
         }
         AboutSection(stringResource(Res.string.vyon_lead_dev)) {
             AboutPerson(painterResource(Res.drawable.bxane_avatar), "bxane", stringResource(Res.string.vyon_lead_dev), Icons.Rounded.Code) {
@@ -70,7 +73,7 @@ fun VyonAbout(modifier: Modifier = Modifier, onLicenses: (() -> Unit)? = null) {
             }
         }
         AboutSection(stringResource(Res.string.vyon_app_info)) {
-            AboutRow(VyonSymbols.Version, "Version", "1.0.0")
+            AboutRow(VyonSymbols.Version, stringResource(Res.string.vyon_version_code), versionCode.toString())
             HorizontalDivider(Modifier.padding(start = 48.dp), color = MaterialTheme.colorScheme.outline.copy(alpha = 0.45f))
             AboutRow(VyonSymbols.Website, stringResource(Res.string.vyon_website), "vyon.live") {
                 uri.openUri("https://vyon.live")
@@ -79,9 +82,9 @@ fun VyonAbout(modifier: Modifier = Modifier, onLicenses: (() -> Unit)? = null) {
             AboutRow(VyonBrandIcons.GitHub, stringResource(Res.string.vyon_source), "github.com/bxanedot/vyon") {
                 uri.openUri("https://github.com/bxanedot/vyon")
             }
-            onLicenses?.let {
-            AboutRow(VyonSymbols.About, "Open source licenses", null, onClick = it)
-            }
+            AboutRow(VyonSymbols.About, stringResource(Res.string.vyon_license), "GPL-3.0", onClick = onLicenses ?: {
+                uri.openUri("https://github.com/bxanedot/vyon/blob/main/LICENSE")
+            })
         }
         AboutSection(stringResource(Res.string.vyon_community)) {
             AboutRow(null, "Discord", null, painter = painterResource(Res.drawable.discord)) { uri.openUri("https://discord.gg/h4Wsu824Uf") }

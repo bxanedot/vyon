@@ -40,34 +40,17 @@ val lastfmSecret: String = (
  * deployment-specific rather than a property of the source, which is what puts
  * it here beside the others instead of in a constant.
  *
- * Empty is a supported state, not a broken build: the field below is only the
- * *default* the address box on the Listen Together screen starts with, and
- * anything typed there wins and persists. So a fresh checkout without this line
- * builds and runs, and simply asks for an address the first time somebody opens
- * the screen. See ListenTogether.DEFAULT_SERVER.
+ * The Cloudflare Worker is the app default; local.properties and environment
+ * overrides support self-hosted builds. See ListenTogether.DEFAULT_SERVER.
  */
 val listenTogetherServer: String = (
     localProps.getProperty("LISTEN_TOGETHER_SERVER")
         ?: System.getenv("LISTEN_TOGETHER_SERVER")
-        ?: ""
+        ?: "https://vyon-listen-together.bxane.workers.dev"
     ).trim().trimEnd('/')
 
-/*
- * Bump this by hand before cutting each sideloaded test build ("beta2",
- * "beta3", ...) and blank it out before cutting the real release. Marks the
- * versionName below as a pre-release: AppUpdateChecker.isNewer() treats any
- * "-suffix" as older than a clean release of the same number, so testers
- * still get the update prompt once the matching tag is actually published.
- *
- * Applied to release builds as well as debug ones, and that is the whole
- * point of it. A sideloaded beta is a *release* build — signed with the real
- * key, installed over the real package — so leaving the marker off it is
- * exactly the case that strands a tester: their build calls itself 1.6.1,
- * the published 1.6.1 then matches it, isNewer() says no, and no prompt ever
- * comes. Blanking this line is the one step that turns a beta into a release,
- * so it is the one place to get right.
- */
-val betaSuffix = ""
+// One version source for all Vyon apps.
+val betaSuffix = rootProject.extra["vyonBetaSuffix"] as String
 
 android {
     namespace = "com.vyon.music"
@@ -82,8 +65,8 @@ android {
         // Haze falls back to a translucent scrim below that.
         minSdk = 26
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = rootProject.extra["vyonVersionCode"] as Int
+        versionName = rootProject.extra["vyonVersionName"] as String
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -202,9 +185,8 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "../android/app/proguard-rules.pro"
             )
-            // Null without a keystore to sign with: fallback to debug signing
-            // so the release build is fully R8 optimized and directly installable.
-            signingConfig = signingConfigs.findByName("release") ?: signingConfigs.getByName("debug")
+            // Without a release keystore this remains unsigned, like the phone and watch apps.
+            signingConfig = signingConfigs.findByName("release")
         }
         /*
          * The release build, installable next to the dev and prod apps: same R8,

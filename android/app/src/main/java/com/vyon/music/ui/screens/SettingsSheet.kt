@@ -136,6 +136,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.viewinterop.AndroidView
 import com.vyon.music.AppIcon
+import com.vyon.music.BuildConfig
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
@@ -386,12 +387,6 @@ fun SettingsScreen(
     var showLastfmLoginDialog by remember { mutableStateOf(false) }
     val scrobbleScope = rememberCoroutineScope()
 
-    val version = remember(context) {
-        runCatching {
-            context.packageManager.getPackageInfo(context.packageName, 0).versionName
-        }.getOrNull() ?: "1.0"
-    }
-
     // Made fresh on every pass rather than remembered: it tallies the rows
     // that answered to the query, and that tally has to start from zero each
     // time the query changes.
@@ -424,7 +419,10 @@ fun SettingsScreen(
         if (targetPage == VyonSettingsPage.ABOUT) {
             Column(modifier.fillMaxWidth().height(settingsViewportHeight).verticalScroll(rememberScrollState()).padding(contentPadding)) {
                 Text(stringResource(R.string.vyon_about), color = MaterialTheme.colorScheme.onBackground, style = MaterialTheme.typography.displayLarge, modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp))
-                com.vyon.music.ui.components.VyonAbout()
+                com.vyon.music.ui.components.VyonAbout(
+                    versionName = BuildConfig.VERSION_NAME,
+                    versionCode = BuildConfig.VERSION_CODE,
+                )
             }
         } else Column(
         modifier = Modifier
@@ -500,14 +498,14 @@ fun SettingsScreen(
                         VyonSettingsPage.UPDATES -> R.string.vyon_updates_summary
                         VyonSettingsPage.ABOUT -> R.string.vyon_about_summary
                     }
-                    SettingsRow(icon = icon, title = stringResource(destination.title), subtitle = stringResource(description), onClick = { searchQuery = ""; onPageChange(destination) })
+                    SettingsRow(icon = icon, title = stringResource(destination.title), subtitle = stringResource(description, BuildConfig.VERSION_NAME), onClick = { searchQuery = ""; onPageChange(destination) })
                 }
             }
             Row(Modifier.fillMaxWidth().padding(24.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
                 VyonLogo(Modifier.size(64.dp), contentDescription = null)
                 Column {
                     Text("vyon", color = MaterialTheme.colorScheme.onBackground, style = MaterialTheme.typography.titleLarge)
-                    Text("1.0.0", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
+                    Text("${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
                 }
             }
         }

@@ -1352,4 +1352,5 @@
     <string name="wear_os_code_hint">Code d’association</string>
     <string name="wear_os_done">Terminé</string>
     <string name="signed_by">Signé par %1$s</string>
+    <string name="app_icon_default">Blanc</string>
 </resources>

@@ -1,5 +1,9 @@
 <resources>
     <string name="vyon_tagline">موسیقی تو، به سبک تو</string>
+    <string name="vyon_stable">پایدار</string>
+    <string name="vyon_version_code">کد نسخه</string>
+    <string name="vyon_license">مجوز</string>
+    <string name="vyon_open_source_licenses">مجوزهای متن‌باز</string>
     <string name="vyon_lead_dev">توسعه‌دهندهٔ اصلی</string>
     <string name="vyon_inspector">بازرس</string>
     <string name="vyon_app_info">اطلاعات برنامه</string>

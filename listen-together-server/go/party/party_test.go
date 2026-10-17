@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/bxandot/vyon/listen-together-server/go/codes"
-	"github.com/bxandot/vyon/listen-together-server/go/config"
+	"github.com/bxanedot/vyon/listen-together-server/go/codes"
+	"github.com/bxanedot/vyon/listen-together-server/go/config"
 )
 
 func TestCodeNormalisation(t *testing.T) {

@@ -1351,4 +1351,5 @@
     <string name="wear_os_code_hint">Kopplungscode</string>
     <string name="wear_os_done">Fertig</string>
     <string name="signed_by">Signiert von %1$s</string>
+    <string name="app_icon_default">Weiß</string>
 </resources>

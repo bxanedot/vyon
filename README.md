@@ -44,25 +44,15 @@ A music player powered by YouTube Music, built for Android, desktop, TV, and bey
 
 ## Download your music
 
-**One song or an entire collection — vyon gives you the choice.**
+**Save individual songs for offline listening.**
 
-| | What you can download | How it works |
-| :---: | --- | --- |
-| 🎤 | **Artist catalog** | Download the songs available in an artist's current track listing together, instead of saving each one individually. |
-| 💿 | **Complete albums** | Download an album's tracks in one action and keep the release together in your Downloads library. |
-| 📚 | **Entire playlists** | Queue a full playlist for download at once, in playlist order. |
-| 🎵 | **Individual tracks** | Pick the exact song you want and download only that track. |
-
-From an artist, album, or playlist, open its **more actions (⋯)** menu and select **Download all**. For one song, open the **track actions (⋯)** menu and choose **Download**. The download features are implemented in the Android and desktop apps; controls and available sources may differ by platform.
-
-> **About artist downloads:** Bulk download uses the tracks currently provided by the artist page. It should not be confused with automatically collecting every release in an artist's lifetime discography. Downloadable formats and tracks depend on the chosen source.
+Choose an individual track and use its **Download** action. Available sources and controls vary by platform.
 
 ### Downloads that you control
 
 - **Download manager** — see what's queued, follow transfer progress, and cancel or retry downloads.
 - **Quality options** — choose your preferred download quality, including lossless when a compatible source supplies it.
 - **Offline listening** — play songs already saved on your device without fetching them again.
-- **Organized collections** — Android remembers albums and playlists downloaded as a group, alongside individual songs.
 - **Artwork and metadata** — save track information and cover art where the source and file format support them.
 - **Network preferences** — Android offers Wi-Fi-only downloading and optional export of supported downloaded files.
 
@@ -161,15 +151,9 @@ Vyon's website only links directly to installers it can verify in published GitH
 ## Questions?
 
 <details>
-<summary><strong>Can I download a whole album or playlist at once?</strong></summary>
+<summary><strong>Can I save a song for offline listening?</strong></summary>
 <br>
-Yes. Open the album or playlist's actions menu and choose <strong>Download all</strong>. The app queues its listed tracks without needing a separate tap for each song.
-</details>
-
-<details>
-<summary><strong>Can I download all of an artist's music?</strong></summary>
-<br>
-An artist page supports batch downloading its available song list. The selection follows the tracks provided by that page; it may not include every album, single, or historical release in a complete discography.
+Use the track's download action where it is available. Previously downloaded tracks can then be played offline on the device that saved them.
 </details>
 
 <details>

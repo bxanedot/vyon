@@ -1,3 +1,4 @@
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="vyon_updates">التحديثات</string>
     <string name="vyon_account_summary">الحسابات المرتبطة والاستماع معًا</string>
@@ -6,6 +7,6 @@
     <string name="vyon_library_summary">التنزيلات والموسيقى المحلية والتخزين</string>
     <string name="vyon_performance_summary">الحركة ومعدل التحديث والتشخيص</string>
     <string name="vyon_updates_summary">الفحص التلقائي والإشعارات</string>
-    <string name="vyon_about_summary">vyon 1.0.0 · الفريق والمجتمع</string>
+    <string name="vyon_about_summary">vyon %1$s · الفريق والمجتمع</string>
     <string name="vyon_reserved">محجوز</string>
 </resources>

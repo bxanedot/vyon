@@ -6048,7 +6048,11 @@ private fun DesktopSettingsScreen(
                     activeCategory == DesktopSettingsCategory.ABOUT -> Column(
                         Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
                     ) {
-                        com.vyon.music.ui.components.VyonAbout(onLicenses = onOpenLicenses)
+                        com.vyon.music.ui.components.VyonAbout(
+                            versionName = DesktopUpdateChecker.currentVersion,
+                            versionCode = DesktopUpdateChecker.currentVersionCode,
+                            onLicenses = onOpenLicenses,
+                        )
                     }
                     activeCategory == null && settingsQuery.isBlank() -> CompositionLocalProvider(
                         LocalSettingsQuery provides "",

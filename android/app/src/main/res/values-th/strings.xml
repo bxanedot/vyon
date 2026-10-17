@@ -1334,4 +1334,5 @@
     <string name="wear_os_code_hint">รหัสจับคู่</string>
     <string name="wear_os_done">เสร็จสิ้น</string>
     <string name="signed_by">ลงนามโดย %1$s</string>
+    <string name="app_icon_default">สีขาว</string>
 </resources>

@@ -1213,13 +1213,14 @@ fun TvScrobbleDialog(onDismiss: () -> Unit) {
 fun TvAboutDialog(onDismiss: () -> Unit) {
     val context = androidx.compose.ui.platform.LocalContext.current
     fun open(url: String) { runCatching { context.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(url))) }.onFailure { android.widget.Toast.makeText(context, "No browser is available on this TV", android.widget.Toast.LENGTH_SHORT).show() } }
-    TvDialog(title = "vyon", message = "Version ${BuildConfig.VERSION_NAME}", onDismissRequest = onDismiss) {
+    TvDialog(title = "vyon", message = "Version ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})", onDismissRequest = onDismiss) {
         TvAppMark(size = 77.dp, modifier = Modifier.padding(bottom = 21.dp))
         Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
             TvListRow(title = "Lead Developer", value = "bxane", enabled = false, onClick = {})
             TvListRow(title = "Inspector", value = "Vantom", onClick = { open("https://guns.lol/vantom0101") })
             TvListRow(title = "Website", value = "vyon.live", onClick = { open("https://vyon.live") })
             TvListRow(title = "Source code", value = "vyon", onClick = { open("https://github.com/bxanedot/vyon") })
+            TvListRow(title = "License", value = "GPL-3.0", onClick = { open("https://github.com/bxanedot/vyon/blob/main/LICENSE") })
         }
         Spacer(modifier = Modifier.height(14.dp))
         Text(

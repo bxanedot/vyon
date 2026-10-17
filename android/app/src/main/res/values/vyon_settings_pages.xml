@@ -6,6 +6,6 @@
     <string name="vyon_library_summary">Downloads, local music and storage</string>
     <string name="vyon_performance_summary">Motion, refresh rate and diagnostics</string>
     <string name="vyon_updates_summary">Automatic checks and notifications</string>
-    <string name="vyon_about_summary">vyon 1.0.0 · People and community</string>
+    <string name="vyon_about_summary">vyon %1$s · People and community</string>
     <string name="vyon_reserved">Reserved</string>
 </resources>

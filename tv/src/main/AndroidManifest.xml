@@ -243,6 +243,10 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data
                     android:scheme="https"
+                    android:host="vyon-listen-together.bxane.workers.dev"
+                    android:pathPattern="/invite/......" />
+                <data
+                    android:scheme="https"
                     android:host="vyon.bxane.workers.dev"
                     android:pathPattern="/invite/......" />
             </intent-filter>

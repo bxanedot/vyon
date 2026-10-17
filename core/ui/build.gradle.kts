@@ -104,7 +104,7 @@ kotlin {
 
 android {
     namespace = "com.vyon.music.sharedui"
-    compileSdk = 36
+    compileSdk = 37
     defaultConfig {
         minSdk = 26
     }

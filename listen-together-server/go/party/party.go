@@ -8,9 +8,9 @@ import (
 	"sort"
 	"sync"
 
-	"github.com/bxandot/vyon/listen-together-server/go/clock"
-	"github.com/bxandot/vyon/listen-together-server/go/codes"
-	"github.com/bxandot/vyon/listen-together-server/go/config"
+	"github.com/bxanedot/vyon/listen-together-server/go/clock"
+	"github.com/bxanedot/vyon/listen-together-server/go/codes"
+	"github.com/bxanedot/vyon/listen-together-server/go/config"
 )
 
 // PartyError represents an error with an HTTP status code and wire error code.
