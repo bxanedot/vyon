@@ -94,7 +94,7 @@ npx playwright test --config=playwright.config.mjs
 
 The homepage keeps all original platform downloads, real screenshot placeholders,
 the interactive ten-band equalizer, the particle logo and falling-dot physics,
-saved accent themes, the Liquid Glass toggle, the command palette, community
+saved accent themes, the permanent Liquid Glass UI, the command palette, community
 links, FAQ, visitor counts and SEO navigation.
 
 \`studio.css\` adds a consistent editorial layout system on top of the existing
@@ -130,7 +130,7 @@ devices. The fallback must remain visually complete.
 The original physics-powered dotted logo is **preserved**, not replaced: it
 lives in the new dedicated `#particle-lab` installation. All of its
 interactions and original IDs remain. Downloads, equalizer, FAQ, themes, the
-Liquid Glass toggle, counters, gallery, and SEO routes still use the original
+permanent Liquid Glass UI, counters, gallery, and SEO routes still use the original
 JavaScript.
 
 `dimension.css` intentionally remakes the layout, while `sonic-scene.js`
@@ -193,3 +193,13 @@ WebGL2 environments successfully construct and draw the SVG geometry.
 
 If the mark is changed, keep its SVG path valid; don't replace the existing
 silhouette with manually approximated curves.
+
+
+## Liquid Glass is now permanent
+
+The website no longer has a Glass on/off toggle. The homepage starts with
+`data-glass="on"`, and JavaScript maintains that setting regardless of
+previous `vyon-liquid-glass` entries in local storage. The visual treatment
+is part of the design system across the floating header, menus, control
+surfaces, and cards. Reduced-transparency settings keep solid readable
+backgrounds, and mobile avoids stacking expensive card blurs.
