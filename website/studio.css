@@ -1,0 +1,441 @@
+/* vyon / editorial experience layer
+   An intentional presentation upgrade over the existing design.
+   Keep all existing app, particle, theme, screenshot and equalizer behavior.
+   No JS runtime, WebGL context, font download, or new design dependency. */
+:root{
+  --studio-ink:#f9f8fb;
+  --studio-soft:#b9b4bd;
+  --studio-muted:#89838e;
+  --studio-line:rgba(255,255,255,.12);
+  --studio-line-bright:rgba(255,255,255,.21);
+  --studio-card:#141216;
+  --studio-ease:cubic-bezier(.22,1,.36,1);
+}
+html{scroll-padding-top:108px}
+body{
+  color:var(--studio-ink);
+  background:#080808;
+  font-feature-settings:"ss01" on;
+}
+.section-pad{padding-inline:clamp(24px,5.8vw,104px)}
+main{isolation:isolate}
+:where(.platforms-section,.experience,.vqe-section,.details,.connect-section,.faq-section){
+  position:relative;
+  scroll-margin-top:104px;
+}
+:where(.platforms-section,.experience,.vqe-section,.details,.connect-section,.faq-section)::before{
+  content:"";
+  position:absolute;
+  z-index:0;
+  top:0;
+  left:clamp(24px,5.8vw,104px);
+  right:clamp(24px,5.8vw,104px);
+  height:1px;
+  pointer-events:none;
+  background:linear-gradient(90deg,transparent,rgba(var(--accent-rgb),.3) 20%,rgba(255,255,255,.12) 65%,transparent);
+}
+:where(.platforms-section,.experience,.vqe-section,.details,.connect-section,.faq-section)>*{
+  position:relative;
+  z-index:1;
+}
+.kicker{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-bottom:clamp(21px,3vw,37px);
+  color:var(--accent);
+  font:500 10px/1.5 var(--mono);
+  letter-spacing:.16em;
+}
+.kicker::before{
+  content:"";
+  flex:0 0 6px;
+  width:6px;height:6px;border-radius:100%;
+  border:1px solid var(--accent);
+  box-shadow:0 0 15px rgba(var(--accent-rgb),.36);
+}
+.heading-row{align-items:end;gap:clamp(24px,5vw,92px)}
+.heading-row h2{
+  font-size:clamp(45px,6.4vw,93px);
+  font-weight:750;
+  line-height:1.035;
+  letter-spacing:-.079em;
+  text-wrap:balance;
+}
+.heading-row p{
+  max-width:380px;
+  font-size:clamp(14px,1.22vw,16px);
+  line-height:1.75;
+  color:var(--studio-soft);
+}
+:where(.heading-row h2 span,.vqe-intro h2 em,.connect-heading h2 em,.faq-intro h2 em){
+  color:var(--accent);
+}
+:where(.btn,.platform-download,.social-card,.screenshot-tab,.theme-chip,.seo-home-links a){
+  -webkit-tap-highlight-color:transparent;
+}
+:where(a,button,summary):focus-visible{
+  outline:2px solid var(--accent);
+  outline-offset:4px;
+}
+
+/* A single premium floating navigation surface; original links and toggles
+   are still present and functional. */
+.site-header{
+  border-radius:22px!important;
+  border:1px solid var(--studio-line-bright)!important;
+  box-shadow:0 14px 50px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.08)!important;
+  overflow:visible;
+}
+:root[data-glass="on"] :is(.site-header,.site-header.is-scrolled){
+  background:linear-gradient(118deg,rgba(28,24,33,.82),rgba(14,12,20,.75))!important;
+  border-color:rgba(255,255,255,.19)!important;
+  box-shadow:0 16px 52px rgba(0,0,0,.29),inset 0 1px 0 rgba(255,255,255,.12)!important;
+  backdrop-filter:blur(20px) saturate(125%)!important;
+  -webkit-backdrop-filter:blur(20px) saturate(125%)!important;
+}
+:root[data-glass="off"] :is(.site-header,.site-header.is-scrolled){
+  background:#131115!important;
+}
+.brand{letter-spacing:-.075em}
+.nav-desktop{gap:clamp(11px,1.5vw,23px)}
+.nav-desktop a{
+  color:#bcb6c1;
+  font-size:12px;
+  transition:color .22s ease;
+}
+.nav-desktop a:is(:hover,[aria-current="location"]){color:#fff}
+.nav-desktop a[aria-current="location"]::after{
+  content:"";
+  display:block;
+  height:2px;width:18px;margin-top:5px;
+  background:var(--accent);
+  border-radius:5px;
+}
+.command-trigger,.glass-toggle{border-radius:100px!important}
+.header-github{
+  border-radius:100px;
+  padding:10px 13px;
+  border:1px solid rgba(var(--accent-rgb),.3);
+  background:rgba(var(--accent-rgb),.09);
+  white-space:nowrap;
+}
+.reading-progress{height:2px;box-shadow:0 0 14px rgba(var(--accent-rgb),.45)}
+
+/* Hero: cinematic whitespace, a single focal title, a real particle logo. */
+.hero{
+  min-height:min(910px,100svh);
+  background:
+    radial-gradient(ellipse at 72% 39%,rgba(var(--accent-rgb),.095),transparent 33%),
+    radial-gradient(ellipse at 28% 110%,rgba(var(--accent-rgb),.052),transparent 55%),
+    #080808!important;
+}
+.hero::after{
+  background:linear-gradient(90deg,rgba(8,8,8,.94) 0%,rgba(8,8,8,.27) 61%,transparent 86%)!important;
+}
+.hero-copy{max-width:850px}
+.hero .eyebrow{
+  width:fit-content;
+  max-width:100%;
+  padding:10px 15px;
+  margin-bottom:clamp(27px,4vw,50px);
+  border-radius:100px;
+  border:1px solid rgba(var(--accent-rgb),.3);
+  background:linear-gradient(115deg,rgba(var(--accent-rgb),.14),rgba(var(--accent-rgb),.025));
+  color:#e5c5cc;
+  letter-spacing:.11em;
+}
+.hero .eyebrow-line{background:var(--accent)}
+.hero h1{
+  font-size:clamp(65px,8.5vw,140px);
+  line-height:.995;
+  letter-spacing:-.084em;
+  margin-bottom:29px;
+  text-shadow:0 10px 45px rgba(0,0,0,.12);
+}
+.hero h1 .h-italic{font-weight:400;letter-spacing:-.075em}
+.hero-description{
+  max-width:455px;
+  color:#bcb7c2;
+  font-size:clamp(15px,1.42vw,18px);
+  line-height:1.78;
+  margin-bottom:29px;
+}
+.hero-buttons-primary{gap:12px}
+.hero-buttons-primary .btn{
+  min-height:55px;
+  border-radius:14px!important;
+  transition:transform .3s var(--studio-ease),background-color .28s ease,border-color .28s ease,box-shadow .28s ease;
+}
+.hero-buttons-primary .btn-primary{
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 9px 28px rgba(var(--accent-rgb),.2);
+}
+.hero-buttons-primary .btn-primary:hover{
+  box-shadow:0 14px 36px rgba(var(--accent-rgb),.3);
+}
+.hero-buttons-primary .btn-ghost{
+  background:rgba(26,23,30,.57);
+  border-color:rgba(255,255,255,.2);
+}
+.hero-footnote{
+  margin-top:49px;
+  color:#a49ca8;
+}
+.visit-counter{
+  width:fit-content;
+  border-top:1px solid rgba(255,255,255,.13);
+  padding-top:17px;
+}
+.hero-stage-note{
+  position:absolute;
+  z-index:4;
+  right:clamp(32px,6vw,110px);
+  bottom:60px;
+  display:flex;align-items:center;gap:13px;
+  max-width:240px;
+  padding:12px 16px;
+  border:1px solid rgba(255,255,255,.15);
+  border-radius:14px;
+  background:rgba(14,12,17,.55);
+  pointer-events:none;
+  color:#aaa4b0;
+  font:10px/1.55 var(--mono);
+  letter-spacing:.05em;
+}
+.hero-stage-note::before{
+  content:"✳";color:var(--accent);font-size:23px;
+}
+.hero-side-label{color:#8e8490}
+
+/* Platform choices now read like product-grade installation surfaces. */
+.platforms-section{
+  padding-block:clamp(90px,11vw,155px)!important;
+  background:linear-gradient(180deg,#0a090c 0%,#111015 52%,#0b0a0e 100%)!important;
+}
+.platforms-heading{margin-bottom:clamp(34px,5vw,62px)}
+.platform-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.platform-card{
+  overflow:hidden;
+  position:relative;
+  min-height:330px;
+  border-radius:25px!important;
+  border:1px solid rgba(255,255,255,.15)!important;
+  padding:clamp(26px,3vw,44px);
+  background:
+    radial-gradient(ellipse at 94% 0%,rgba(var(--accent-rgb),.12),transparent 55%),
+    linear-gradient(145deg,#1b1820,#121115)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 12px 35px rgba(0,0,0,.12)!important;
+  transition:transform .5s var(--studio-ease),border-color .35s ease,box-shadow .35s ease;
+}
+.platform-card:nth-child(2),.platform-card:nth-child(3){
+  background:
+    radial-gradient(ellipse at 8% 0%,rgba(var(--accent-rgb),.08),transparent 60%),
+    linear-gradient(145deg,#17161c,#111115)!important;
+}
+.platform-card::before{
+  content:"";
+  position:absolute;
+  inset:0 0 auto;
+  height:1px;
+  background:linear-gradient(90deg,transparent,rgba(var(--accent-rgb),.5),transparent);
+  pointer-events:none;
+}
+.platform-card h3{
+  font-size:clamp(40px,4vw,66px);
+  letter-spacing:-.075em;
+  line-height:1.04;
+}
+.platform-card-top{color:#b0aab5}
+.platform-summary{color:#b3abb8}
+.platform-card:hover{
+  transform:translate3d(0,-5px,0);
+  border-color:rgba(var(--accent-rgb),.46)!important;
+  box-shadow:0 22px 68px rgba(0,0,0,.3),0 0 0 1px rgba(var(--accent-rgb),.1)!important;
+}
+.platform-download{
+  border-radius:12px;
+  transition:background .25s ease,transform .25s var(--studio-ease);
+}
+.platform-download:hover{transform:translateY(-1px)}
+.platform-footnote{color:#aaa4ae}
+
+/* App gallery: proof and honesty presented with the same care as the hero. */
+.experience{padding-block:clamp(100px,12vw,180px)!important;background:#0b0a0d}
+.experience .section-heading{margin-bottom:clamp(32px,5vw,60px)}
+.screenshot-layout{gap:20px;grid-template-columns:minmax(0,1.28fr) minmax(300px,.72fr)}
+.screenshot-browser,.screenshot-aside{
+  border-radius:25px!important;
+  border:1px solid rgba(255,255,255,.16)!important;
+  background:linear-gradient(150deg,#1c1921,#111015)!important;
+  box-shadow:0 22px 68px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.08)!important;
+}
+.screenshot-aside{padding:clamp(30px,3.6vw,55px)}
+.screenshot-aside h3{letter-spacing:-.068em}
+.screenshot-tab{
+  border-radius:8px;
+  transition:padding-left .3s var(--studio-ease),color .2s ease;
+}
+.screenshot-tab:hover{padding-left:9px}
+
+/* Audio controls remain interactive, only the presentation changes. */
+.vqe-section{
+  padding-block:clamp(104px,12vw,175px)!important;
+  background:
+    radial-gradient(ellipse at 75% 60%,rgba(var(--accent-rgb),.065),transparent 55%),
+    #0b0a0d;
+}
+.vqe-layout{gap:clamp(25px,4vw,65px)}
+.vqe-intro h2{letter-spacing:-.065em}
+
+/* Visual identity, now a coherent two-panel editorial showcase. */
+.details{
+  padding-block:clamp(102px,12vw,174px)!important;
+  background:linear-gradient(180deg,#0b0a0d,#100e12 45%,#0b0a0d)!important;
+}
+.feature-grid{gap:20px}
+.feature-card{
+  position:relative;
+  overflow:hidden;
+  border-radius:26px!important;
+  border:1px solid rgba(255,255,255,.15)!important;
+  background:
+    radial-gradient(ellipse at 80% 25%,rgba(var(--accent-rgb),.085),transparent 52%),
+    linear-gradient(140deg,#1d1920,#121114)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 12px 44px rgba(0,0,0,.16)!important;
+  transition:transform .5s var(--studio-ease),border-color .32s ease!important;
+}
+.feature-card:hover{
+  transform:translate3d(0,-4px,0);
+  border-color:rgba(var(--accent-rgb),.5)!important;
+}
+.feature-top{color:#b4aeba}
+.feature-bottom h3{letter-spacing:-.065em}
+
+/* Community and support: clear editorial hierarchy. */
+.connect-section{
+  padding-block:clamp(95px,11vw,165px)!important;
+  background:#09090b!important;
+}
+.connect-heading h2{letter-spacing:-.068em}
+.connect-heading p{color:var(--studio-soft)}
+.social-grid{gap:14px}
+.social-card{
+  min-height:91px;
+  padding:20px!important;
+  border-radius:18px!important;
+  border:1px solid rgba(255,255,255,.13)!important;
+  background:linear-gradient(145deg,#1a181e,#121115)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.055)!important;
+  transition:transform .35s var(--studio-ease),border-color .32s ease,background .32s ease;
+}
+.social-card:hover{
+  transform:translate3d(0,-3px,0);
+  border-color:rgba(var(--accent-rgb),.42)!important;
+}
+.support-group{margin-top:clamp(55px,8vw,112px)}
+
+/* Questions: generous rhythm, quiet visual grouping. */
+.faq-section{
+  padding-block:clamp(95px,11vw,170px)!important;
+  background:linear-gradient(180deg,#0b0a0d,#100d11)!important;
+}
+.faq-item{
+  border-radius:19px!important;
+  border-color:rgba(255,255,255,.12)!important;
+  background:#171419!important;
+}
+.faq-item:is(:hover,[open]){
+  background:#1c171e!important;
+  border-color:rgba(var(--accent-rgb),.36)!important;
+}
+.faq-item summary{font-size:clamp(15px,1.4vw,18px)}
+.vyon-footer{
+  background:linear-gradient(150deg,#151016,#09090b)!important;
+  border-top:1px solid rgba(255,255,255,.13);
+}
+
+/* The explicit glass setting still works but doesn't flood each card
+   with mobile-unfriendly backdrop blurs. */
+:root[data-glass="on"] :is(.platform-card,.feature-card,.screenshot-browser,.screenshot-aside,.social-card){
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+}
+@media(min-width:1051px){
+  .platform-card:first-child{min-height:340px}
+}
+@media(max-width:1100px){
+  .nav-desktop{gap:13px}
+  .site-header{padding-inline:18px!important}
+  .hero-stage-note{right:28px}
+}
+@media(max-width:850px){
+  .hero{
+    min-height:760px;
+    background:
+      radial-gradient(ellipse at 63% 13%,rgba(var(--accent-rgb),.12),transparent 47%),#080808!important;
+  }
+  .hero::after{background:linear-gradient(180deg,rgba(8,8,8,.02) 0%,rgba(8,8,8,.25) 35%,#080808 78%)!important}
+  .hero .eyebrow{margin-bottom:20px;padding:8px 11px}
+  .hero h1{font-size:clamp(48px,9.8vw,78px)}
+  .hero-stage-note{display:none}
+  .hero-footnote{margin-top:26px}
+  .screenshot-layout{grid-template-columns:1fr}
+  .platform-grid{gap:12px}
+  .platform-card{min-height:275px}
+  :root[data-glass="on"] :is(.site-header,.site-header.is-scrolled){
+    backdrop-filter:blur(13px) saturate(120%)!important;
+    -webkit-backdrop-filter:blur(13px) saturate(120%)!important;
+  }
+}
+@media(max-width:590px){
+  html{scroll-padding-top:85px}
+  .section-pad{padding-inline:clamp(19px,5vw,26px)}
+  .site-header{border-radius:17px!important}
+  .hero{min-height:max(755px,100svh);padding-bottom:75px}
+  .hero h1{font-size:clamp(43px,11vw,65px)}
+  .hero .eyebrow{font-size:9px}
+  .hero-description{line-height:1.72;max-width:38ch}
+  .hero-buttons-primary .btn{border-radius:12px!important}
+  .hero-footnote{margin-top:21px}
+  .platform-grid{grid-template-columns:1fr}
+  .platforms-section{padding-block:73px 88px!important}
+  .platform-card{min-height:245px;padding:24px;border-radius:19px!important}
+  .platform-card h3{font-size:39px}
+  .experience,.details,.connect-section,.faq-section,.vqe-section{padding-block:80px!important}
+  .screenshot-browser,.screenshot-aside,.feature-card{border-radius:19px!important}
+  .social-card{min-height:76px;padding:15px!important}
+  .faq-item{border-radius:15px!important}
+  .heading-row h2{font-size:clamp(39px,10.1vw,59px)}
+}
+@media(hover:none){
+  .platform-card:hover,.feature-card:hover,.social-card:hover{transform:none}
+}
+@media(prefers-reduced-motion:reduce){
+  :where(.platform-card,.feature-card,.social-card,.hero-buttons-primary .btn,.platform-download,.screenshot-tab){
+    transition:none!important;transform:none!important;
+  }
+  html{scroll-behavior:auto}
+}
+@media(prefers-reduced-transparency:reduce){
+  :root[data-glass="on"] :is(.site-header,.site-header.is-scrolled){
+    background:#18151c!important;
+    backdrop-filter:none!important;
+    -webkit-backdrop-filter:none!important;
+  }
+  .hero-stage-note{background:#151219}
+}
+
+
+/* Navigation remains usable in the tablet range and after page scrolling. */
+.mobile-menu{position:fixed;top:90px;left:clamp(15px,3vw,56px);right:clamp(15px,3vw,56px)}
+@media(min-width:851px) and (max-width:1100px){
+ .nav-desktop{display:none}
+ .mobile-menu-btn{display:block}
+ .mobile-menu{padding:15px 24px;max-height:calc(100svh - 110px);overflow-y:auto}
+}
+@media(max-width:850px){
+ .mobile-menu{top:82px;left:15px;right:15px}
+}
+@media(max-width:590px){
+ .mobile-menu{top:77px;left:12px;right:12px}
+}

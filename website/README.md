@@ -88,3 +88,29 @@ npm install --no-save --package-lock=false @playwright/test@1.56.1
 npx playwright install chromium
 npx playwright test --config=playwright.config.mjs
 ```
+
+
+## Premium editorial website layer
+
+The homepage keeps all original platform downloads, real screenshot placeholders,
+the interactive ten-band equalizer, the particle logo and falling-dot physics,
+saved accent themes, the Liquid Glass toggle, the command palette, community
+links, FAQ, visitor counts and SEO navigation.
+
+\`studio.css\` adds a consistent editorial layout system on top of the existing
+homepage styles: restrained accent-reactive atmospheres, a refined floating
+header, clearer section hierarchy, product-style platform cards, gallery framing,
+and tactile yet subtle interaction feedback. The original IDs and JS events are
+unchanged. The stylesheet loads last so it can unify legacy visual treatments
+without replacing the underlying functionality. It has no network resources,
+fonts, shaders, JavaScript, or WebGPU dependency.
+
+Do not remove \`studio.css\` from \`build-vercel.mjs\`: it must be copied and
+minified for Vercel's \`dist/\`. The production smoke test and Playwright
+browser suite assert its presence, mobile text bounds, and interaction
+continuity.
+
+To preview the website, serve the built \`dist/\` directory over HTTP. Opening
+\`website/index.html\` directly with \`file://\` is **not supported**: root-relative
+\`/styles.css\`, scripts and icons require a web server and will appear unstyled
+otherwise. See the local build commands above.
