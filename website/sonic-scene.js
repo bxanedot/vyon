@@ -165,12 +165,16 @@
   let start=performance.now(),elapsed=0,prev=0,scroll=0;
   const pointer={x:0,y:0,tx:0,ty:0};
   let width=0,height=0;
-  const dprLimit=window.innerWidth<800?1:1.5;
+  const dprLimit=window.innerWidth<800?1:1.35;
+  const pixelBudget=window.innerWidth<800?300000:720000;
+  const minFrameMs=window.innerWidth<800?33:20;
+  let lastDraw=0;
 
   function resize(){
     const rect=canvas.getBoundingClientRect();
     if(!rect.width || !rect.height)return;
-    const dpr=Math.min(devicePixelRatio||1,dprLimit);
+    const dpr=Math.min(devicePixelRatio||1,dprLimit,
+      Math.sqrt(pixelBudget/(rect.width*rect.height)));
     const w=Math.max(1,Math.round(rect.width*dpr));
     const h=Math.max(1,Math.round(rect.height*dpr));
     if(w!==width||h!==height){
@@ -184,6 +188,11 @@
     if(disposed||!visible||paused||reduced.matches)return;
     resize();
     if(!width||!height)return;
+    if(lastDraw && now-lastDraw<minFrameMs){
+      frame=requestAnimationFrame(render);
+      return;
+    }
+    lastDraw=now;
     const dt=Math.min((now-(prev||now))/1000,.05);
     prev=now;
     elapsed+=dt;
