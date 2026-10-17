@@ -372,15 +372,18 @@ function rebuildObstacles(){
  }
  range.detach?.();
 }
+// Reuse scratch storage during sequential physics collision checks instead of
+// allocating a new array and Set for every moving dot on every substep.
+const nearbyBoxes=[],seenNearbyBoxes=new Set();
 function getNearby(x,y){
  const cx=Math.floor(x/gridSize),cy=Math.floor(y/gridSize);
- const out=[],seen=new Set();
+ nearbyBoxes.length=0;seenNearbyBoxes.clear();
  for(let row=cy-1;row<=cy+1;row++)for(let col=cx-1;col<=cx+1;col++){
   for(const box of obstacleCells.get(col+","+row)||[]){
-   if(!seen.has(box)){seen.add(box);out.push(box);}
+   if(!seenNearbyBoxes.has(box)){seenNearbyBoxes.add(box);nearbyBoxes.push(box);}
   }
  }
- return out;
+ return nearbyBoxes;
 }
 function paintDebris(blend=1){
  if(!debrisCtx)return;
