@@ -424,3 +424,18 @@ main{isolation:isolate}
   }
   .hero-stage-note{background:#151219}
 }
+
+
+/* Navigation remains usable in the tablet range and after page scrolling. */
+.mobile-menu{position:fixed;top:90px;left:clamp(15px,3vw,56px);right:clamp(15px,3vw,56px)}
+@media(min-width:851px) and (max-width:1100px){
+ .nav-desktop{display:none}
+ .mobile-menu-btn{display:block}
+ .mobile-menu{padding:15px 24px;max-height:calc(100svh - 110px);overflow-y:auto}
+}
+@media(max-width:850px){
+ .mobile-menu{top:82px;left:15px;right:15px}
+}
+@media(max-width:590px){
+ .mobile-menu{top:77px;left:12px;right:12px}
+}
