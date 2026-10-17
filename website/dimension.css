@@ -616,3 +616,17 @@ body{
 .rive-motion-slot.rive-ready{opacity:1}
 .rive-motion-canvas{width:100%;height:100%;display:block}
 @media(prefers-reduced-motion:reduce){.rive-motion-slot{display:none!important}}
+
+
+/* Mobile art direction: separate the sculpture and copy into intentional
+   stages, instead of allowing technical labels to cross the headline. */
+@media(max-width:590px){
+  #main .hero{padding-top:420px!important}
+  .sonic-scene{top:74px;height:340px;width:112%;right:-6%}
+  .sonic-scene-crosshair{inset:5% 18%}
+  .sonic-coordinate-a{display:none}
+}
+@media(max-width:380px){
+  #main .hero{padding-top:399px!important}
+  .sonic-scene{height:324px;top:67px}
+}
