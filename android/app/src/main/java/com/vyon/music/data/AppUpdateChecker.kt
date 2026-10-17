@@ -113,17 +113,16 @@ object AppUpdateChecker {
     }
 
     /**
-     * One release carries the phone app and the TV app, each as a universal
-     * APK plus per-ABI splits:
+     * A release distinguishes the phone and TV APKs by prefix:
      *
-     *     Vyon-v1.0.0.apk     Vyon-v1.0.0_arm64-v8a.apk     ...
-     *     VyonTV-v1.0.0.apk   VyonTV-v1.0.0_arm64-v8a.apk   ...
+     *     vyon-android-<tag>.apk
+     *     vyon-tv-<tag>.apk
      *
      * so this app's APKs are the ones named with its own
      * [BuildConfig.UPDATE_APK_PREFIX] — "vyon-android-" never matches a TV file,
-     * since the prefix ends at the hyphen. The universal build (no `_ABI`
-     * suffix) is taken first, as it installs anywhere; failing that, the split
-     * for this device's ABI. A release with neither leaves
+     * since the prefix ends at the hyphen. A universal APK (no `_ABI` suffix)
+     * is preferred; if a release offers only ABI-specific files, the split for
+     * this device is used. A release with neither leaves
      * [UpdateInfo.apkUrl] null and the UI falls back to opening the releases
      * page.
      */

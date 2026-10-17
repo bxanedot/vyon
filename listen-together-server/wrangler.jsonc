@@ -26,6 +26,20 @@
       "storage": "sqlite"
     }
   },
+  "previews": {
+    "durable_objects": {
+      "bindings": [
+        {
+          "name": "ROOMS",
+          "class_name": "ListenRoom"
+        },
+        {
+          "name": "PARTIES",
+          "class_name": "PartyRoom"
+        }
+      ]
+    }
+  },
   "assets": {
     "directory": "./public",
     "binding": "ASSETS",

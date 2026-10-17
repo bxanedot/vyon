@@ -1,0 +1,303 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Validate version and signing configuration
+        shell: bash
+        env:
+          VYON_LICENSE_REVIEWED: ${{ vars.VYON_LICENSE_REVIEWED }}
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          if [[ "$VYON_LICENSE_REVIEWED" != "true" ]]; then
+            echo "Set the VYON_LICENSE_REVIEWED repository variable to true only after reviewing licenses for all shipped binaries." >&2
+            exit 1
+          fi
+
+          version="$(sed -n 's/^extra\["vyonVersionName"\] = "\([^"]*\)".*/\1/p' build.gradle.kts)"
+          code="$(sed -n 's/^extra\["vyonVersionCode"\] = \([0-9][0-9]*\).*/\1/p' build.gradle.kts)"
+          test -n "$version" && test -n "$code"
+          test "$GITHUB_REF_NAME" = "v$version"
+          test "$version" = "1.0.0"
+          test "$code" = "1"
+          test -n "$ANDROID_KEYSTORE_BASE64"
+          test -n "$ANDROID_KEYSTORE_PASSWORD"
+          test -n "$ANDROID_KEY_ALIAS"
+          test -n "$ANDROID_KEY_PASSWORD"
+
+  android:
+    needs: preflight
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: gradle/actions/setup-gradle@v6
+        with:
+          cache-provider: basic
+      - name: Install Android SDK packages
+        shell: bash
+        run: |
+          printf 'sdk.dir=%s\n' "$ANDROID_HOME" >> local.properties
+          set +o pipefail
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null
+          set -o pipefail
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install \
+            --channel=3 \
+            "platforms;android-37.0" \
+            "build-tools;37.0.0" \
+            "ndk;28.2.13676358" \
+            "cmake;3.22.1"
+      - name: Prepare temporary signing key
+        shell: bash
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          python - <<'PY'
+          import base64, os, pathlib
+
+          values = {
+              "storePassword": os.environ["ANDROID_KEYSTORE_PASSWORD"],
+              "keyAlias": os.environ["ANDROID_KEY_ALIAS"],
+              "keyPassword": os.environ["ANDROID_KEY_PASSWORD"],
+          }
+          for key, value in values.items():
+              if "\n" in value or "\r" in value:
+                  raise SystemExit(f"{key} must be single-line")
+
+          encoded = "".join(os.environ["ANDROID_KEYSTORE_BASE64"].split())
+          key = base64.b64decode(encoded, validate=True)
+          if not key:
+              raise SystemExit("The configured Android keystore is empty")
+
+          pathlib.Path("release-keystore.jks").write_bytes(key)
+          os.chmod("release-keystore.jks", 0o600)
+
+          def escape(value):
+              out = []
+              for char in value:
+                  if char == "\\":
+                      out.append("\\\\")
+                  elif char == "\t":
+                      out.append("\\t")
+                  elif char == "\f":
+                      out.append("\\f")
+                  elif char in " =:#!":
+                      out.append("\\" + char)
+                  elif ord(char) < 0x20 or ord(char) > 0x7e:
+                      encoded = char.encode("utf-16-be")
+                      out.extend(
+                          "\\u" + f"{int.from_bytes(encoded[i:i + 2], 'big'):04x}"
+                          for i in range(0, len(encoded), 2)
+                      )
+                  else:
+                      out.append(char)
+              return "".join(out)
+
+          properties = ["storeFile=release-keystore.jks"]
+          properties.extend(f"{name}={escape(value)}" for name, value in values.items())
+          pathlib.Path("keystore.properties").write_text("\n".join(properties) + "\n", encoding="ascii")
+          os.chmod("keystore.properties", 0o600)
+          PY
+      - name: Build phone, TV, and watch APKs
+        run: ./gradlew :app:assembleProdRelease :tv:assembleProdRelease :wearos:assembleProdRelease --console=plain
+      - name: Verify signatures, versions, and stage APKs
+        shell: bash
+        run: |
+          set -euo pipefail
+          apksigner="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -n 1)"
+          aapt="$(find "$ANDROID_HOME/build-tools" -type f -name aapt | sort -V | tail -n 1)"
+          test -x "$apksigner" && test -x "$aapt"
+
+          mkdir -p "$RUNNER_TEMP/vyon-release"
+          phone="$(find android/app/build/outputs/apk/prod/release -maxdepth 1 -type f -name 'app-prod-universal-release.apk' -print -quit)"
+          tv="$(find tv/build/outputs/apk/prod/release -maxdepth 1 -type f -name 'tv-prod-universal-release.apk' -print -quit)"
+          watch="$(find android/wearos/build/outputs/apk/prod/release -maxdepth 1 -type f -name 'vyonWear-prod-release.apk' -print -quit)"
+          test -n "$phone" && test -n "$tv" && test -n "$watch"
+
+          verify_apk() {
+            apk="$1"
+            package="$2"
+            "$apksigner" verify --verbose "$apk"
+            badging="$("$aapt" dump badging "$apk")"
+            grep -F "package: name='$package'" <<< "$badging"
+            grep -F "versionCode='1' versionName='1.0.0'" <<< "$badging"
+          }
+
+          verify_apk "$phone" com.vyon.music
+          verify_apk "$tv" com.vyon.music.tv
+          verify_apk "$watch" com.vyon.music
+
+          cp "$phone" "$RUNNER_TEMP/vyon-release/vyon-android-$GITHUB_REF_NAME.apk"
+          cp "$tv" "$RUNNER_TEMP/vyon-release/vyon-tv-$GITHUB_REF_NAME.apk"
+          cp "$watch" "$RUNNER_TEMP/vyon-release/vyon-wearos-$GITHUB_REF_NAME.apk"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: android-apks
+          path: ${{ runner.temp }}/vyon-release/*
+          if-no-files-found: error
+          retention-days: 7
+
+  desktop:
+    needs: preflight
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: windows
+            runner: windows-latest
+          - platform: macos-arm64
+            runner: macos-15
+          - platform: macos-x64
+            runner: macos-15-intel
+          - platform: linux
+            runner: ubuntu-latest
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: gradle/actions/setup-gradle@v6
+        with:
+          cache-provider: basic
+      - uses: msys2/setup-msys2@v2
+        if: ${{ matrix.platform == 'windows' }}
+        with:
+          update: true
+          msystem: UCRT64
+          install: >-
+            mingw-w64-ucrt-x86_64-gcc
+            mingw-w64-ucrt-x86_64-cmake
+            mingw-w64-ucrt-x86_64-ninja
+      - name: Install Linux packaging tools
+        if: ${{ matrix.platform == 'linux' }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake g++ rpm
+      - name: Install macOS CMake
+        if: startsWith(matrix.platform, 'macos')
+        run: brew install cmake
+      - name: Build Windows installers
+        if: ${{ matrix.platform == 'windows' }}
+        run: .\gradlew.bat :desktopApp:packageMsi :desktopApp:packageExe --console=plain
+      - name: Verify Windows native libraries and stage installers
+        if: ${{ matrix.platform == 'windows' }}
+        shell: pwsh
+        env:
+          VERSION: ${{ github.ref_name }}
+        run: |
+          $native = 'desktop/app/build/resources/main/native'
+          foreach ($name in @('vyon_analysis.dll', 'vyon_window.dll', 'vyon_smtc.dll')) {
+            if (-not (Test-Path (Join-Path $native $name))) { throw "Missing required Windows library: $name" }
+          }
+          $source = Get-ChildItem 'desktop/app/build/compose/binaries' -Recurse -File |
+            Where-Object { $_.Directory.Name -in @('msi', 'exe') -and $_.Extension.ToLowerInvariant() -in @('.msi', '.exe') }
+          if (@($source | Where-Object Extension -eq '.msi').Count -ne 1 -or
+              @($source | Where-Object Extension -eq '.exe').Count -ne 1) { throw 'Expected one MSI and one EXE installer' }
+          New-Item release-assets -ItemType Directory | Out-Null
+          $msi = $source | Where-Object Extension -eq '.msi' | Select-Object -First 1
+          $exe = $source | Where-Object Extension -eq '.exe' | Select-Object -First 1
+          Copy-Item $msi.FullName "release-assets/vyon-$env:VERSION-windows-x64.msi"
+          Copy-Item $exe.FullName "release-assets/Vyon-$env:VERSION-windows-x64-setup.exe"
+      - name: Build macOS installers
+        if: startsWith(matrix.platform, 'macos')
+        run: ./gradlew :desktopApp:packageDmg :desktopApp:packagePkg --console=plain
+      - name: Verify macOS native library and stage installers
+        if: startsWith(matrix.platform, 'macos')
+        shell: bash
+        run: |
+          set -euo pipefail
+          native="desktop/app/build/resources/main/native"
+          test -f "$native/libvyon_analysis.dylib"
+          arch="$(uname -m)"
+          case "$arch" in
+            arm64|aarch64) arch=arm64 ;;
+            x86_64) arch=x64 ;;
+            *) echo "Unsupported macOS architecture: $arch" >&2; exit 1 ;;
+          esac
+          dmg="$(find desktop/app/build/compose/binaries -type f -iname '*.dmg' -print -quit)"
+          pkg="$(find desktop/app/build/compose/binaries -type f -iname '*.pkg' -print -quit)"
+          test -n "$dmg" && test -n "$pkg"
+          mkdir -p release-assets
+          cp "$dmg" "release-assets/Vyon-$GITHUB_REF_NAME-macos-$arch.dmg"
+          cp "$pkg" "release-assets/Vyon-$GITHUB_REF_NAME-macos-$arch.pkg"
+      - name: Build Linux installers
+        if: ${{ matrix.platform == 'linux' }}
+        run: ./gradlew :desktopApp:packageDeb :desktopApp:packageRpm --console=plain
+      - name: Verify Linux native library and stage installers
+        if: ${{ matrix.platform == 'linux' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f desktop/app/build/resources/main/native/libvyon_analysis.so
+          deb="$(find desktop/app/build/compose/binaries -type f -iname '*.deb' -print -quit)"
+          rpm="$(find desktop/app/build/compose/binaries -type f -iname '*.rpm' -print -quit)"
+          test -n "$deb" && test -n "$rpm"
+          mkdir -p release-assets
+          cp "$deb" "release-assets/Vyon-$GITHUB_REF_NAME-linux-amd64.deb"
+          cp "$rpm" "release-assets/Vyon-$GITHUB_REF_NAME-linux-x86_64.rpm"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: desktop-${{ matrix.platform }}
+          path: release-assets/*
+          if-no-files-found: error
+          retention-days: 7
+
+  publish:
+    needs:
+      - preflight
+      - android
+      - desktop
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          path: release-assets
+          merge-multiple: true
+      - name: Verify release asset set
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f "release-assets/vyon-android-$GITHUB_REF_NAME.apk"
+          test -f "release-assets/vyon-tv-$GITHUB_REF_NAME.apk"
+          test -f "release-assets/vyon-wearos-$GITHUB_REF_NAME.apk"
+          test -f "release-assets/Vyon-$GITHUB_REF_NAME-windows-x64-setup.exe"
+          test -f "release-assets/vyon-$GITHUB_REF_NAME-windows-x64.msi"
+          test -f "release-assets/Vyon-$GITHUB_REF_NAME-macos-arm64.dmg"
+          test -f "release-assets/Vyon-$GITHUB_REF_NAME-macos-arm64.pkg"
+          test -f "release-assets/Vyon-$GITHUB_REF_NAME-macos-x64.dmg"
+          test -f "release-assets/Vyon-$GITHUB_REF_NAME-macos-x64.pkg"
+          test -f "release-assets/Vyon-$GITHUB_REF_NAME-linux-amd64.deb"
+          test -f "release-assets/Vyon-$GITHUB_REF_NAME-linux-x86_64.rpm"
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" release-assets/* --title "vyon $GITHUB_REF_NAME" --notes-file docs/releases/v1.0.0-notes.md --verify-tag

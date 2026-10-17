@@ -25,7 +25,7 @@ val SFPro = FontFamily(
 )
 
 /** The phone's AccentRed: Love, and nothing much else. */
-val AccentRed = Color(0xFFFA2D48)
+val AccentRed = Color(0xFFC8102E)
 
 /** Secondary text on the mesh and on black: the phone's onSurfaceVariant. */
 val Secondary = Color(0xFF8E8E93)

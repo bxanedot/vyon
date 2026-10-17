@@ -1,13 +1,24 @@
 import {cp, mkdir, readFile, rm, writeFile} from "node:fs/promises";
 import {join} from "node:path";
-import {build as bundle} from "esbuild";
+import {build as bundle, transform as optimizeCss} from "esbuild";
 import sharp from "sharp";
 const output=join(process.cwd(),"dist");
 await rm(output,{recursive:true,force:true});
 await mkdir(output,{recursive:true});
-const publicFiles=["index.html","app.js","visit-counters.js","styles.css","compact.css","equalizer.css","equalizer.js","premium.css","favicon.svg","vyon-social-preview.png","robots.txt","sitemap.xml","google487965bff30850ae.html","seo-pages.css","download.html","features.html","android.html","desktop.html","faq.html"];
+const publicFiles=["index.html","app.js","visit-counters.js","styles.css","compact.css","equalizer.css","equalizer.js","premium.css","favicon.svg","vyon-social-preview.png","robots.txt","sitemap.xml","google487965bff30850ae.html","seo-pages.css","seo-foundation.css","download.html","features.html","android.html","desktop.html","faq.html"];
 for(const file of publicFiles)await cp(join(process.cwd(),file),join(output,file));
 for(const dir of ["icons","screenshots"])await cp(join(process.cwd(),dir),join(output,dir),{recursive:true});
+
+// Reduce CSS download and parse work for mobile without changing stylesheet order.
+// Transform the deployed copies only; keep readable source styles in Git.
+for (const file of ["styles.css","compact.css","equalizer.css","seo-pages.css","seo-foundation.css"]) {
+ const path=join(output,file);
+ const input=await readFile(path,"utf8");
+ const {code}=await optimizeCss(input,{loader:"css",minify:true,target:["chrome100","safari16","firefox100"]});
+ await writeFile(path,code);
+ console.log(`Optimized ${file}: ${Buffer.byteLength(input)} → ${Buffer.byteLength(code)} bytes`);
+}
+
 
 // Generate an actual, validated social card PNG from the same official logo
 // displayed on the site. The old preview asset in git is corrupted.

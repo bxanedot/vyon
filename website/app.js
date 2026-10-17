@@ -1120,7 +1120,16 @@ if(shotStage){
   chooseShot(shotOrder[next]);
  },{passive:true});
 }
-chooseShot("home");
+// Off-screen screenshot assets shouldn't contend with the critical hero render.
+const screenshotSection=document.getElementById("experience")||shotStage;
+if(screenshotSection&&"IntersectionObserver" in window){
+ const screenshotObserver=new IntersectionObserver(entries=>{
+  if(!entries.some(entry=>entry.isIntersecting))return;
+  screenshotObserver.disconnect();
+  if(!shotRequest)chooseShot("home");
+ },{rootMargin:"250px 0px"});
+ screenshotObserver.observe(screenshotSection);
+}else chooseShot("home");
 // Expand a real screenshot only. Placeholders never open an invented image.
 const lightbox=document.createElement("div");
 lightbox.className="shot-lightbox";
@@ -1177,7 +1186,7 @@ function setReleaseCard(card,asset,error){
   status.textContent=error?"Unable to verify release files. Check GitHub Releases.":"No matching stable installer published yet.";
  }
 }
-(async()=>{
+async function loadStableReleases(){
  let stable=[];
  try{
   const controller=new AbortController();
@@ -1203,6 +1212,23 @@ function setReleaseCard(card,asset,error){
    accepts(String(a.name||""))&&/^https:\/\//i.test(String(a.browser_download_url||"")));
   setReleaseCard(card,asset||null,false);
  });
-})();
+}
+// Begin checking official releases just before the downloads enter the viewport.
+// Keep the no-IntersectionObserver path fully functional.
+let releaseLookupStarted=false;
+function startReleaseLookup(){
+ if(releaseLookupStarted)return;
+ releaseLookupStarted=true;
+ void loadStableReleases();
+}
+const downloadSection=document.getElementById("downloads");
+if(downloadSection&&"IntersectionObserver" in window){
+ const downloadObserver=new IntersectionObserver(entries=>{
+  if(!entries.some(entry=>entry.isIntersecting))return;
+  downloadObserver.disconnect();
+  startReleaseLookup();
+ },{rootMargin:"150px 0px"});
+ downloadObserver.observe(downloadSection);
+}else startReleaseLookup();
 
 })();
