@@ -7,7 +7,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 val appVersion: String = providers.gradleProperty("vyon.version").orNull
     ?.removePrefix("v")
     ?.takeIf { it.isNotBlank() }
-    ?: "1.0.0"
+    ?: rootProject.extra["vyonVersionName"] as String
 
 /** Which platform this build is *for*, which is the host unless told otherwise. */
 val hostIsWindows = System.getProperty("os.name").contains("Windows", ignoreCase = true)
@@ -23,11 +23,9 @@ val targetOs: String = (providers.gradleProperty("vyon.target").orNull ?: when {
 val hostArch = System.getProperty("os.arch").lowercase()
 val isArm64 = hostArch == "aarch64" || hostArch == "arm64"
 
-// Windows installer metadata requires MAJOR.MINOR.BUILD even though the app's public version is
-// intentionally displayed without a patch number (1.7 rather than 1.7.0).
-// The build number is the desktop version code; it also keeps "-beta1" out of the numeric installer version.
-val desktopVersionCode = 1
-val nativePackageVersion = "1.0.0"
+// Installer metadata uses the numeric release version.
+val desktopVersionCode = rootProject.extra["vyonVersionCode"] as Int
+val nativePackageVersion = appVersion.substringBefore('-')
 
 // FFmpeg decodes audio; see DesktopAudioDecoder.
 val javacppVersion = "1.5.12"
@@ -401,6 +399,7 @@ val windowsPortableAssemble by tasks.registering {
     inputs.file(appJar)
     inputs.files(runtime)
     inputs.property("version", version)
+    inputs.property("versionCode", desktopVersionCode)
     inputs.property("moduleIndex", moduleIndex)
     inputs.property("lastfm", lastfmKey.isNotBlank())
     inputs.property("mainClass", mainClass)
@@ -430,7 +429,7 @@ val windowsPortableAssemble by tasks.registering {
                 appendLine("set \"HERE=%~dp0\"")
                 appendLine("set \"RUNNER=java\"")
                 appendLine("if defined JAVA_HOME set \"RUNNER=%JAVA_HOME%\\bin\\java\"")
-                append("\"%RUNNER%\" -Dvyon.version=$version")
+                append("\"%RUNNER%\" -Dvyon.version=$version -Dvyon.versionCode=$desktopVersionCode")
                 if (moduleIndex.isNotBlank()) append(" -Dvyon.module.index=$moduleIndex")
                 if (lastfmKey.isNotBlank() && lastfmSharedSecret.isNotBlank()) {
                     append(" -Dvyon.lastfm.key=$lastfmKey -Dvyon.lastfm.secret=$lastfmSharedSecret")
@@ -499,7 +498,7 @@ compose.desktop {
         mainClass = composeMainClass
         jvmArgs("-Xmx512m")
         jvmArgs("-XX:+UseG1GC", "-XX:G1PeriodicGCInterval=20000", "-XX:G1PeriodicGCSystemLoadThreshold=0")
-        jvmArgs("-Dvyon.version=$appVersion")
+        jvmArgs("-Dvyon.version=$appVersion", "-Dvyon.versionCode=$desktopVersionCode")
         if (desktopModuleIndexUrl.isNotBlank()) {
             jvmArgs("-Dvyon.module.index=$desktopModuleIndexUrl")
         }

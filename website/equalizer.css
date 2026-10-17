@@ -1,5 +1,4 @@
-/* vyon EQ — circular 3-range tuner + five-band advanced display.
-   Matte-black interpretation of the control layout shown on xan.lat. */
+/* Vyon equalizer: three-range tuner and five-band advanced controls. */
 .vqe-section{
  --vqe-rule:rgba(255,255,255,.105);
  --vqe-soft:#aba8b6;

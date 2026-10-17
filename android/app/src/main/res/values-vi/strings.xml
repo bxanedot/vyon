@@ -1268,4 +1268,5 @@
     <string name="wear_os_code_hint">Mã ghép nối</string>
     <string name="wear_os_done">Xong</string>
     <string name="signed_by">Được ký bởi %1$s</string>
+    <string name="app_icon_default">Trắng</string>
 </resources>

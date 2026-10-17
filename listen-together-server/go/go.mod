@@ -1,4 +1,4 @@
-module github.com/bxandot/vyon/listen-together-server/go
+module github.com/bxanedot/vyon/listen-together-server/go
 
 go 1.27.0
 

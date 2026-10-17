@@ -53,4 +53,27 @@ class JamInviteTest {
     fun `a built url round-trips`() {
         assertEquals("ZZ99QQ", JamInvite.parse(JamInvite.url("zz99qq")))
     }
+
+    @Test
+    fun `new links use the deployed listen together origin`() {
+        assertEquals("https://vyon-listen-together.bxane.workers.dev/invite/ABC123", JamInvite.url("abc123"))
+    }
+
+    @Test
+    fun `previous public invite links remain valid`() {
+        assertEquals("ABC123", JamInvite.parse("https://vyon.bxane.workers.dev/invite/abc123"))
+    }
+
+    @Test
+    fun `origin casing does not prevent joining`() {
+        assertEquals("ABC123", JamInvite.parse("HTTPS://VYON-LISTEN-TOGETHER.BXANE.WORKERS.DEV/invite/abc123"))
+    }
+
+    @Test
+    fun `lookalike hosts and malformed codes are refused`() {
+        assertNull(JamInvite.parse("${JamInvite.ORIGIN}.example.com/invite/ABC123"))
+        assertNull(JamInvite.parse("${JamInvite.ORIGIN}/invite/ABC123/extra"))
+        assertNull(JamInvite.parse("${JamInvite.ORIGIN}/invite/ABC12é"))
+        assertNull(JamInvite.parse("http://vyon-listen-together.bxane.workers.dev/invite/ABC123"))
+    }
 }

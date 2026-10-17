@@ -1308,4 +1308,5 @@
     <string name="wear_os_code_hint">Eşleme kodu</string>
     <string name="wear_os_done">Bitti</string>
     <string name="signed_by">%1$s tarafından imzalandı</string>
+    <string name="app_icon_default">Beyaz</string>
 </resources>

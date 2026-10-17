@@ -1,5 +1,9 @@
 <resources>
     <string name="vyon_tagline">Your music, your way</string>
+    <string name="vyon_stable">Stable</string>
+    <string name="vyon_version_code">Version Code</string>
+    <string name="vyon_license">License</string>
+    <string name="vyon_open_source_licenses">Open source licenses</string>
     <string name="vyon_lead_dev">Lead Developer</string>
     <string name="vyon_inspector">Inspector</string>
     <string name="vyon_app_info">App info</string>

@@ -13,13 +13,14 @@ import (
 
 	"github.com/gorilla/websocket"
 
-	"github.com/bxandot/vyon/listen-together-server/go/clock"
-	"github.com/bxandot/vyon/listen-together-server/go/config"
-	"github.com/bxandot/vyon/listen-together-server/go/presence"
-	"github.com/bxandot/vyon/listen-together-server/go/protocol"
+	"github.com/bxanedot/vyon/listen-together-server/go/clock"
+	"github.com/bxanedot/vyon/listen-together-server/go/config"
+	"github.com/bxanedot/vyon/listen-together-server/go/presence"
+	"github.com/bxanedot/vyon/listen-together-server/go/protocol"
 )
 
 func setupTestServer() *httptest.Server {
+	createLimiter = newIPRateLimiter(time.Minute, config.CreateRatePerMinute, config.RateLimitMaxEntries)
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /{$}", handleRoot)
 	mux.HandleFunc("GET /healthz", handleHealthz)
@@ -490,11 +491,23 @@ func TestWebSocketTokenAsSubprotocol(t *testing.T) {
 	defer ts.Close()
 
 	b, _ := json.Marshal(map[string]string{"userId": "u1", "deviceId": "d1", "displayName": "Host"})
-	res, _ := http.Post(ts.URL+"/api/parties", "application/json", bytes.NewReader(b))
+	res, err := http.Post(ts.URL+"/api/parties", "application/json", bytes.NewReader(b))
+	if err != nil {
+		t.Fatalf("POST /api/parties failed: %v", err)
+	}
+	defer res.Body.Close()
+	if res.StatusCode != http.StatusCreated {
+		t.Fatalf("POST /api/parties: status %d, want %d", res.StatusCode, http.StatusCreated)
+	}
 	var created map[string]interface{}
-	_ = json.NewDecoder(res.Body).Decode(&created)
-	code := created["code"].(string)
-	token := created["token"].(string)
+	if err := json.NewDecoder(res.Body).Decode(&created); err != nil {
+		t.Fatalf("decode created party: %v", err)
+	}
+	code, _ := created["code"].(string)
+	token, _ := created["token"].(string)
+	if code == "" || token == "" {
+		t.Fatal("expected code and token in created party")
+	}
 
 	u, _ := url.Parse(ts.URL)
 	u.Scheme = "ws"

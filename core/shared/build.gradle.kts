@@ -65,5 +65,5 @@ kotlin {
 
 android {
     namespace = "com.vyon.music.shared"
-    compileSdk = 36
+    compileSdk = 37
 }

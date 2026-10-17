@@ -69,7 +69,7 @@ class JamInviteLinkTest {
             JamInviteLink.url("abc123", ""),
         )
         assertEquals(
-            "https://vyon.bxane.workers.dev/invite/ABC123",
+            "https://vyon-listen-together.bxane.workers.dev/invite/ABC123",
             JamInviteLink.url("abc123", null),
         )
     }

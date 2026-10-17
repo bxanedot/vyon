@@ -1,3 +1,4 @@
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="vyon_updates">به‌روزرسانی‌ها</string>
     <string name="vyon_account_summary">حساب‌های متصل و گوش دادن گروهی</string>
@@ -6,6 +7,6 @@
     <string name="vyon_library_summary">بارگیری‌ها، موسیقی دستگاه و فضای ذخیره‌سازی</string>
     <string name="vyon_performance_summary">حرکت، نرخ نوسازی و عیب‌یابی</string>
     <string name="vyon_updates_summary">بررسی خودکار و اعلان‌ها</string>
-    <string name="vyon_about_summary">vyon 1.0.0 · تیم و جامعه</string>
+    <string name="vyon_about_summary">vyon %1$s · تیم و جامعه</string>
     <string name="vyon_reserved">رزرو شده</string>
 </resources>

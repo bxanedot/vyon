@@ -1328,4 +1328,5 @@
     <string name="wear_os_code_hint">Kode pemasangan</string>
     <string name="wear_os_done">Selesai</string>
     <string name="signed_by">Ditandatangani oleh %1$s</string>
+    <string name="app_icon_default">Putih</string>
 </resources>

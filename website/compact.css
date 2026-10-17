@@ -233,8 +233,7 @@ html{scroll-behavior:smooth}
 }
 
 
-/* vyon FAQ — compact, editorial, expandable rows inspired by the
-   clarity of Metrolist's help section; original styling and content. */
+/* Vyon FAQ with compact, expandable rows. */
 .faq-section{
  display:grid;
  grid-template-columns:minmax(0,.75fr) minmax(0,1.25fr);
