@@ -1,0 +1,606 @@
+/* DIMENSION / VYON — architecture-level visual reset, not a recolor.
+   This layer ships after the legacy styles. All interactive IDs stay intact. */
+:root{
+ --dimension-black:#060608;
+ --dimension-panel:#121018;
+ --dimension-edge:rgba(235,225,246,.16);
+ --dimension-ease:cubic-bezier(.22,1,.36,1);
+}
+html{scroll-behavior:smooth}
+body{
+ background:var(--dimension-black)!important;
+ color:#f6f4f8;
+}
+#main{overflow:clip}
+#main :is(.hero,.vyon-particle-lab,.platforms-section,.experience,.vqe-section,.details,.connect-section,.faq-section){
+ scroll-margin-top:100px;
+}
+.section-pad{padding-inline:clamp(23px,6vw,120px)!important}
+.site-header{
+ top:22px!important;
+ left:clamp(20px,4vw,72px)!important;
+ right:clamp(20px,4vw,72px)!important;
+ border-radius:4px!important;
+ height:72px!important;
+ padding-inline:clamp(22px,2.4vw,40px)!important;
+ background:rgba(14,13,19,.83)!important;
+ border:1px solid rgba(255,255,255,.16)!important;
+ box-shadow:0 18px 70px rgba(0,0,0,.34)!important;
+}
+:root[data-glass="on"] :is(.site-header,.site-header.is-scrolled){
+ background:rgba(14,13,19,.79)!important;
+ border:1px solid rgba(255,255,255,.18)!important;
+ backdrop-filter:blur(20px) saturate(110%)!important;
+ -webkit-backdrop-filter:blur(20px) saturate(110%)!important;
+ box-shadow:0 18px 70px rgba(0,0,0,.27)!important;
+}
+:root[data-glass="off"] :is(.site-header,.site-header.is-scrolled){
+ background:#151319!important;
+}
+.site-header .brand{font-size:27px;letter-spacing:-.08em}
+.nav-desktop a{font:500 12px/1.5 var(--body);letter-spacing:0;color:#c0bac6}
+.site-header .header-github{border-radius:4px}
+.site-header .glass-toggle,.site-header .command-trigger{border-radius:4px!important}
+#main :is(.heading-row h2,.connect-heading h2,.faq-intro h2){
+ letter-spacing:-.085em;
+}
+#main .kicker{letter-spacing:.18em;font-size:10px}
+
+/* First fold: text and a rendered volumetric artifact occupy their own worlds. */
+#main .hero{
+ min-height:max(760px,100svh)!important;
+ height:auto!important;
+ display:flex!important;
+ flex-direction:column!important;
+ justify-content:center!important;
+ align-items:stretch!important;
+ position:relative;
+ overflow:hidden;
+ isolation:isolate;
+ padding-block:clamp(155px,19vh,230px) clamp(135px,15vh,175px)!important;
+ background:
+  radial-gradient(circle at 78% 45%,rgba(var(--accent-rgb),.13),transparent 31%),
+  linear-gradient(110deg,#07070a 3%,#100c14 67%,#08070b 100%)!important;
+}
+#main .hero::before{
+ content:"";
+ position:absolute;inset:0;z-index:0;pointer-events:none;
+ background:repeating-linear-gradient(0deg,transparent 0,transparent 65px,rgba(255,255,255,.018) 66px),
+ repeating-linear-gradient(90deg,transparent 0,transparent 65px,rgba(255,255,255,.018) 66px);
+ mask-image:linear-gradient(90deg,transparent,black 24%,black 92%,transparent);
+}
+#main .hero::after{
+ content:"";z-index:0;pointer-events:none;
+ background:linear-gradient(90deg,rgba(6,6,9,.83) 0%,rgba(6,6,9,.49) 43%,transparent 76%)!important;
+}
+.hero-atmosphere{display:none!important}
+#main .hero-copy{
+ width:min(53%,690px)!important;
+ max-width:690px!important;
+ z-index:6;
+ margin:0!important;
+ padding:0!important;
+ align-self:flex-start!important;
+ pointer-events:none;
+}
+#main .hero-copy :is(a,button){pointer-events:auto}
+#main .hero .eyebrow{
+ margin:0 0 clamp(30px,4vw,56px)!important;
+ padding:0!important;
+ border:0!important;
+ border-radius:0!important;
+ background:none!important;
+ color:#bcb4c1;
+ font:500 11px/1.6 var(--mono);
+ letter-spacing:.16em;
+}
+#main .hero .eyebrow-line{height:1px;width:45px}
+#main .hero h1{
+ width:max-content;
+ max-width:100%;
+ margin:0 0 29px!important;
+ font-family:var(--display);
+ font-size:clamp(74px,8.3vw,144px)!important;
+ font-weight:750;
+ letter-spacing:-.105em!important;
+ line-height:.91!important;
+ color:#fcf9ff;
+ white-space:normal!important;
+ text-wrap:nowrap;
+ text-shadow:0 30px 80px rgba(0,0,0,.36);
+}
+#main .hero h1 .h-italic{
+ display:inline-block;
+ font-family:Georgia,'Times New Roman',serif;
+ font-weight:400;
+ font-size:1em;
+ line-height:1.05;
+ letter-spacing:-.092em;
+ color:var(--accent);
+ font-style:italic;
+}
+#main .hero h1 .h-dot{color:#fff}
+#main .hero-description{
+ max-width:450px!important;
+ margin:0 0 34px!important;
+ font-size:clamp(15px,1.35vw,18px)!important;
+ line-height:1.76;
+ color:#c0bac7;
+}
+#main .hero-buttons-primary{
+ display:flex!important;
+ flex-wrap:wrap;
+ width:auto!important;
+ gap:11px!important;
+ align-items:center;
+}
+#main .hero-buttons-primary .btn{
+ min-height:58px!important;
+ border-radius:3px!important;
+ padding-inline:25px!important;
+ font-size:13px;
+ box-shadow:none!important;
+}
+#main .hero-buttons-primary .btn-primary{
+ background:var(--accent)!important;
+ color:#09080a!important;
+}
+#main .hero-buttons-primary .btn-ghost{
+ background:rgba(255,255,255,.045)!important;
+ border:1px solid rgba(255,255,255,.27)!important;
+}
+#main .hero-buttons-primary .btn:hover{transform:translateY(-2px)}
+.hero-explore{
+ display:inline-flex;
+ align-items:center;
+ gap:13px;
+ margin-top:25px;
+ font:500 11px/1.4 var(--mono);
+ letter-spacing:.08em;
+ color:#ddd5e2;
+ width:max-content;
+ border-bottom:1px solid rgba(255,255,255,.34);
+ padding-bottom:9px;
+}
+.hero-explore-icon{
+ color:var(--accent);
+ font-size:18px;
+}
+.hero-explore:hover{color:var(--accent)}
+#main .hero-footnote{margin-top:clamp(33px,4vw,56px)!important}
+#main .hero .visit-counter{border-color:rgba(255,255,255,.13)!important;margin-top:14px}
+#main .hero-side-label{
+ right:clamp(19px,3vw,52px);
+ top:auto;
+ bottom:144px;
+ color:#aaa0ad;
+}
+#main .hero .scroll-cue{z-index:7;bottom:39px}
+#main .hero .scroll-cue a{pointer-events:auto}
+
+/* Physical 3D: first-person lighting, analytic torus normals, smooth pointer
+   motion, real raymarching and a native CSS fall-through if WebGL is absent. */
+.sonic-scene{
+ position:absolute;
+ right:-3%;
+ top:7%;
+ width:62%;
+ height:87%;
+ z-index:2;
+ overflow:visible;
+ pointer-events:auto;
+ touch-action:pan-y;
+}
+.sonic-scene-glow{
+ position:absolute;
+ inset:13% 0;
+ pointer-events:none;
+ background:radial-gradient(ellipse at 58% 51%,rgba(var(--accent-rgb),.25),transparent 55%);
+ filter:blur(28px);
+ opacity:.8;
+}
+.sonic-canvas{
+ position:absolute;
+ inset:0;
+ width:100%;
+ height:100%;
+ display:block;
+ pointer-events:none;
+ opacity:0;
+ transform:translateZ(0);
+ transition:opacity 1s ease;
+}
+.sonic-scene[data-renderer="webgl"] .sonic-canvas{opacity:1}
+.sonic-scene-fallback{
+ position:absolute;
+ inset:12% 10%;
+ display:grid;
+ place-items:center;
+ pointer-events:none;
+ opacity:1;
+ transition:opacity .7s ease;
+ perspective:900px;
+}
+.sonic-scene[data-renderer="webgl"] .sonic-scene-fallback{opacity:0}
+.sonic-ring{
+ position:absolute;
+ width:min(75%,640px);
+ aspect-ratio:1;
+ border-radius:50%;
+ border:clamp(21px,2.9vw,47px) solid transparent;
+ box-shadow:
+  inset 12px 14px 28px rgba(255,255,255,.28),
+  inset -19px -20px 31px rgba(0,0,0,.7),
+  14px 18px 35px rgba(0,0,0,.4),
+  0 0 60px rgba(var(--accent-rgb),.25);
+ background:linear-gradient(135deg,#e4dbef 4%,#5f5c70 22%,var(--accent) 44%,#19111c 70%,#c9c5d4) border-box;
+ mask:radial-gradient(farthest-side,transparent calc(100% - clamp(21px,2.9vw,47px)),#000 0);
+}
+.sonic-ring-one{transform:rotateX(68deg) rotateY(12deg) rotateZ(-18deg)}
+.sonic-ring-two{transform:rotateY(69deg) rotateX(-18deg) rotateZ(38deg);width:min(69%,590px)}
+.sonic-ring-three{transform:rotateY(-34deg) rotateX(33deg);width:min(56%,490px)}
+.sonic-scene-crosshair{
+ position:absolute;
+ inset:8% 14%;
+ pointer-events:none;
+ display:flex;
+ justify-content:space-between;
+ align-items:flex-start;
+ font:500 9px/1.5 var(--mono);
+ letter-spacing:.2em;
+ color:#a9a1b1;
+}
+.sonic-scene-crosshair::before,.sonic-scene-crosshair::after{
+ content:"";
+ position:absolute;width:13px;height:13px;
+ border:1px solid rgba(255,255,255,.33);
+}
+.sonic-scene-crosshair::before{
+ left:-15px;top:-15px;
+ border-right:0;border-bottom:0;
+}
+.sonic-scene-crosshair::after{
+ right:-15px;bottom:-15px;
+ border-left:0;border-top:0;
+}
+.sonic-coordinate{
+ position:absolute;
+ z-index:4;
+ pointer-events:none;
+ font:10px/1.4 var(--mono);
+ letter-spacing:.18em;
+ color:#9a909f;
+}
+.sonic-coordinate-a{left:14%;bottom:12%}
+.sonic-coordinate-b{right:11%;top:17%;writing-mode:vertical-rl}
+.sonic-scene[data-renderer="fallback"] .sonic-coordinate-b{display:none}
+
+/* A completely new chapter / live particle installation. */
+.signal-ribbon{
+ width:100%;
+ overflow:hidden;
+ height:66px;
+ display:flex;
+ align-items:center;
+ background:var(--accent);
+ color:#0a070b;
+ transform:rotate(-1.1deg) scale(1.02);
+ position:relative;z-index:5;
+}
+.signal-ribbon-track{
+ display:flex;
+ width:max-content;
+ gap:0;
+ animation:signal-marquee 40s linear infinite;
+}
+.signal-ribbon-track span{
+ flex:none;
+ display:flex;
+ gap:32px;
+ align-items:center;
+ white-space:nowrap;
+ padding:0 40px 0 0;
+ font:800 clamp(15px,1.8vw,24px)/1 var(--display);
+ letter-spacing:-.035em;
+}
+.signal-ribbon-track i{font:26px/1 Georgia,serif}
+@keyframes signal-marquee{to{transform:translateX(-50%)}}
+.vyon-particle-lab{
+ position:relative;
+ display:grid;
+ grid-template-columns:minmax(300px,.78fr) minmax(0,1.22fr);
+ gap:clamp(25px,6vw,100px);
+ align-items:center;
+ padding-block:clamp(100px,13vw,200px)!important;
+ background:
+  radial-gradient(ellipse at 95% 70%,rgba(var(--accent-rgb),.11),transparent 44%),
+  linear-gradient(135deg,#0d0c11,#15111a 57%,#08080b);
+ overflow:hidden;
+}
+.vyon-particle-lab::before{
+ content:"";
+ position:absolute;inset:0;pointer-events:none;
+ background-image:linear-gradient(rgba(255,255,255,.027) 1px,transparent 1px),
+ linear-gradient(90deg,rgba(255,255,255,.027) 1px,transparent 1px);
+ background-size:68px 68px;
+ mask-image:linear-gradient(90deg,transparent,#000 45%,transparent 98%);
+}
+.particle-lab-intro{position:relative;z-index:4}
+.particle-lab-index{
+ display:flex;justify-content:space-between;
+ width:min(100%,340px);
+ margin-bottom:50px;
+ border-top:1px solid var(--accent);
+ padding-top:12px;
+ color:var(--accent);
+ font:11px var(--mono);
+ letter-spacing:.15em;
+}
+.particle-lab-intro h2{
+ margin:0 0 30px;
+ font:750 clamp(45px,5.2vw,88px)/.99 var(--display);
+ letter-spacing:-.088em;
+ text-wrap:balance;
+}
+.particle-lab-intro h2 em{
+ color:var(--accent);
+ font:italic 400 1em/.97 Georgia,serif;
+ letter-spacing:-.075em;
+}
+.particle-lab-intro p{
+ margin:0 0 34px;
+ max-width:420px;
+ font:15px/1.8 var(--body);
+ color:#bbb2c0;
+}
+.particle-lab-next{
+ display:inline-flex;gap:22px;
+ align-items:center;
+ padding:13px 0;
+ border-bottom:1px solid rgba(255,255,255,.32);
+ font:500 12px var(--mono);
+ color:#f4f0f7;
+}
+.particle-lab-next span{color:var(--accent);font-size:21px}
+.particle-lab-stage{
+ position:relative;
+ min-height:clamp(420px,44vw,630px);
+ width:100%;
+ border:1px solid rgba(255,255,255,.2);
+ background:
+  radial-gradient(circle at 50% 53%,rgba(var(--accent-rgb),.12),transparent 48%),
+  linear-gradient(145deg,#16131c,#09080e);
+ box-shadow:0 45px 95px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.07);
+ overflow:hidden;
+}
+.particle-lab-stage::before{
+ content:"";position:absolute;inset:18%;
+ border:1px solid rgba(255,255,255,.055);
+ border-radius:50%;pointer-events:none;
+}
+.particle-lab-heading,.particle-lab-caption{
+ position:absolute;
+ left:26px;right:26px;
+ display:flex;align-items:center;justify-content:space-between;
+ color:#a9a2b1;
+ font:10px/1.5 var(--mono);
+ letter-spacing:.1em;
+ pointer-events:none;
+ z-index:6;
+}
+.particle-lab-heading{top:24px}
+.particle-lab-caption{bottom:22px}
+.particle-lab-led{
+ width:8px;height:8px;border-radius:50%;background:var(--accent);
+ box-shadow:0 0 16px rgba(var(--accent-rgb),.55);
+}
+.vyon-particle-lab .hero-orb{
+ position:absolute!important;
+ inset:37px 0 35px!important;
+ width:100%!important;
+ height:calc(100% - 72px)!important;
+ min-height:0!important;
+ opacity:1!important;
+ transform:none!important;
+ z-index:3!important;
+ cursor:crosshair;
+ touch-action:manipulation;
+}
+.vyon-particle-lab .hero-orb canvas{width:100%;height:100%}
+.vyon-particle-lab .hero-orb:focus-visible{outline:2px solid var(--accent);outline-offset:-5px}
+
+/* New asymmetric installation hierarchy. */
+#main .platforms-section{
+ padding-block:clamp(110px,12vw,180px)!important;
+ background:#07070a!important;
+}
+#main .platforms-section .heading-row h2{font-size:clamp(53px,6.5vw,108px)}
+#main .platform-grid{
+ display:grid!important;
+ grid-template-columns:minmax(0,1.22fr) minmax(0,1fr)!important;
+ grid-template-rows:repeat(3,minmax(200px,auto));
+ gap:12px!important;
+}
+#main .platform-card{
+ min-height:0!important;
+ border-radius:4px!important;
+ padding:clamp(28px,3vw,48px)!important;
+ background:linear-gradient(145deg,#17151d,#0e0c12)!important;
+}
+#main .platform-card:first-child{
+ grid-row:1 / span 3;
+ background:
+  radial-gradient(ellipse at 60% 12%,rgba(var(--accent-rgb),.15),transparent 55%),
+  linear-gradient(160deg,#1b1722,#0b090f)!important;
+ display:flex;flex-direction:column;
+ justify-content:space-between;
+}
+#main .platform-card:first-child h3{
+ font-size:clamp(65px,8vw,132px)!important;
+ margin-top:auto;
+ letter-spacing:-.105em;
+}
+#main .platform-card:not(:first-child) h3{
+ font-size:clamp(38px,4.4vw,60px)!important;
+ margin:12px 0!important;
+}
+#main .platform-card::before{
+ content:"";position:absolute;inset:auto -12% -55%;
+ height:80%;width:120%;
+ background:radial-gradient(ellipse,rgba(var(--accent-rgb),.12),transparent 65%);
+ pointer-events:none;
+}
+#main .platform-card:first-child::after{
+ content:"01";
+ position:absolute;
+ top:18%;right:5%;
+ font:800 clamp(135px,20vw,290px)/1 var(--display);
+ letter-spacing:-.15em;
+ color:rgba(255,255,255,.035);
+ pointer-events:none;
+}
+#main .platform-card .platform-download{
+ border-radius:4px!important;
+ position:relative;
+ z-index:2;
+}
+#main .platform-card:hover{transform:none!important;border-color:rgba(var(--accent-rgb),.58)!important}
+#main .platform-card .platform-status{position:relative;z-index:2}
+#main .experience{
+ padding-block:clamp(110px,11vw,180px)!important;
+ background:linear-gradient(180deg,#09080e,#100d15)!important;
+}
+#main .screenshot-layout{
+ grid-template-columns:minmax(0,1.45fr) minmax(280px,.55fr)!important;
+ gap:10px!important;
+}
+#main .screenshot-browser,#main .screenshot-aside{
+ border-radius:4px!important;
+ background:#17141b!important;
+}
+#main .screenshot-aside{padding:clamp(35px,5vw,70px)}
+#main .vqe-section{
+ padding-block:clamp(110px,12vw,200px)!important;
+ background:radial-gradient(ellipse at 78% 54%,rgba(var(--accent-rgb),.1),transparent 45%),#09080c!important;
+}
+#main .details{
+ padding-block:clamp(110px,12vw,170px)!important;
+ background:linear-gradient(140deg,#100d15,#070709)!important;
+}
+#main .feature-grid{gap:10px!important}
+#main .feature-card{
+ border-radius:4px!important;
+ min-height:470px!important;
+ background:linear-gradient(138deg,#211920,#110e16)!important;
+}
+#main .connect-section{
+ padding-block:clamp(110px,12vw,170px)!important;
+ background:#09080c!important;
+}
+#main .social-grid{gap:10px}
+#main .social-card{border-radius:4px!important;background:#17131b!important}
+#main .faq-section{
+ padding-block:clamp(100px,11vw,180px)!important;
+ background:#09080c!important;
+}
+#main .faq-item{border-radius:4px!important;background:#141018!important}
+#main .faq-item:is(:hover,[open]){background:#1e1720!important}
+#main .vyon-footer{background:#09070d!important}
+
+/* Progressive enhancement: shaders are never a prerequisite for content. */
+@media(max-width:1100px){
+ #main .hero h1{font-size:clamp(69px,8.4vw,105px)!important}
+ #main .hero-copy{width:55%!important}
+ .sonic-scene{width:62%;right:-11%}
+ #main .hero-side-label{display:none}
+}
+@media(max-width:850px){
+ .site-header{top:12px!important;left:15px!important;right:15px!important;height:64px!important}
+ .mobile-menu{top:86px!important;left:15px!important;right:15px!important}
+ #main .hero{
+  min-height:900px!important;
+  padding-top:510px!important;
+  padding-bottom:99px!important;
+  justify-content:flex-end!important;
+ }
+ #main .hero::after{
+  background:linear-gradient(180deg,transparent 6%,rgba(6,6,9,.2) 40%,#07070a 68%)!important;
+ }
+ #main .hero-copy{width:100%!important;max-width:700px!important}
+ #main .hero h1{font-size:clamp(66px,10.3vw,95px)!important}
+ .sonic-scene{top:7%;right:0;width:100%;height:520px}
+ .sonic-scene-crosshair{inset:18% 17%}
+ .sonic-coordinate-a{bottom:4%}
+ .vyon-particle-lab{grid-template-columns:1fr;gap:35px;padding-block:85px!important}
+ .particle-lab-intro{max-width:640px}
+ .particle-lab-stage{height:clamp(460px,75vw,640px)}
+ #main .screenshot-layout{grid-template-columns:1fr!important}
+ #main .platform-grid{grid-template-columns:1fr 1fr!important;grid-template-rows:auto}
+ #main .platform-card:first-child{grid-row:auto;grid-column:1 / -1;min-height:375px!important}
+ #main .platform-card:not(:first-child){min-height:260px!important}
+ #main .platform-card:last-child{grid-column:1 / -1}
+ #main .platform-card:first-child h3{font-size:75px!important}
+ #main .platforms-section{padding-block:80px!important}
+}
+@media(max-width:590px){
+ .section-pad{padding-inline:21px!important}
+ .site-header{top:9px!important;left:11px!important;right:11px!important;height:59px!important;padding-inline:14px!important}
+ .mobile-menu{top:77px!important;left:11px!important;right:11px!important}
+ #main .hero{
+  min-height:890px!important;
+  padding-top:400px!important;
+  padding-bottom:100px!important;
+ }
+ .sonic-scene{height:430px;top:7%;right:-6%;width:112%}
+ .sonic-scene-crosshair{inset:13% 17%}
+ .sonic-coordinate{font-size:8px}
+ .sonic-coordinate-a{left:21%;bottom:3%}
+ #main .hero .eyebrow{font-size:8px!important;margin-bottom:17px!important;letter-spacing:.08em}
+ #main .hero h1{
+  font-size:clamp(51px,12.1vw,72px)!important;
+  line-height:.95!important;
+  margin-bottom:20px!important;
+ }
+ #main .hero-description{font-size:14px!important;max-width:39ch!important;margin-bottom:23px!important}
+ #main .hero-buttons-primary{display:flex!important;gap:9px!important;flex-wrap:wrap}
+ #main .hero-buttons-primary .btn{min-height:49px!important;padding-inline:17px!important}
+ #main .hero-explore{margin-top:17px}
+ #main .hero-footnote{margin-top:21px!important}
+ #main .hero .scroll-cue{bottom:27px}
+ .signal-ribbon{height:53px}
+ .signal-ribbon-track span{font-size:15px}
+ .vyon-particle-lab{padding-block:70px!important}
+ .particle-lab-intro h2{font-size:clamp(44px,11vw,64px)}
+ .particle-lab-index{margin-bottom:25px}
+ .particle-lab-stage{min-height:370px;height:390px}
+ .particle-lab-caption,.particle-lab-heading{left:16px;right:16px;font-size:8px}
+ #main .platform-grid{grid-template-columns:1fr!important;gap:10px!important}
+ #main .platform-card:first-child,#main .platform-card:last-child{grid-column:auto}
+ #main .platform-card:first-child{min-height:340px!important}
+ #main .platform-card:not(:first-child){min-height:250px!important}
+ #main .platform-card:first-child h3{font-size:62px!important}
+ #main .platform-card{border-radius:4px!important}
+ #main .experience,#main .vqe-section,#main .details,#main .connect-section,#main .faq-section{padding-block:80px!important}
+ #main .feature-card{min-height:340px!important}
+ #main :is(.heading-row h2,.connect-heading h2,.faq-intro h2){font-size:clamp(41px,10.5vw,64px)!important}
+}
+@media(max-width:380px){
+ #main .hero{min-height:860px!important;padding-top:380px!important}
+ #main .hero h1{font-size:49px!important}
+ .sonic-scene{height:390px}
+}
+@media(hover:none){
+ .platform-card:hover,.feature-card:hover,.social-card:hover{transform:none!important}
+}
+@media(prefers-reduced-motion:reduce){
+ *,*::before,*::after{scroll-behavior:auto}
+ .signal-ribbon-track{animation:none!important}
+ .sonic-canvas{display:none!important}
+ .sonic-scene-fallback{opacity:1!important}
+ .sonic-scene-glow{filter:none!important;opacity:.4}
+ .sonic-ring{transition:none!important}
+}
+@media(prefers-reduced-transparency:reduce){
+ :root[data-glass="on"] .site-header{background:#15131b!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+ .sonic-scene-glow{filter:none}
+}
