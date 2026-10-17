@@ -63,6 +63,7 @@ jobs:
           yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null
           set -o pipefail
           "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install \
+            --channel=3 \
             "platforms;android-37" \
             "build-tools;37.0.0" \
             "ndk;28.2.13676358" \
