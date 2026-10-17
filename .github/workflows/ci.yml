@@ -1,0 +1,122 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - perf/**
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  website:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: website/package-lock.json
+      - run: npm ci --no-audit --no-fund
+        working-directory: website
+      - run: npm run build
+        working-directory: website
+
+  worker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: listen-together-server/package-lock.json
+      - run: npm ci --no-audit --no-fund
+        working-directory: listen-together-server
+      - run: npm run typecheck
+        working-directory: listen-together-server
+
+  go-service:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: listen-together-server/go/go.mod
+          cache-dependency-path: listen-together-server/go/go.sum
+      - run: go test -count=1 ./...
+        working-directory: listen-together-server/go
+
+  desktop:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: windows-latest
+            platform: windows
+          - runner: macos-latest
+            platform: macos
+          - runner: ubuntu-latest
+            platform: linux
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: gradle/actions/setup-gradle@v6
+        with:
+          cache-provider: basic
+      - uses: msys2/setup-msys2@v2
+        if: ${{ matrix.platform == 'windows' }}
+        with:
+          update: true
+          msystem: UCRT64
+          install: >-
+            mingw-w64-ucrt-x86_64-gcc
+            mingw-w64-ucrt-x86_64-cmake
+            mingw-w64-ucrt-x86_64-ninja
+      - name: Install CMake
+        if: ${{ matrix.platform == 'macos' }}
+        run: brew install cmake
+      - name: Run desktop tests on Windows
+        if: ${{ matrix.platform == 'windows' }}
+        run: .\gradlew.bat :desktopApp:test --console=plain
+      - name: Run desktop tests
+        if: ${{ matrix.platform != 'windows' }}
+        run: ./gradlew :desktopApp:test --console=plain
+
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: gradle/actions/setup-gradle@v6
+        with:
+          cache-provider: basic
+      - name: Install Android SDK packages
+        shell: bash
+        run: |
+          printf 'sdk.dir=%s\n' "$ANDROID_HOME" >> local.properties
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install \
+            "platforms;android-37" \
+            "build-tools;37.0.0" \
+            "ndk;28.2.13676358" \
+            "cmake;3.22.1"
+      - name: Run shared tests and assemble Android targets
+        run: ./gradlew :shared:jvmTest :app:testDevDebugUnitTest :app:assembleProdRelease :tv:assembleProdRelease :wearos:assembleProdRelease --console=plain

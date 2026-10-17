@@ -180,6 +180,8 @@ Open a <a href="https://github.com/bxanedot/vyon/issues">GitHub issue</a> with a
 
 Vyon is open source under the [GNU General Public License v3.0](LICENSE). Bundled third-party components retain their respective licenses.
 
+Build, architecture, installation, and release guidance is in the [project documentation](docs/README.md). See [third-party notices](NOTICE.md) for source-level attribution.
+
 **Disclaimer:** Vyon is an independent music player and is not affiliated with, endorsed by, or sponsored by Google or YouTube. YouTube and YouTube Music are trademarks of their respective owners.
 
 <div align="center">

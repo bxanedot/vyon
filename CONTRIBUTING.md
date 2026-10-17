@@ -25,7 +25,7 @@ You don't have to write code to help.
 | Area | Examples |
 | --- | --- |
 | 🐛 **Bug fixes** | Playback failures, crashes, downloads, navigation, and device-specific issues |
-| 🎵 **Music features** | Artist, album, playlist and single-track downloads; library; sources; lyrics; audio |
+| 🎵 **Music features** | Single-track downloads; library; sources; lyrics; audio. Collection downloads are outside the v1.0.0 release scope. |
 | 🎨 **Design & UX** | Accessibility, animations, responsive layouts, polished and consistent interfaces |
 | 🌍 **Translations** | Improve existing strings and translations, or help expand language support |
 | 📖 **Documentation** | Clearer explanations, useful screenshots, typo fixes, and troubleshooting |
@@ -45,7 +45,7 @@ When filing a bug, please include:
 - **App version** (or commit SHA), plus the relevant music source if applicable.
 - **Useful evidence** — screenshots, short recordings, or **redacted** logs.
 
-For download issues, include whether it affects a **single track, album, playlist, or artist page**, and whether the download fails, stalls, saves incorrectly, or cannot play offline. For playback issues, mention the audio format/quality or output device if relevant.
+For download issues, include the **track page** and whether the download fails, stalls, saves incorrectly, or cannot play offline. Collection-level downloads are not part of the v1.0.0 release. For playback issues, mention the audio format/quality or output device if relevant.
 
 > **🔐 Security issues belong in a private report, not a public issue.** Read [SECURITY.md](SECURITY.md) for responsible disclosure instructions. Never include passwords, session cookies, authentication tokens, or private user data in bug reports.
 
@@ -181,7 +181,7 @@ For synchronization work, test reconnects, host/guest permissions, queue updates
 
 - **Match the surrounding code.** Follow existing Kotlin, Compose, JavaScript/TypeScript, and Go patterns instead of introducing another style for the same feature.
 - **Protect playback stability.** Queue ordering, cancellation, buffering, audio quality, and offline state should remain predictable.
-- **Treat downloads as collections when appropriate.** An album or playlist batch has different library behavior from saving a single track; preserve track metadata and avoid duplicate downloads.
+- **Keep download scope clear.** v1.0.0 supports individual track downloads; album, playlist, and artist catalog downloads are deferred.
 - **Keep interfaces platform-appropriate.** Respect Android's touch interactions, TV remote focus, desktop mouse/keyboard behavior, and watch constraints.
 - **Prioritize accessibility and performance.** Label controls, keep focus/navigation usable, respect reduced motion, and avoid excessive background work or animations.
 - **Make network work defensive.** External music APIs and providers can fail, change, or return incomplete metadata. Handle these cases clearly.
