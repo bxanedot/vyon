@@ -170,3 +170,26 @@ The actual particle physics, WebGL shader, equalizer and legacy `.reveal`
 logic are deliberately not controlled by Anime.js, avoiding competing
 transforms. If the CDN is unreachable, the site renders normally; the
 animation enhancement is optional. Reduced-motion and Data Saver opt out.
+
+
+## Official Vyon 3D icon (replaces experimental ring sculpture)
+
+The hero GPU object is now based directly on the actual
+`/icons/vyon-mark.svg` path. `sonic-scene.js` parses the three official
+contours, triangulates the filled outlines, extrudes them into a shallow 3D
+solid with front/back bevels, and shades the resulting GPU triangle mesh with
+the selected theme color, chrome lighting, and pointer tilt. The object stays
+mostly front-facing so the Vyon identity remains readable.
+
+This fixes the previous raymarching shader's torus geometry and rendering
+instability without adding Three.js, React, external runtime imports, or a
+second 3D engine. The renderer continues to pause outside the viewport,
+caps its GPU resolution, and respects reduced motion and data saver.
+
+**Fallback always shows the actual Vyon SVG mark** from the same source,
+including on devices that lack WebGL2 or lose their GPU context. Tests now
+check the real icon source, and the browser suite verifies that supported
+WebGL2 environments successfully construct and draw the SVG geometry.
+
+If the mark is changed, keep its SVG path valid; don't replace the existing
+silhouette with manually approximated curves.
