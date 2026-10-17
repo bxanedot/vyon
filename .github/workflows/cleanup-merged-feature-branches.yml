@@ -1,0 +1,48 @@
+name: Clean up merged feature branches
+
+on:
+  pull_request:
+    types: [closed]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  clean-up:
+    # Limit this workflow to these two PRs, or an explicit manual run.
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event.pull_request.merged == true && (github.event.pull_request.number == 7 || github.event.pull_request.number == 8)) }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete only already-merged, unchanged PR branches
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          for entry in "7|build/android-debug-apk" "8|perf/particle-caching-lighthouse-2026"; do
+            pr="${entry%%|*}"
+            branch="${entry#*|}"
+            details="$(gh api "repos/$GITHUB_REPOSITORY/pulls/$pr")"
+            merged_at="$(jq -r '.merged_at // ""' <<< "$details")"
+            head_ref="$(jq -r '.head.ref // ""' <<< "$details")"
+            head_repo="$(jq -r '.head.repo.full_name // ""' <<< "$details")"
+            merged_head_sha="$(jq -r '.head.sha // ""' <<< "$details")"
+
+            if [[ -z "$merged_at" || "$head_ref" != "$branch" || "$head_repo" != "$GITHUB_REPOSITORY" ]]; then
+              echo "Skipping PR #$pr: not merged or branch/repo doesn't match."
+              continue
+            fi
+
+            # If the branch was already deleted, or somebody committed new work
+            # since merge, do not remove it.
+            current_sha="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/$branch" --jq '.object.sha' 2>/dev/null || true)"
+            if [[ -z "$current_sha" ]]; then
+              echo "Branch $branch already absent."
+            elif [[ "$current_sha" != "$merged_head_sha" ]]; then
+              echo "Skipping $branch: head changed since its PR was merged."
+            else
+              echo "Deleting merged branch $branch (PR #$pr)."
+              gh api --method DELETE "repos/$GITHUB_REPOSITORY/git/refs/heads/$branch"
+            fi
+          done
