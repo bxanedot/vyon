@@ -2,7 +2,7 @@ import {test, expect} from "@playwright/test";
 
 test("homepage keeps its identity and interactive particle canvas", async ({page}) => {
   await page.goto("/", {waitUntil: "domcontentloaded"});
-  await expect(page.locator("main h1")).toContainText("A different");
+  await expect(page.locator("main h1")).toContainText("Sound in");
   await expect(page.locator("#orb-canvas")).toBeAttached();
   await expect(page.locator(".hero-atmosphere")).toHaveAttribute("aria-hidden", "true");
   await expect(page.locator('a.hero-download-btn[href="#downloads"]')).toBeAttached();
@@ -71,13 +71,16 @@ test("editorial design loads as real CSS and preserves the content system", asyn
       background: getComputedStyle(node).backgroundColor,
       font: getComputedStyle(heading).fontFamily,
       cardRadius: parseFloat(getComputedStyle(card).borderTopLeftRadius),
-      heroLabel: Boolean(document.querySelector(".hero-stage-note"))
+      hasScene: Boolean(document.querySelector("#sonic-canvas")),
+      hasLab: Boolean(document.querySelector("#particle-lab"))
     };
   });
   expect(htmlStyles.background).not.toBe("rgba(0, 0, 0, 0)");
   expect(htmlStyles.font).not.toBe('"Times New Roman"');
-  expect(htmlStyles.cardRadius).toBeGreaterThanOrEqual(18);
-  expect(htmlStyles.heroLabel).toBe(true);
+  expect(htmlStyles.cardRadius).toBeGreaterThanOrEqual(3);
+  expect(htmlStyles.cardRadius).toBeLessThanOrEqual(10);
+  expect(htmlStyles.hasScene).toBe(true);
+  expect(htmlStyles.hasLab).toBe(true);
   await expect(page.locator(".platform-card")).toHaveCount(4);
   await expect(page.locator(".screenshot-tabs button")).toHaveCount(3);
   await expect(page.locator(".faq-item")).toHaveCount(6);
@@ -120,4 +123,47 @@ test("capture review screenshots for desktop and mobile", async ({page}, testInf
     animations: "disabled",
     fullPage: true
   });
+});
+
+
+test("the sculptural scene ships with a genuine WebGL2 path and a visible fallback", async ({page}) => {
+  await page.goto("/", {waitUntil: "load"});
+  await expect(page.locator("#sonic-canvas")).toHaveCount(1);
+  await expect(page.locator("#sonic-scene")).toHaveAttribute("data-renderer", /^(fallback|webgl)$/);
+  const jsResponse=await page.request.get("/sonic-scene.js");
+  expect(jsResponse.status()).toBe(200);
+  expect(await jsResponse.text()).toContain('getContext("webgl2"');
+  await expect(page.locator("#particle-lab #orb-region")).toHaveCount(1);
+  await expect(page.locator("#particle-lab #orb-canvas")).toHaveCount(1);
+  const css=await page.request.get("/dimension.css");
+  expect(css.status()).toBe(200);
+  expect(css.headers()["content-type"]).toContain("text/css");
+  await expect(page.locator('.rive-motion-slot[data-rive-motion]')).toHaveCount(1);
+});
+
+test("reduced-motion users get the static dimensional sculpture", async ({page}) => {
+  await page.emulateMedia({reducedMotion: "reduce"});
+  await page.goto("/", {waitUntil: "load"});
+  await expect(page.locator("#sonic-scene")).toHaveAttribute("data-renderer", "fallback");
+  const fallback=await page.locator(".sonic-scene-fallback").evaluate(
+    el => getComputedStyle(el).opacity
+  );
+  expect(fallback).toBe("1");
+  const ribbon=await page.locator(".signal-ribbon-track").evaluate(
+    el => getComputedStyle(el).animationName
+  );
+  expect(ribbon).toBe("none");
+});
+
+test("new dimensional experience preserves all core homepage interactions", async ({page}) => {
+  await page.goto("/", {waitUntil: "domcontentloaded"});
+  await expect(page.locator(".platform-card")).toHaveCount(4);
+  await expect(page.locator("#vqe-preset-title")).toBeAttached();
+  await expect(page.locator("#glass-toggle")).toBeAttached();
+  await expect(page.locator(".theme-chip")).toHaveCount(5);
+  await expect(page.locator("#vyon-live-count")).toBeAttached();
+  await expect(page.locator("#vyon-total-count")).toBeAttached();
+  await expect(page.locator(".faq-item")).toHaveCount(6);
+  await expect(page.locator(".screenshot-tab")).toHaveCount(3);
+  await expect(page.locator('.hero-explore[href="#particle-lab"]')).toBeAttached();
 });
