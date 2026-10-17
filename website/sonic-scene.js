@@ -176,7 +176,7 @@
  const palette={blood:[.90,.22,.33],violet:[.65,.60,1],acid:[.69,.95,.35],
   coral:[1,.56,.42],ice:[.38,.78,.95]};
  const pointer={x:0,y:0,targetX:0,targetY:0};
- const pixelBudget=innerWidth<850?360000:850000;
+ const pixelBudget=innerWidth<850?600000:850000;
  const frameMs=innerWidth<850?33:20;
  let visible=false,disposed=false,observer,resizeObserver;
  let frame=0,previous=0,lastDraw=0,elapsed=0,count=0,started=false;
@@ -189,7 +189,7 @@
  function resize(){
   const rect=canvas.getBoundingClientRect();
   if(!rect.width||!rect.height)return;
-  const dpr=Math.min(devicePixelRatio||1,innerWidth<850?1:1.5,
+  const dpr=Math.min(devicePixelRatio||1,innerWidth<850?1.75:1.5,
    Math.sqrt(pixelBudget/(rect.width*rect.height)));
   const width=Math.max(1,Math.round(rect.width*dpr));
   const height=Math.max(1,Math.round(rect.height*dpr));
