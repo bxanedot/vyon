@@ -1,0 +1,55 @@
+name: Mobile Lighthouse regression
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "website/**"
+      - ".github/workflows/lighthouse-mobile.yml"
+  push:
+    branches: [main]
+    paths:
+      - "website/**"
+      - ".github/workflows/lighthouse-mobile.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mobile-lighthouse-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  mobile-lighthouse:
+    name: Mobile Lighthouse (homepage and guides)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: website
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: website/package-lock.json
+      - name: Install project dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Build and smoke-test the static site
+        run: npm run build
+      - name: Install pinned Lighthouse CI
+        run: npm install --global @lhci/cli@0.15.1 --no-audit --no-fund
+      - name: Run mobile Lighthouse regression checks
+        run: lhci autorun --config=./lighthouserc.cjs
+      - name: Save Lighthouse reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vyon-mobile-lighthouse-${{ github.run_number }}
+          path: |
+            website/lighthouse-reports/
+            website/.lighthouseci/
+          if-no-files-found: warn
+          retention-days: 14
