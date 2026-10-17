@@ -105,8 +105,19 @@ test("hero text stays within the visible viewport", async ({page}) => {
 test("new editorial layer respects reduced motion", async ({page}) => {
   await page.emulateMedia({reducedMotion: "reduce"});
   await page.goto("/", {waitUntil: "load"});
-  const transition = await page.locator(".platform-card").evaluate(
+  const transition = await page.locator(".platform-card").first().evaluate(
     element => getComputedStyle(element).transitionDuration
   );
   expect(transition.split(",").every(x => x.trim() === "0s")).toBe(true);
+});
+
+
+test("capture review screenshots for desktop and mobile", async ({page}, testInfo) => {
+  await page.goto("/", {waitUntil: "load"});
+  await page.evaluate(() => document.fonts.ready);
+  await page.screenshot({
+    path: "test-results/preview-" + testInfo.project.name + ".png",
+    animations: "disabled",
+    fullPage: true
+  });
 });
