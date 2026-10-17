@@ -229,7 +229,7 @@ test("Anime.js is skipped for reduced-motion preference", async ({page}) => {
 });
 
 
-test("Liquid Glass is permanent and a stored off setting cannot disable it", async ({page}) => {
+test("Liquid Glass is permanent and a stored off setting cannot disable it", async ({page}, testInfo) => {
   await page.addInitScript(() => localStorage.setItem("vyon-liquid-glass","off"));
   await page.goto("/", {waitUntil:"load"});
   await expect(page.locator("html")).toHaveAttribute("data-glass","on");
@@ -241,6 +241,9 @@ test("Liquid Glass is permanent and a stored off setting cannot disable it", asy
   });
   expect(styles.background).toContain("gradient");
   expect(styles.border).not.toBe("rgba(0, 0, 0, 0)");
-  await expect(page.locator("#command-trigger")).toBeVisible();
-  await expect(page.locator("#mobile-menu-btn")).toBeAttached();
+  if (testInfo.project.name === "mobile-chromium") {
+    await expect(page.locator("#mobile-menu-btn")).toBeVisible();
+  } else {
+    await expect(page.locator("#command-trigger")).toBeVisible();
+  }
 });
