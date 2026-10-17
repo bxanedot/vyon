@@ -114,3 +114,59 @@ To preview the website, serve the built \`dist/\` directory over HTTP. Opening
 \`website/index.html\` directly with \`file://\` is **not supported**: root-relative
 \`/styles.css\`, scripts and icons require a web server and will appear unstyled
 otherwise. See the local build commands above.
+
+
+## Sonic Dimension redesign (WebGL2 + optional Rive)
+
+The hero contains a **real fragment-shader 3D sculpture**, raymarched with
+multiple interlocking toroidal signed-distance fields, calculated surface
+normals, specular highlights, Fresnel lighting, and the visitor's chosen
+accent color. It is not a screenshot or a CSS 3D imitation. The renderer uses
+WebGL2 only while the hero is visible. It pauses on tab backgrounding and
+automatically falls back to a fully CSS-rendered three-ring sculpture on
+devices without WebGL2, reduced-motion requests, Data Saver, or constrained
+devices. The fallback must remain visually complete.
+
+The original physics-powered dotted logo is **preserved**, not replaced: it
+lives in the new dedicated `#particle-lab` installation. All of its
+interactions and original IDs remain. Downloads, equalizer, FAQ, themes, the
+Liquid Glass toggle, counters, gallery, and SEO routes still use the original
+JavaScript.
+
+`dimension.css` intentionally remakes the layout, while `sonic-scene.js`
+supplies the GPU scene. Both files are copied to `dist/` by
+`build-vercel.mjs`. Do not inline runtime dependencies or insert remote
+shader frameworks.
+
+### Branded Rive animations
+
+`rive-studio.js` provides a **real, lazy Rive Canvas Lite runtime integration**
+that activates only if a locally hosted, genuine `.riv` animation is assigned
+to the `data-rive-src` attribute on `.rive-motion-slot`. Export your
+interactive Vyon motion piece from the Rive editor, publish it within the
+`website/` static assets, add the path to the build's public file list, then
+set its state machine via `data-rive-state-machine`. The runtime downloads
+only when this visible artwork exists; a missing asset never creates a broken
+widget. No fake `.riv` file is generated.
+
+Sitereel.ai provides layout/art-direction prompt references rather than a
+runtime. Manus.im is an independent agent/web-builder, not a client-side
+animation library. The Vyon site remains owned, editable source code.
+
+### Test gates
+
+Run `npm run build` from `website/` to run the production smoke checks.
+The browser CI additionally checks desktop/mobile content, the WebGL scene's
+presence and fallback behavior, keyboard navigation, and the existing audio
+and theme interactions. Chrome screenshots are attached to the browser
+workflow for visual inspection before merging.
+
+### Anime.js motion art direction
+
+`anime-motion.js` loads the pinned **Anime.js v4.5.0 ES module** on capable,
+motion-enabled browsers. It orchestrates a staggered hero entrance, a
+one-time particle-lab editorial reveal and gentle download-card arrival.
+The actual particle physics, WebGL shader, equalizer and legacy `.reveal`
+logic are deliberately not controlled by Anime.js, avoiding competing
+transforms. If the CDN is unreachable, the site renders normally; the
+animation enhancement is optional. Reduced-motion and Data Saver opt out.
