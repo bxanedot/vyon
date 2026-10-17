@@ -23,14 +23,14 @@ import androidx.compose.ui.unit.sp
 import com.vyon.music.R
 
 // Vyon uses blood red at rest and artwork color during playback.
-val AccentRed = Color(0xFFE5485E)
+val AccentRed = Color(0xFFC8102E)
 
 private val DarkColors = darkColorScheme(
     primary = AccentRed,
     secondary = AccentRed,
     secondaryContainer = Color(0xFF501527),
     onSecondaryContainer = Color(0xFFFFD9E0),
-    onPrimary = Color(0xFF16090E),
+    onPrimary = Color.White,
     primaryContainer = Color(0xFF650F22),
     onPrimaryContainer = Color(0xFFFFD9E0),
     background = Color(0xFF0B080A),
@@ -43,8 +43,8 @@ private val DarkColors = darkColorScheme(
 )
 
 private val LightColors = lightColorScheme(
-    primary = Color(0xFFAA1530),
-    secondary = Color(0xFFAA1530),
+    primary = AccentRed,
+    secondary = AccentRed,
     secondaryContainer = Color(0xFFFFD9E0),
     onSecondaryContainer = Color(0xFF501527),
     onPrimary = Color.White,

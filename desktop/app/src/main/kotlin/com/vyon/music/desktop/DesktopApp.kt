@@ -232,6 +232,7 @@ import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.addPathNodes
 import androidx.compose.ui.input.key.Key
@@ -371,7 +372,7 @@ private val LocalDesktopBottomInset = staticCompositionLocalOf { 0.dp }
 
 /** Android's own edge on these bars: `Color.White.copy(alpha = 0.10f)`. */
 private val DesktopBarEdge = Color(0x1AFFFFFF)
-internal var DesktopAccent by mutableStateOf(Color(0xFFE5485E))
+internal var DesktopAccent by mutableStateOf(Color(0xFFC8102E))
 
 /** Deleting, signing out, and anything that failed — the one place a colour survives, as on Android. */
 internal val DesktopDestructive = Color(0xFFFF453A)
@@ -382,7 +383,7 @@ internal fun desktopChipColors() = FilterChipDefaults.filterChipColors(
     containerColor = Color.Transparent,
     labelColor = DesktopSecondary,
     selectedContainerColor = DesktopAccent,
-    selectedLabelColor = Color.Black,
+    selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
 )
 
 /** Android's switch: a white track with a black knob on, a faint wash off. */
@@ -441,10 +442,9 @@ private const val AUTOPLAY_EMPTY_REFRESH_DELAY_MS = 2_000L
 /** The phone's dark scheme, which the shared pages are drawn against. */
 internal fun desktopColorScheme() = darkColorScheme(
     primary = DesktopAccent,
-    // Black on the accent, now that the accent is white.
-    onPrimary = Color(0xFF16090E),
+    onPrimary = if (DesktopAccent.luminance() > .4f) Color.Black else Color.White,
     secondary = DesktopAccent,
-    onSecondary = Color.Black,
+    onSecondary = if (DesktopAccent.luminance() > .4f) Color.Black else Color.White,
     secondaryContainer = Color(0xFF501527),
     onSecondaryContainer = Color(0xFFFFD9E0),
     primaryContainer = Color.White.copy(alpha = 0.16f),
@@ -1850,7 +1850,7 @@ fun VyonDesktopApp() {
     }
     val playback by playbackEngine.state.collectAsState()
     val vyonArtworkTint = com.vyon.music.ui.theme.rememberPlayerTint(selectedSong?.thumbnailUrl.takeIf { playback.isPlaying })
-    SideEffect { DesktopAccent = vyonArtworkTint ?: Color(0xFFE5485E) }
+    SideEffect { DesktopAccent = vyonArtworkTint ?: Color(0xFFC8102E) }
 
     // The shared player reads the playhead off this one object, and only where it
     // draws it — see PlaybackPosition — so a tick never recomposes the player.

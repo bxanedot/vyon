@@ -80,7 +80,7 @@ data class TvColorPalette(
 // ─────────────────────────────────────────────────────────────────────────────
 
 val TvDarkPalette = TvColorPalette(
-    accentRed = Color(0xFFE5485E),
+    accentRed = Color(0xFFC8102E),
     accentRedGlow = Color(0x66FFFFFF),
     accentPink = Color(0xFFE5E5EA),
     accentPurple = Color(0xFFD1D1D6),
@@ -121,7 +121,7 @@ val TvDarkPalette = TvColorPalette(
 // ─────────────────────────────────────────────────────────────────────────────
 
 val TvOledPalette = TvColorPalette(
-    accentRed = Color(0xFFE5485E),
+    accentRed = Color(0xFFC8102E),
     accentRedGlow = Color(0x66FFFFFF),
     accentPink = Color(0xFFE5E5EA),
     accentPurple = Color(0xFFD1D1D6),
@@ -165,7 +165,7 @@ val TvOledPalette = TvColorPalette(
 // ─────────────────────────────────────────────────────────────────────────────
 
 val TvMidnightPalette = TvColorPalette(
-    accentRed = Color(0xFFE5485E),
+    accentRed = Color(0xFFC8102E),
     accentRedGlow = Color(0x660A84FF),
     accentPink = Color(0xFF5E5CE6),
     accentPurple = Color(0xFFBF5AF2),
@@ -487,7 +487,7 @@ object TvGlass {
     /** Resting fill for a primary button, a touch brighter than [Fill]. */
     val FillStrong = Color.White.copy(alpha = 0.18f)
     /** The selected-but-unfocused tab or segment. */
-    val FillSelected = Color(0xFFE5485E).copy(alpha = 0.32f)
+    val FillSelected = Color(0xFFC8102E).copy(alpha = 0.32f)
     /** The tab bar's own capsule. */
     val Bar = Color.White.copy(alpha = 0.08f)
     /** Placeholder behind artwork that hasn't loaded. */
@@ -504,7 +504,7 @@ object TvGlass {
     val TextTertiary = Color.White.copy(alpha = 0.38f)
 
     /** Apple Music red, kept for the few places that mean "music": playing, liked. */
-    val AppleRed = Color(0xFFFA2D48)
+    val AppleRed = Color(0xFFC8102E)
     val Destructive = Color(0xFFFF453A)
 }
 
@@ -545,7 +545,7 @@ fun VyonTvTheme(
 
     val colorScheme = darkColorScheme(
         primary = palette.accentRed,
-        onPrimary = Color(0xFF16090E),
+        onPrimary = Color.White,
         primaryContainer = palette.surfaceVariant,
         onPrimaryContainer = palette.textPrimary,
         secondary = palette.accentPink,

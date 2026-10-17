@@ -784,7 +784,7 @@ private const val CARD_ROWS = 5
 private const val COLUMN_GAP = 36f
 private const val ROW_HEIGHT = 116f
 private const val ART = 84f
-private const val ACCENT = 0xFFFA2D48.toInt()
+private const val ACCENT = 0xFFC8102E.toInt()
 
 private const val POSTER_ROWS = 5
 private const val POSTER_ALBUMS = 3
