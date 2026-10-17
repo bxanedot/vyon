@@ -227,9 +227,14 @@ function dropHeart(spot,hitX,hitY){
   paintDebris();
  }else animateFalls();
 }
+// Cache constant dot colors during animation; recompute when the theme changes.
 function dotColor(p){
- const palette=tones[root.dataset.accent]||tones.blood;
- return "rgba("+palette[Math.min(2,Math.max(0,Math.floor((p.x+p.y+2)/4*3)))]+","+(.58+.38*p.j).toFixed(3)+")";
+ const accent=root.dataset.accent;
+ if(p.dotColorAccent===accent&&p.dotColorValue)return p.dotColorValue;
+ const palette=tones[accent]||tones.blood;
+ const color="rgba("+palette[Math.min(2,Math.max(0,Math.floor((p.x+p.y+2)/4*3)))]+","+(.58+.38*p.j).toFixed(3)+")";
+ p.dotColorAccent=accent;p.dotColorValue=color;
+ return color;
 }
 // Wait for the real vyon mark before painting dots; never draw an old placeholder.
 function loadIconParticles(){
@@ -255,8 +260,11 @@ function loadIconParticles(){
 function resizeDebris(){
  ratio=Math.min(window.devicePixelRatio||1,compactMotion?1.5:2);
  vw=window.innerWidth;vh=window.innerHeight;
- debris.width=Math.round(vw*ratio);debris.height=Math.round(vh*ratio);
- if(debrisCtx)debrisCtx.setTransform(ratio,0,0,ratio,0,0);
+ const width=Math.max(1,Math.round(vw*ratio)),height=Math.max(1,Math.round(vh*ratio));
+ if(debris.width!==width||debris.height!==height){
+  debris.width=width;debris.height=height;
+  if(debrisCtx)debrisCtx.setTransform(ratio,0,0,ratio,0,0);
+ }
  paintDebris();
 }
 function resizeOrb(){
@@ -264,8 +272,11 @@ function resizeOrb(){
  const b=region.getBoundingClientRect();
  w=Math.max(1,b.width);h=Math.max(1,b.height);
  const r=Math.min(window.devicePixelRatio||1,2);
- canvas.width=Math.round(w*r);canvas.height=Math.round(h*r);
- ctx.setTransform(r,0,0,r,0,0);
+ const width=Math.max(1,Math.round(w*r)),height=Math.max(1,Math.round(h*r));
+ if(canvas.width!==width||canvas.height!==height){
+  canvas.width=width;canvas.height=height;
+  ctx.setTransform(r,0,0,r,0,0);
+ }
  orbScale=Math.min(w*.43,h*.42,320)*.75;
  renderOrb();
 }
@@ -463,6 +474,8 @@ function resolveDotContacts(){
 }
 function advanceDebris(dt){
  const now=performance.now();
+ // Cache layout-dependent width once per physics step, not per particle.
+ const viewportWidth=document.documentElement.clientWidth;
  // Visible glyph collision only, allowing long particle tours at low cost.
  // Individual dots use independent circular rigid-body contacts, plus DOM text boxes.
  const steps=1,step=dt;
@@ -474,7 +487,7 @@ function advanceDebris(dt){
    p.vy=Math.min(1950,p.vy+1800*step);
    p.px+=p.vx*step;p.py+=p.vy*step;
    if(p.px<p.radius){p.px=p.radius;p.vx=Math.abs(p.vx)*.55+9;}
-   if(p.px>document.documentElement.clientWidth-p.radius){p.px=document.documentElement.clientWidth-p.radius;p.vx=-Math.abs(p.vx)*.55-9;}
+   if(p.px>viewportWidth-p.radius){p.px=viewportWidth-p.radius;p.vx=-Math.abs(p.vx)*.55-9;}
    // Words are springy obstacles, not permanent shelves for the particles.
    // After repeated hits a trapped dot passes through rather than hanging mid-page.
    if((p.passTextUntil||0)<now&&p.py>scrollY-120&&p.py<scrollY+innerHeight+120){
@@ -519,7 +532,7 @@ function advanceDebris(dt){
   for(const p of falling){
    if(p.resting)continue;
    if(p.px<p.radius){p.px=p.radius;p.vx=Math.abs(p.vx)*.55;}
-   if(p.px>document.documentElement.clientWidth-p.radius){p.px=document.documentElement.clientWidth-p.radius;p.vx=-Math.abs(p.vx)*.55;}
+   if(p.px>viewportWidth-p.radius){p.px=viewportWidth-p.radius;p.vx=-Math.abs(p.vx)*.55;}
    if(p.py>floor-p.radius){
     p.py=floor-p.radius;
     p.vy=-Math.abs(p.vy)*p.bounce;
@@ -1015,16 +1028,31 @@ region.addEventListener("keydown",e=>{
  if(thankYou.classList.contains("is-visible"))shatterThankDots();
  else collapseDottedLogo();
 });
+// Coalesce resize bursts (mobile address bars / orientation / keyboard).
+let resizeFrame=0;
 window.addEventListener("resize",()=>{
- obstacleDirty=true;resizeOrb();resizeDebris();if(falling.length)rebuildObstacles();
- if(thankYou.classList.contains("is-visible")){
-  const phrase=thanksOptions[thanksIndex]?.message;
-  if(phrase)buildThankDots(phrase);
-  regroup=[];regrouping=false;
-  thankYou.classList.remove("is-regrouping");
- }
+ if(resizeFrame)return;
+ resizeFrame=requestAnimationFrame(()=>{
+  resizeFrame=0;
+  obstacleDirty=true;resizeOrb();resizeDebris();if(falling.length)rebuildObstacles();
+  if(thankYou.classList.contains("is-visible")){
+   const phrase=thanksOptions[thanksIndex]?.message;
+   if(phrase)buildThankDots(phrase);
+   regroup=[];regrouping=false;
+   thankYou.classList.remove("is-regrouping");
+  }
+ });
 },{passive:true});
-window.addEventListener("scroll",()=>{if(!active)paintDebris()},{passive:true});
+// The physics tick already paints while active. Only reposition settled dots
+// once per animation frame during scrolling rather than per scroll event.
+let scrollPaintFrame=0;
+window.addEventListener("scroll",()=>{
+ if(active||scrollPaintFrame||(!falling.length&&!regroup.length))return;
+ scrollPaintFrame=requestAnimationFrame(()=>{
+  scrollPaintFrame=0;
+  if(!active)paintDebris();
+ });
+},{passive:true});
 document.addEventListener("visibilitychange",()=>{if(document.hidden)stopDotFollow();else if(falling.some(p=>!p.resting))animateFalls();});
 // Initialize the dotted logo before any optional FAQ listeners.
 resizeOrb();resizeDebris();loadIconParticles();
@@ -1097,11 +1125,18 @@ function chooseShot(key){
  $("#screenshot-empty-title").textContent=shot.title;
  shotImg.hidden=true;shotImg.removeAttribute("src");emptyShot.hidden=false;
  const image=new Image();
+ image.decoding="async";image.fetchPriority="low";
  image.onload=()=>{
   if(request!==shotRequest)return;
-  shotImg.src=image.src;
-  shotImg.alt="Official vyon Android screenshot: "+shot.title;
-  shotImg.hidden=false;emptyShot.hidden=true;
+  const show=()=>{
+   if(request!==shotRequest)return;
+   shotImg.src=image.src;
+   shotImg.alt="Official vyon Android screenshot: "+shot.title;
+   shotImg.hidden=false;emptyShot.hidden=true;
+  };
+  // Decode off the main paint path before swapping the placeholder.
+  if(image.decode)image.decode().then(show,show);
+  else show();
  };
  image.onerror=()=>{if(request===shotRequest){shotImg.hidden=true;emptyShot.hidden=false;}};
  image.src="/screenshots/"+shot.file;
