@@ -61,22 +61,29 @@ internal object DesktopUpdateChecker {
         UpdateInfo(
             version = latest,
             releaseUrl = url,
-            downloadUrl = installerUrl(release),
+            downloadUrl = installerUrl(
+                release,
+                installerSuffixes(System.getProperty("os.name").orEmpty(), System.getProperty("os.arch").orEmpty()),
+            ),
             notes = release["body"]?.jsonPrimitive?.contentOrNull,
         )
     }.getOrNull()
 
     /**
-     * The release names its files `Vyon-<version>-windows-x64-setup.exe` and
-     * `Vyon-<version>-linux-x86_64.AppImage` (see .github/workflows/release.yml); match on the
-     * platform part so a version change does not matter.
+     * These suffixes match the installers staged by .github/workflows/release.yml.
      */
-    private fun installerUrl(release: JsonObject): String? {
-        val suffixes = when {
-            DesktopPlatform.isWindows -> listOf("-windows-x64-setup.exe", "-windows-portable.zip")
-            DesktopPlatform.isLinux -> listOf(".AppImage", "-linux-amd64.deb")
-            else -> return null
+    internal fun installerSuffixes(osName: String, architecture: String): List<String> = when {
+        osName.startsWith("Windows", ignoreCase = true) -> listOf("-windows-x64-setup.exe", "-windows-portable.zip")
+        osName.contains("Linux", ignoreCase = true) -> listOf(".AppImage", "-linux-amd64.deb")
+        osName.contains("Mac", ignoreCase = true) -> when (architecture.lowercase()) {
+            "arm64", "aarch64" -> listOf("-macos-arm64.dmg", "-macos-arm64.pkg")
+            "x86_64", "amd64" -> listOf("-macos-x64.dmg", "-macos-x64.pkg")
+            else -> emptyList()
         }
+        else -> emptyList()
+    }
+
+    private fun installerUrl(release: JsonObject, suffixes: List<String>): String? {
         val assets = release["assets"]?.jsonArray?.mapNotNull { it as? JsonObject }.orEmpty()
         for (suffix in suffixes) {
             val hit = assets.firstOrNull { asset ->
