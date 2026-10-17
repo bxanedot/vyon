@@ -59,7 +59,9 @@ jobs:
         shell: bash
         run: |
           printf 'sdk.dir=%s\n' "$ANDROID_HOME" >> local.properties
+          set +o pipefail
           yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null
+          set -o pipefail
           "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install \
             "platforms;android-37" \
             "build-tools;37.0.0" \
