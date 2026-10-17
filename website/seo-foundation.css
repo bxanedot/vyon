@@ -1,0 +1,28 @@
+/* Lightweight base styles for static SEO guides. Keep this file scoped to the
+   guides so the interactive homepage continues to use its original CSS. */
+:root {
+  --bg:#080808;
+  --base:#080808;
+  --ink:#f8f7f9;
+  --muted:#9998a2;
+  --rule:rgba(255,255,255,.085);
+  --accent:#e43d4f;
+  --accent-rgb:228,61,79;
+  --surface:#101010;
+  --edge:rgba(228,61,79,.17);
+  --mono:'DM Mono',monospace;
+  --body:'DM Sans',sans-serif;
+  --display:'Manrope',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body.seo-page{margin:0;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+.seo-page a{color:inherit;text-decoration:none}
+.seo-page button,.seo-page input{font:inherit}
+.seo-page ::selection{color:#080808;background:var(--accent)}
+.seo-page .skip-link{
+  position:fixed;top:10px;left:10px;z-index:999;
+  padding:10px 16px;transform:translateY(-160%);
+  background:var(--accent);color:#080808
+}
+.seo-page .skip-link:focus{transform:translateY(0)}
