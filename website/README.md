@@ -55,3 +55,36 @@ The app uses YouTube Music as its backend and is not affiliated with YouTube. Th
 ## Motion and accessibility
 
 Logo debris uses a fixed 120 Hz physics step with interpolated rendering, so falling and collisions stay visually consistent at different screen refresh rates. Text reactions are gentler and rate-limited. Section reveals, command palette, mobile menu, FAQ answers, buttons, social cards, and EQ presets use coordinated easing; the equalizer curve applies time-based exponential smoothing instead of frame-dependent interpolation. `prefers-reduced-motion` continues to disable decorative movement.
+
+
+## Design polish and browser testing
+
+The current site deliberately remains **vanilla HTML/CSS/JavaScript**. The
+ambient lighting on the homepage and the SEO guide pages takes inspiration
+from Shader Gradient and the principles behind React Bits, Taste Skill and
+Emil Kowalski's motion guidance, but uses composited CSS animation rather than
+loading another JavaScript renderer. The original particle canvas and its
+interactions are unchanged. Motion stops under `prefers-reduced-motion`, and
+mobile guide pages avoid an expensive sticky blur.
+
+Avoid adding R3F, Spline, Shader/WebGPU renderers, Lenis or GSAP by default:
+only introduce one when there is a specific interaction that native CSS/Canvas
+cannot express clearly, a reduced-motion fallback, and verified mobile
+performance. Preserve the Vyon logo, color palette, typography and accessible
+navigation.
+
+Pull requests changing `website/**` run browser checks in
+`.github/workflows/website-browser.yml`. Playwright verifies the homepage,
+desktop/mobile navigation, all five SEO guides and reduced-motion behavior.
+The runner is installed in CI only; it is not included in the deployed bundle.
+
+To reproduce the browser checks locally (requires Python 3):
+
+```sh
+cd website
+npm ci
+npm run build
+npm install --no-save --package-lock=false @playwright/test@1.56.1
+npx playwright install chromium
+npx playwright test --config=playwright.config.mjs
+```
