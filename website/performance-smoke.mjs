@@ -17,6 +17,7 @@ assert.match(homepage,/<link rel="stylesheet" href="\/styles.css">/);
 assert.match(homepage,/<link rel="stylesheet" href="\/compact.css/);
 assert.match(homepage,/<link rel="stylesheet" href="\/equalizer.css">/);
 assert.match(homepage,/<link rel="stylesheet" href="\/seo-pages.css">/);
+assert.match(homepage,/<link rel="stylesheet" href="\/studio.css">/);
 assert.match(homepage,/href="https:\/\/fonts.googleapis.com\/css2\?/);
 assert.match(homepage,/href="\/download"/);
 assert.match(homepage,/<meta name="description"/);
@@ -45,7 +46,11 @@ for(const page of pages){
 for(const script of ["app.js","equalizer.js","visit-counters.js"])
  execFileSync(process.execPath,["--check",join(output,script)],{stdio:"pipe"});
 
-const css=["styles.css","compact.css","equalizer.css","seo-pages.css","seo-foundation.css"];
+const css=["styles.css","compact.css","equalizer.css","seo-pages.css","seo-foundation.css","studio.css"];
+const studioCss=await read("studio.css");
+assert.match(studioCss,/hero-stage-note/);
+assert.match(studioCss,/prefers-reduced-motion/);
+assert.match(studioCss,/prefers-reduced-transparency/);
 const siteScript=await read("app.js");
 assert.match(siteScript,/const screenshotObserver=new IntersectionObserver/);
 assert.match(siteScript,/async function loadStableReleases/);
