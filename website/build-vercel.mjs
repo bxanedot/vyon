@@ -19,6 +19,16 @@ for (const file of ["styles.css","compact.css","equalizer.css","seo-pages.css","
  console.log(`Optimized ${file}: ${Buffer.byteLength(input)} → ${Buffer.byteLength(code)} bytes`);
 }
 
+// Minify the deployed JavaScript without altering the source or changing the
+// defer order that initializes Vyon's particle and equalizer interactions.
+for(const file of ["app.js","equalizer.js","visit-counters.js"]){
+ const path=join(output,file);
+ const input=await readFile(path,"utf8");
+ const {code}=await optimizeCss(input,{loader:"js",minify:true,target:["es2020"]});
+ await writeFile(path,code);
+ console.log(`Optimized ${file}: ${Buffer.byteLength(input)} → ${Buffer.byteLength(code)} bytes`);
+}
+
 
 // Generate an actual, validated social card PNG from the same official logo
 // displayed on the site. The old preview asset in git is corrupted.

@@ -45,11 +45,43 @@ for(const page of pages){
 for(const script of ["app.js","equalizer.js","visit-counters.js"])
  execFileSync(process.execPath,["--check",join(output,script)],{stdio:"pipe"});
 
+const scripts=["app.js","equalizer.js","visit-counters.js"];
+const inputScriptSizes=await Promise.all(scripts.map(async file=>(await stat(join(source,file))).size));
+const outputScriptSizes=await Promise.all(scripts.map(async file=>(await stat(join(output,file))).size));
+const jsBefore=inputScriptSizes.reduce((sum,n)=>sum+n,0);
+const jsAfter=outputScriptSizes.reduce((sum,n)=>sum+n,0);
+assert.ok(jsAfter<jsBefore*.85, "Production JS minification should reduce download and parse cost by at least 15%");
+console.log(`JS payload (uncompressed): ${jsBefore} → ${jsAfter} bytes (${Math.round(100*(1-jsAfter/jsBefore))}% smaller)`);
 const css=["styles.css","compact.css","equalizer.css","seo-pages.css","seo-foundation.css"];
-const siteScript=await read("app.js");
+// Check structural hooks in readable source; the production output is minified.
+const siteScript=await readFile(join(source,"app.js"),"utf8");
 assert.match(siteScript,/const screenshotObserver=new IntersectionObserver/);
 assert.match(siteScript,/async function loadStableReleases/);
 assert.match(siteScript,/const downloadObserver=new IntersectionObserver/);
+// Keep original interactions available; guard the particle work batching that
+// prevents mobile resize/scroll bursts from saturating the main thread.
+for(const pattern of [
+ /let scrollPaintFrame=0/,
+ /let resizeFrame=0/,
+ /seenNearbyBoxes\.clear\(\)/,
+ /const viewportWidth=document\.documentElement\.clientWidth/,
+ /if\(p\.dotColorAccent===accent&&p\.dotColorValue\)/,
+ /image\.decode\(\)\.then\(show,show\)/,
+ /function collapseDottedLogo\(\)/,
+ /function dragDotBrush\(/,
+ /function renderOrb\(\)/
+])assert.match(siteScript,pattern);
+const cacheFor=route=>redirects.headers.find(rule=>rule.source===route)
+ ?.headers.find(header=>header.key.toLowerCase()==="cache-control")?.value;
+for(const route of ["/icons/(.*)","/screenshots/(.*)","/favicon.svg"]){
+ assert.match(cacheFor(route)||"",/max-age=86400/,route+": cache one day");
+ assert.match(cacheFor(route)||"",/stale-while-revalidate/,route+": serve existing assets while updating");
+}
+assert.match(cacheFor("/vyon-social-preview-2026.png")||"",/immutable/);
+assert.ok(!redirects.headers.some(rule=>["/app.js","/styles.css","/compact.css"].includes(rule.source)),
+ "Mutable app files must not get long-lived immutable caching");
+execFileSync(process.execPath,["--check",join(source,"lighthouserc.cjs")],{stdio:"pipe"});
+
 const guideCssBytes=(await stat(join(output,"seo-pages.css"))).size
  +(await stat(join(output,"seo-foundation.css"))).size;
 const oldGuideCssBytes=(await stat(join(source,"styles.css"))).size
