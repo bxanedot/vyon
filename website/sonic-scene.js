@@ -32,7 +32,7 @@
   "vec3 p=rotation*aPosition;",
   "p.y+=sin(uTime*.65)*.018;",
   "vNormal=normalize(rotation*aNormal); vPosition=p;",
-  "gl_Position=vec4(p.x*3.35*uAspect,p.y*3.35,p.z,3.65-p.z);",
+  "gl_Position=vec4(p.x*2.8*uAspect,p.y*2.8,-p.z,3.65-p.z);",
   "}"
  ].join("\n");
  const fragmentSource=[
