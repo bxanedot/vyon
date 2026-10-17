@@ -129,6 +129,10 @@ Listen Together coordinates playback; it does **not** host or redistribute audio
 
 **iOS and iPadOS are not supported.** Some features and downloadable builds may be available on only certain platforms.
 
+<p align="center">
+  <img src="assets/screenshots/android-about.png" width="360" alt="Vyon Android About page showing version 1.0.0, version code 1, credits, website and source code">
+</p>
+
 ---
 
 ## Get vyon
