@@ -169,6 +169,44 @@ test("new dimensional experience preserves all core homepage interactions", asyn
 });
 
 
+
+
+test("the 3D hero is constructed from the original Vyon SVG, not torus rings", async ({page}) => {
+  await page.goto("/", {waitUntil:"load"});
+  await expect(page.locator(".sonic-scene-fallback img.sonic-mark-fallback"))
+    .toHaveAttribute("src","/icons/vyon-mark.svg");
+  await expect(page.locator(".sonic-ring")).toHaveCount(0);
+  const logo=await page.request.get("/icons/vyon-mark.svg");
+  expect(logo.ok()).toBe(true);
+  expect(await logo.text()).toContain('viewBox="132 284 736 446"');
+  const renderer=await page.request.get("/sonic-scene.js");
+  expect(renderer.ok()).toBe(true);
+  const source=await renderer.text();
+  expect(source).toContain("buildMesh(readContours(text))");
+  expect(source).toContain("triangulate(poly)");
+  expect(source).not.toContain("float torus(");
+});
+
+test("actual SVG mesh reaches the GPU whenever WebGL2 is supported", async ({page}) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator,"hardwareConcurrency",{configurable:true,get:()=>8});
+  });
+  await page.goto("/", {waitUntil:"load"});
+  const webgl2=await page.evaluate(()=>{
+    const canvas=document.createElement("canvas");
+    return Boolean(canvas.getContext("webgl2"));
+  });
+  if (!webgl2) {
+    await expect(page.locator(".sonic-scene-fallback img")).toBeVisible();
+    return;
+  }
+  await expect(page.locator("#sonic-scene")).toHaveAttribute("data-renderer","webgl",{timeout:15000});
+  await expect(page.locator("#sonic-scene")).toHaveAttribute("data-geometry","vyon-mark");
+  const vertices=Number(await page.locator("#sonic-scene").getAttribute("data-vertex-count"));
+  expect(vertices).toBeGreaterThan(200);
+  await expect(page.locator("#sonic-canvas")).toBeVisible();
+});
+
 test("Anime.js cinematic choreography is provided without blocking the page", async ({page}) => {
   await page.goto("/", {waitUntil: "domcontentloaded"});
   await expect(page.locator('script[type="module"][src="/anime-motion.js"]')).toHaveCount(1);
