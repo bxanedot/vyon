@@ -1,0 +1,44 @@
+name: Website browser checks
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "website/**"
+      - ".github/workflows/website-browser.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: website
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: website/package-lock.json
+      - name: Install production build dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Build and run static smoke checks
+        run: npm run build
+      - name: Install Playwright runner (CI only)
+        run: npm install --no-save --package-lock=false @playwright/test@1.56.1
+      - name: Install browser
+        run: npx playwright install --with-deps chromium
+      - name: Run desktop and mobile interaction checks
+        run: npx playwright test --config=playwright.config.mjs
+      - name: Upload Playwright traces after failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: website-playwright-traces
+          path: website/test-results/
+          retention-days: 7
