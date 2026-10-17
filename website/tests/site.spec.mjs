@@ -116,8 +116,17 @@ test("new editorial layer respects reduced motion", async ({page}) => {
 
 
 test("capture review screenshots for desktop and mobile", async ({page}, testInfo) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator,"hardwareConcurrency",{configurable:true,get:()=>8});
+  });
   await page.goto("/", {waitUntil: "load"});
   await page.evaluate(() => document.fonts.ready);
+  const supportsWebGL=await page.evaluate(() =>
+    Boolean(document.createElement("canvas").getContext("webgl2"))
+  );
+  if (supportsWebGL) {
+    await expect(page.locator("#sonic-scene")).toHaveAttribute("data-renderer","webgl",{timeout:15000});
+  }
   await page.screenshot({
     path: "test-results/preview-" + testInfo.project.name + ".png",
     animations: "disabled",
