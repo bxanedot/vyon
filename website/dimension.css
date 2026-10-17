@@ -630,3 +630,44 @@ body{
   #main .hero{padding-top:399px!important}
   .sonic-scene{height:324px;top:67px}
 }
+
+
+/* THE ACTUAL VYON MARK — recognizable across all rendering paths.
+   When GPU acceleration is unavailable, use the same official SVG silhouette,
+   never generic toroidal placeholder geometry. */
+.sonic-scene-fallback{
+  position:absolute;
+  inset:12% 7%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  perspective:950px;
+  pointer-events:none;
+}
+.sonic-scene-fallback .sonic-ring{display:none!important}
+.sonic-mark-fallback{
+  display:block;
+  width:min(94%,780px);
+  max-height:82%;
+  height:auto;
+  object-fit:contain;
+  filter:drop-shadow(3px 6px 0 rgba(var(--accent-rgb),.43))
+         drop-shadow(22px 29px 28px rgba(0,0,0,.52))
+         drop-shadow(0 0 70px rgba(var(--accent-rgb),.26));
+  transform:rotateX(7deg) rotateY(-13deg) translate3d(0,0,0);
+  backface-visibility:hidden;
+  transition:filter .3s ease;
+}
+.sonic-scene[data-renderer="webgl"] .sonic-mark-fallback{transform:none}
+.sonic-scene[data-renderer="fallback"] .sonic-scene-crosshair{opacity:.9}
+@media(max-width:850px){
+  .sonic-scene-fallback{inset:12% 5%}
+  .sonic-mark-fallback{max-height:74%;width:90%}
+}
+@media(max-width:590px){
+  .sonic-scene-fallback{inset:7% 7%}
+  .sonic-mark-fallback{width:95%;max-height:74%;transform:rotateX(5deg) rotateY(-9deg)}
+}
+@media(prefers-reduced-motion:reduce){
+  .sonic-mark-fallback{transform:none!important;transition:none!important}
+}
