@@ -46,6 +46,18 @@ for(const script of ["app.js","equalizer.js","visit-counters.js"])
  execFileSync(process.execPath,["--check",join(output,script)],{stdio:"pipe"});
 
 const css=["styles.css","compact.css","equalizer.css","seo-pages.css","seo-foundation.css"];
+const siteScript=await read("app.js");
+assert.match(siteScript,/const screenshotObserver=new IntersectionObserver/);
+assert.match(siteScript,/async function loadStableReleases/);
+assert.match(siteScript,/const downloadObserver=new IntersectionObserver/);
+const guideCssBytes=(await stat(join(output,"seo-pages.css"))).size
+ +(await stat(join(output,"seo-foundation.css"))).size;
+const oldGuideCssBytes=(await stat(join(source,"styles.css"))).size
+ +(await stat(join(source,"compact.css"))).size
+ +(await stat(join(source,"seo-pages.css"))).size;
+assert.ok(guideCssBytes<oldGuideCssBytes*.25,
+ "Guide pages should avoid loading the full homepage CSS payload");
+console.log(`Guide CSS (uncompressed): ${oldGuideCssBytes} → ${guideCssBytes} bytes (${Math.round(100*(1-guideCssBytes/oldGuideCssBytes))}% smaller)`);
 const before=await Promise.all(css.map(async file=>(await stat(join(source,file))).size));
 const after=await Promise.all(css.map(async file=>(await stat(join(output,file))).size));
 const beforeBytes=before.reduce((a,b)=>a+b,0),afterBytes=after.reduce((a,b)=>a+b,0);
