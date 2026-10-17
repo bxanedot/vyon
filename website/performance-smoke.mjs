@@ -45,8 +45,16 @@ for(const page of pages){
 for(const script of ["app.js","equalizer.js","visit-counters.js"])
  execFileSync(process.execPath,["--check",join(output,script)],{stdio:"pipe"});
 
+const scripts=["app.js","equalizer.js","visit-counters.js"];
+const inputScriptSizes=await Promise.all(scripts.map(async file=>(await stat(join(source,file))).size));
+const outputScriptSizes=await Promise.all(scripts.map(async file=>(await stat(join(output,file))).size));
+const jsBefore=inputScriptSizes.reduce((sum,n)=>sum+n,0);
+const jsAfter=outputScriptSizes.reduce((sum,n)=>sum+n,0);
+assert.ok(jsAfter<jsBefore*.85, "Production JS minification should reduce download and parse cost by at least 15%");
+console.log(`JS payload (uncompressed): ${jsBefore} → ${jsAfter} bytes (${Math.round(100*(1-jsAfter/jsBefore))}% smaller)`);
 const css=["styles.css","compact.css","equalizer.css","seo-pages.css","seo-foundation.css"];
-const siteScript=await read("app.js");
+// Check structural hooks in readable source; the production output is minified.
+const siteScript=await readFile(join(source,"app.js"),"utf8");
 assert.match(siteScript,/const screenshotObserver=new IntersectionObserver/);
 assert.match(siteScript,/async function loadStableReleases/);
 assert.match(siteScript,/const downloadObserver=new IntersectionObserver/);
