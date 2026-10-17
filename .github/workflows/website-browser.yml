@@ -35,6 +35,14 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Run desktop and mobile interaction checks
         run: npx playwright test --config=playwright.config.mjs
+      - name: Attach desktop and mobile website previews
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vyon-website-design-previews
+          path: website/test-results/preview-*.png
+          if-no-files-found: ignore
+          retention-days: 7
       - name: Upload Playwright traces after failure
         if: failure()
         uses: actions/upload-artifact@v4
