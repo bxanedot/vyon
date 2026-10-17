@@ -160,3 +160,13 @@ The browser CI additionally checks desktop/mobile content, the WebGL scene's
 presence and fallback behavior, keyboard navigation, and the existing audio
 and theme interactions. Chrome screenshots are attached to the browser
 workflow for visual inspection before merging.
+
+### Anime.js motion art direction
+
+`anime-motion.js` loads the pinned **Anime.js v4.5.0 ES module** on capable,
+motion-enabled browsers. It orchestrates a staggered hero entrance, a
+one-time particle-lab editorial reveal and gentle download-card arrival.
+The actual particle physics, WebGL shader, equalizer and legacy `.reveal`
+logic are deliberately not controlled by Anime.js, avoiding competing
+transforms. If the CDN is unreachable, the site renders normally; the
+animation enhancement is optional. Reduced-motion and Data Saver opt out.
