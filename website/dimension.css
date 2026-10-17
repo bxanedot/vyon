@@ -671,3 +671,83 @@ body{
 @media(prefers-reduced-motion:reduce){
   .sonic-mark-fallback{transform:none!important;transition:none!important}
 }
+
+
+/* Permanent Liquid Glass / a fixed design language, not a runtime toggle.
+   Bright edge refraction and layered transparency on every primary surface;
+   preserve fast touch scrolling by limiting expensive backdrop blur on mobile. */
+:root[data-glass="on"] :is(.site-header,.site-header.is-scrolled){
+  background:
+    linear-gradient(122deg,rgba(255,255,255,.17),rgba(255,255,255,.035) 29%,rgba(12,10,21,.6) 70%),
+    rgba(30,26,38,.58)!important;
+  border:1px solid rgba(255,255,255,.36)!important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.35),
+    inset 0 -1px 0 rgba(255,255,255,.06),
+    0 18px 60px rgba(0,0,0,.27)!important;
+  backdrop-filter:blur(22px) saturate(145%)!important;
+  -webkit-backdrop-filter:blur(22px) saturate(145%)!important;
+}
+:root[data-glass="on"] :is(
+  .platform-card,.screenshot-browser,.screenshot-aside,
+  .feature-card,.social-card,.faq-item,.particle-lab-stage
+){
+  background:
+    linear-gradient(130deg,rgba(255,255,255,.16) 0%,rgba(255,255,255,.04) 34%,
+      rgba(var(--accent-rgb),.035) 74%,rgba(8,7,14,.28)),
+    rgba(26,22,34,.66)!important;
+  border-color:rgba(255,255,255,.25)!important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.22),
+    inset 1px 0 0 rgba(255,255,255,.06),
+    0 17px 55px rgba(0,0,0,.17)!important;
+}
+:root[data-glass="on"] :is(
+  .hero-buttons-primary .btn-ghost,.header-github,.command-trigger,
+  .platform-download,.screenshot-tab,.particle-lab-next
+){
+  background:linear-gradient(130deg,rgba(255,255,255,.13),rgba(255,255,255,.025)),
+    rgba(30,25,37,.3)!important;
+  border-color:rgba(255,255,255,.24)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.15)!important;
+}
+:root[data-glass="on"] .hero-buttons-primary .btn-primary{
+  background:var(--accent)!important;
+  color:#0b090d!important;
+}
+:root[data-glass="on"] :is(.mobile-menu,.command-dialog){
+  background:linear-gradient(140deg,rgba(78,68,91,.45),rgba(13,11,20,.66))!important;
+  border:1px solid rgba(255,255,255,.27)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.2),
+    0 20px 65px rgba(0,0,0,.35)!important;
+  backdrop-filter:blur(22px) saturate(145%)!important;
+  -webkit-backdrop-filter:blur(22px) saturate(145%)!important;
+}
+@media(min-width:851px) and (prefers-reduced-transparency:no-preference){
+  :root[data-glass="on"] :is(.platform-card,.screenshot-browser,
+    .screenshot-aside,.feature-card,.social-card,.faq-item,.particle-lab-stage){
+    backdrop-filter:blur(7px) saturate(120%)!important;
+    -webkit-backdrop-filter:blur(7px) saturate(120%)!important;
+  }
+}
+@media(max-width:850px){
+  :root[data-glass="on"] :is(.site-header,.site-header.is-scrolled,
+    .mobile-menu,.command-dialog){
+    backdrop-filter:blur(12px) saturate(120%)!important;
+    -webkit-backdrop-filter:blur(12px) saturate(120%)!important;
+  }
+  :root[data-glass="on"] :is(.platform-card,.screenshot-browser,
+    .screenshot-aside,.feature-card,.social-card,.faq-item,.particle-lab-stage){
+    backdrop-filter:none!important;
+    -webkit-backdrop-filter:none!important;
+  }
+}
+@media(prefers-reduced-transparency:reduce){
+  :root[data-glass="on"] :is(.site-header,.site-header.is-scrolled,.mobile-menu,
+    .command-dialog,.platform-card,.screenshot-browser,.screenshot-aside,
+    .feature-card,.social-card,.faq-item,.particle-lab-stage){
+    background:#201b27!important;
+    backdrop-filter:none!important;
+    -webkit-backdrop-filter:none!important;
+  }
+}
