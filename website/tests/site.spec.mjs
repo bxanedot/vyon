@@ -159,7 +159,8 @@ test("new dimensional experience preserves all core homepage interactions", asyn
   await page.goto("/", {waitUntil: "domcontentloaded"});
   await expect(page.locator(".platform-card")).toHaveCount(4);
   await expect(page.locator("#vqe-preset-title")).toBeAttached();
-  await expect(page.locator("#glass-toggle")).toBeAttached();
+  await expect(page.locator("#glass-toggle")).toHaveCount(0);
+  await expect(page.locator("html")).toHaveAttribute("data-glass","on");
   await expect(page.locator(".theme-chip")).toHaveCount(5);
   await expect(page.locator("#vyon-live-count")).toBeAttached();
   await expect(page.locator("#vyon-total-count")).toBeAttached();
@@ -225,4 +226,21 @@ test("Anime.js is skipped for reduced-motion preference", async ({page}) => {
   await expect(page.locator("html")).toHaveAttribute("data-anime-motion", "skipped");
   await expect(page.locator(".hero h1")).toBeVisible();
   await expect(page.locator("#particle-lab")).toBeAttached();
+});
+
+
+test("Liquid Glass is permanent and a stored off setting cannot disable it", async ({page}) => {
+  await page.addInitScript(() => localStorage.setItem("vyon-liquid-glass","off"));
+  await page.goto("/", {waitUntil:"load"});
+  await expect(page.locator("html")).toHaveAttribute("data-glass","on");
+  await expect(page.locator(".glass-toggle")).toHaveCount(0);
+  await expect(page.getByRole("button",{name:/liquid glass/i})).toHaveCount(0);
+  const styles=await page.locator("#site-header").evaluate(element=>{
+    const cs=getComputedStyle(element);
+    return {background:cs.backgroundImage, blur:cs.backdropFilter, border:cs.borderColor};
+  });
+  expect(styles.background).toContain("gradient");
+  expect(styles.border).not.toBe("rgba(0, 0, 0, 0)");
+  await expect(page.locator("#command-trigger")).toBeVisible();
+  await expect(page.locator("#mobile-menu-btn")).toBeAttached();
 });
