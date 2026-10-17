@@ -58,3 +58,58 @@
 @media(max-width:900px){.seo-header{margin-inline:12px;padding:12px 20px}.seo-nav{display:none}.seo-mobile-nav{display:block;position:relative}.seo-mobile-nav summary{list-style:none;cursor:pointer}.seo-mobile-nav summary::-webkit-details-marker{display:none}.seo-mobile-nav nav{position:absolute;top:calc(100% + 25px);right:-14px;display:flex;flex-direction:column;align-items:stretch;min-width:180px;gap:0;padding:8px;background:var(--surface);border:1px solid var(--edge);border-radius:16px;box-shadow:0 20px 50px rgba(0,0,0,.4)}.seo-mobile-nav nav a{padding:12px 14px}.seo-footer{padding-inline:24px}}
 @media(max-width:640px){.seo-page h1{font-size:clamp(39px,11vw,62px)}.seo-header{min-height:59px;gap:12px;padding:10px 16px}.seo-brand{font-size:22px}.seo-brand img{width:31px;height:22px}.seo-github{font-size:11px}.seo-main{padding:20px 17px 65px}.seo-hero{padding:41px 24px 46px;border-radius:22px}.seo-lead{font-size:14px}.seo-section{padding:53px 2px 31px}.seo-section h2{font-size:34px}.seo-grid{grid-template-columns:1fr}.seo-card{min-height:0;padding:24px}.seo-hero-actions{gap:16px}.seo-last-call{padding:32px 23px}.seo-footer{padding-block:35px}.seo-steps{font-size:14px}}
 @media(prefers-reduced-motion:reduce){.seo-button{transition:none}.seo-page *{scroll-behavior:auto}}
+
+
+/* Motion craft: one gentle accent-reactive atmosphere instead of runtime
+   shaders, while content and links remain above the decorative layer. */
+.seo-hero{isolation:isolate}
+.seo-hero::before{
+ content:"";position:absolute;z-index:0;inset:-30%;pointer-events:none;
+ background:radial-gradient(ellipse at 72% 28%,
+  rgba(var(--accent-rgb),.125) 0%,rgba(var(--accent-rgb),.035) 38%,transparent 67%);
+ transform:translate3d(-3%,0,0) scale(1);
+ animation:vyon-guide-ambient 18s ease-in-out infinite alternate;
+}
+.seo-hero::after{z-index:0}
+.seo-hero>*{position:relative;z-index:1}
+@keyframes vyon-guide-ambient{
+ to{transform:translate3d(4%,-2%,0) scale(1.035)}
+}
+/* Tactile but reserved UI feedback, inspired by purposeful motion rules. */
+.seo-button{
+ transition:transform .22s cubic-bezier(.2,.8,.2,1),
+  box-shadow .22s ease,background-color .22s ease;
+}
+@media(hover:hover) and (prefers-reduced-motion:no-preference){
+ .seo-button:is(:hover,:focus-visible){
+  box-shadow:0 9px 25px rgba(var(--accent-rgb),.16)
+ }
+ .seo-card{
+  transition:transform .24s cubic-bezier(.2,.8,.2,1),
+   border-color .24s ease;
+ }
+ .seo-card:is(:hover,:focus-within){
+  transform:translate3d(0,-3px,0);
+  border-color:rgba(var(--accent-rgb),.48)
+ }
+}
+.seo-button:active{transform:translateY(0) scale(.985)}
+.seo-faq-item summary span{
+ transition:transform .22s cubic-bezier(.2,.8,.2,1)
+}
+/* Avoid an expensive sticky-backdrop blur on constrained mobile devices. */
+@media(max-width:640px){
+ .seo-header{background:var(--surface,#1a0d11);
+  backdrop-filter:none;-webkit-backdrop-filter:none}
+ .seo-hero::before{animation:none;transform:none;opacity:.65}
+}
+@media(prefers-reduced-motion:reduce){
+ .seo-hero::before{animation:none;transform:none}
+ .seo-card,.seo-button,.seo-faq-item summary span{
+  transition:none!important;transform:none!important}
+}
+@media(prefers-reduced-transparency:reduce){
+ .seo-hero::before{display:none}
+ .seo-header{background:var(--surface,#1a0d11);
+  backdrop-filter:none;-webkit-backdrop-filter:none}
+}
