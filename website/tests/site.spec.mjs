@@ -116,8 +116,17 @@ test("new editorial layer respects reduced motion", async ({page}) => {
 
 
 test("capture review screenshots for desktop and mobile", async ({page}, testInfo) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator,"hardwareConcurrency",{configurable:true,get:()=>8});
+  });
   await page.goto("/", {waitUntil: "load"});
   await page.evaluate(() => document.fonts.ready);
+  const supportsWebGL=await page.evaluate(() =>
+    Boolean(document.createElement("canvas").getContext("webgl2"))
+  );
+  if (supportsWebGL) {
+    await expect(page.locator("#sonic-scene")).toHaveAttribute("data-renderer","webgl",{timeout:15000});
+  }
   await page.screenshot({
     path: "test-results/preview-" + testInfo.project.name + ".png",
     animations: "disabled",
@@ -159,7 +168,8 @@ test("new dimensional experience preserves all core homepage interactions", asyn
   await page.goto("/", {waitUntil: "domcontentloaded"});
   await expect(page.locator(".platform-card")).toHaveCount(4);
   await expect(page.locator("#vqe-preset-title")).toBeAttached();
-  await expect(page.locator("#glass-toggle")).toBeAttached();
+  await expect(page.locator("#glass-toggle")).toHaveCount(0);
+  await expect(page.locator("html")).toHaveAttribute("data-glass","on");
   await expect(page.locator(".theme-chip")).toHaveCount(5);
   await expect(page.locator("#vyon-live-count")).toBeAttached();
   await expect(page.locator("#vyon-total-count")).toBeAttached();
@@ -168,6 +178,44 @@ test("new dimensional experience preserves all core homepage interactions", asyn
   await expect(page.locator('.hero-explore[href="#particle-lab"]')).toBeAttached();
 });
 
+
+
+
+test("the 3D hero is constructed from the original Vyon SVG, not torus rings", async ({page}) => {
+  await page.goto("/", {waitUntil:"load"});
+  await expect(page.locator(".sonic-scene-fallback img.sonic-mark-fallback"))
+    .toHaveAttribute("src","/icons/vyon-mark.svg");
+  await expect(page.locator(".sonic-ring")).toHaveCount(0);
+  const logo=await page.request.get("/icons/vyon-mark.svg");
+  expect(logo.ok()).toBe(true);
+  expect(await logo.text()).toContain('viewBox="132 284 736 446"');
+  const renderer=await page.request.get("/sonic-scene.js");
+  expect(renderer.ok()).toBe(true);
+  const source=await renderer.text();
+  expect(source).toContain("buildMesh(readContours(text))");
+  expect(source).toContain("triangulate(poly)");
+  expect(source).not.toContain("float torus(");
+});
+
+test("actual SVG mesh reaches the GPU whenever WebGL2 is supported", async ({page}) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator,"hardwareConcurrency",{configurable:true,get:()=>8});
+  });
+  await page.goto("/", {waitUntil:"load"});
+  const webgl2=await page.evaluate(()=>{
+    const canvas=document.createElement("canvas");
+    return Boolean(canvas.getContext("webgl2"));
+  });
+  if (!webgl2) {
+    await expect(page.locator(".sonic-scene-fallback img")).toBeVisible();
+    return;
+  }
+  await expect(page.locator("#sonic-scene")).toHaveAttribute("data-renderer","webgl",{timeout:15000});
+  await expect(page.locator("#sonic-scene")).toHaveAttribute("data-geometry","vyon-mark");
+  const vertices=Number(await page.locator("#sonic-scene").getAttribute("data-vertex-count"));
+  expect(vertices).toBeGreaterThan(200);
+  await expect(page.locator("#sonic-canvas")).toBeVisible();
+});
 
 test("Anime.js cinematic choreography is provided without blocking the page", async ({page}) => {
   await page.goto("/", {waitUntil: "domcontentloaded"});
@@ -187,4 +235,24 @@ test("Anime.js is skipped for reduced-motion preference", async ({page}) => {
   await expect(page.locator("html")).toHaveAttribute("data-anime-motion", "skipped");
   await expect(page.locator(".hero h1")).toBeVisible();
   await expect(page.locator("#particle-lab")).toBeAttached();
+});
+
+
+test("Liquid Glass is permanent and a stored off setting cannot disable it", async ({page}, testInfo) => {
+  await page.addInitScript(() => localStorage.setItem("vyon-liquid-glass","off"));
+  await page.goto("/", {waitUntil:"load"});
+  await expect(page.locator("html")).toHaveAttribute("data-glass","on");
+  await expect(page.locator(".glass-toggle")).toHaveCount(0);
+  await expect(page.getByRole("button",{name:/liquid glass/i})).toHaveCount(0);
+  const styles=await page.locator("#site-header").evaluate(element=>{
+    const cs=getComputedStyle(element);
+    return {background:cs.backgroundImage, blur:cs.backdropFilter, border:cs.borderColor};
+  });
+  expect(styles.background).toContain("gradient");
+  expect(styles.border).not.toBe("rgba(0, 0, 0, 0)");
+  if (testInfo.project.name === "mobile-chromium") {
+    await expect(page.locator("#mobile-menu-btn")).toBeVisible();
+  } else {
+    await expect(page.locator("#command-trigger")).toBeVisible();
+  }
 });

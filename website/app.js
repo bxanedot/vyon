@@ -4,17 +4,8 @@
 const $=(s,scope=document)=>scope.querySelector(s), $$=(s,scope=document)=>[...scope.querySelectorAll(s)];
 const root=document.documentElement;
 const reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-// Toggle Liquid Glass without reloading; the head preloads the stored preference.
-const glassToggle=$("#glass-toggle");
-function applyGlass(enabled,save=false){
- root.dataset.glass=enabled?"on":"off";
- glassToggle?.setAttribute("aria-pressed",String(enabled));
- glassToggle?.setAttribute("aria-label",enabled?"Turn Liquid Glass off":"Turn Liquid Glass on");
- glassToggle?.setAttribute("title",enabled?"Disable Liquid Glass":"Enable Liquid Glass");
- if(save)try{localStorage.setItem("vyon-liquid-glass",enabled?"on":"off")}catch{}
-}
-applyGlass(root.dataset.glass!=="off");
-glassToggle?.addEventListener("click",()=>applyGlass(root.dataset.glass==="off",true));
+// Liquid Glass is the permanent Vyon surface; no persisted off state or toggle.
+root.dataset.glass="on";
 // Navigation
 const overlay=$("#command-overlay"),input=$("#command-input"),items=$$("[data-command-item]"),mob=$("#mobile-menu"),mobBtn=$("#mobile-menu-btn");
 let focusBefore=null,selected=0;

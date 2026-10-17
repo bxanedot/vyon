@@ -94,7 +94,7 @@ npx playwright test --config=playwright.config.mjs
 
 The homepage keeps all original platform downloads, real screenshot placeholders,
 the interactive ten-band equalizer, the particle logo and falling-dot physics,
-saved accent themes, the Liquid Glass toggle, the command palette, community
+saved accent themes, the permanent Liquid Glass UI, the command palette, community
 links, FAQ, visitor counts and SEO navigation.
 
 \`studio.css\` adds a consistent editorial layout system on top of the existing
@@ -130,7 +130,7 @@ devices. The fallback must remain visually complete.
 The original physics-powered dotted logo is **preserved**, not replaced: it
 lives in the new dedicated `#particle-lab` installation. All of its
 interactions and original IDs remain. Downloads, equalizer, FAQ, themes, the
-Liquid Glass toggle, counters, gallery, and SEO routes still use the original
+permanent Liquid Glass UI, counters, gallery, and SEO routes still use the original
 JavaScript.
 
 `dimension.css` intentionally remakes the layout, while `sonic-scene.js`
@@ -170,3 +170,36 @@ The actual particle physics, WebGL shader, equalizer and legacy `.reveal`
 logic are deliberately not controlled by Anime.js, avoiding competing
 transforms. If the CDN is unreachable, the site renders normally; the
 animation enhancement is optional. Reduced-motion and Data Saver opt out.
+
+
+## Official Vyon 3D icon (replaces experimental ring sculpture)
+
+The hero GPU object is now based directly on the actual
+`/icons/vyon-mark.svg` path. `sonic-scene.js` parses the three official
+contours, triangulates the filled outlines, extrudes them into a shallow 3D
+solid with front/back bevels, and shades the resulting GPU triangle mesh with
+the selected theme color, chrome lighting, and pointer tilt. The object stays
+mostly front-facing so the Vyon identity remains readable.
+
+This fixes the previous raymarching shader's torus geometry and rendering
+instability without adding Three.js, React, external runtime imports, or a
+second 3D engine. The renderer continues to pause outside the viewport,
+caps its GPU resolution, and respects reduced motion and data saver.
+
+**Fallback always shows the actual Vyon SVG mark** from the same source,
+including on devices that lack WebGL2 or lose their GPU context. Tests now
+check the real icon source, and the browser suite verifies that supported
+WebGL2 environments successfully construct and draw the SVG geometry.
+
+If the mark is changed, keep its SVG path valid; don't replace the existing
+silhouette with manually approximated curves.
+
+
+## Liquid Glass is now permanent
+
+The website no longer has a Glass on/off toggle. The homepage starts with
+`data-glass="on"`, and JavaScript maintains that setting regardless of
+previous `vyon-liquid-glass` entries in local storage. The visual treatment
+is part of the design system across the floating header, menus, control
+surfaces, and cards. Reduced-transparency settings keep solid readable
+backgrounds, and mobile avoids stacking expensive card blurs.
