@@ -8,6 +8,26 @@
     {
       "source": "/",
       "destination": "/index.html"
+    },
+    {
+      "source": "/download",
+      "destination": "/download.html"
+    },
+    {
+      "source": "/features",
+      "destination": "/features.html"
+    },
+    {
+      "source": "/android",
+      "destination": "/android.html"
+    },
+    {
+      "source": "/desktop",
+      "destination": "/desktop.html"
+    },
+    {
+      "source": "/faq",
+      "destination": "/faq.html"
     }
   ],
   "headers": [

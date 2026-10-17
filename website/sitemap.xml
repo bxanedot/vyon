@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://vyon.live/</loc></url>
+  <url><loc>https://vyon.live/download</loc></url>
+  <url><loc>https://vyon.live/features</loc></url>
+  <url><loc>https://vyon.live/android</loc></url>
+  <url><loc>https://vyon.live/desktop</loc></url>
+  <url><loc>https://vyon.live/faq</loc></url>
 </urlset>
