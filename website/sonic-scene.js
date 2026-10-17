@@ -24,14 +24,14 @@
     host.dataset.renderer = "fallback";
     return;
   }
-  const vertex = \`#version 300 es
+  const vertex = `#version 300 es
     precision highp float;
     void main() {
       vec2 p = vec2((gl_VertexID << 1) & 2, gl_VertexID & 2);
       gl_Position = vec4(p * 2.0 - 1.0, 0.0, 1.0);
     }
-  \`;
-  const fragment = \`#version 300 es
+  `;
+  const fragment = `#version 300 es
     precision highp float;
     out vec4 fragColor;
     uniform vec2 uResolution;
@@ -118,7 +118,7 @@
       float alpha=1.;
       fragColor=vec4(clamp(col,0.,1.)*alpha,alpha);
     }
-  \`;
+  `;
   function makeShader(type, source){
     const shader = gl.createShader(type);
     gl.shaderSource(shader, source);
